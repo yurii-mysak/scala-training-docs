@@ -1,57 +1,120 @@
 # Scala Training — Master Index
 
-## Core Scala language & tooling
-1. [Pattern Matching](PatternMatching.md)
-2. [Traits vs Classes](TraitsClasses.md)
-3. [Collections](Collections.md)
-4. [Option](Option.md)
-5. [Type Hierarchy](TypeHierarchy.md)
-6. [Advanced Functions](AdvancedFunctions.md)
-7. [Objects & Companions](ObjectsCompanions.md)
-8. [For Comprehensions](ForComprehensions.md)
-9. [Generic Classes](GenericClasses.md)
-10. [Implicits & Type Classes](ImplicitsTypeClasses.md)
-11. [Macros & Metaprogramming](MacrosMeta.md)
-
-## Effect systems, concurrency & build
-12. [Side-Effects & IO Monad](SideEffects_IO.md)
-13. [Cats Effect Concurrency](CatsEffectConcurrency.md)
-14. [Advanced SBT](SBT_Advanced.md)
-
-## Akka & distributed actor model
-15. [Akka Actors Core](AkkaActorsCore.md)
-16. [Akka Advanced](AkkaAdvanced.md)
-
-## Generic programming & advanced libs
-17. [Shapeless HLists](Shapeless_HLists.md)
+## Core Scala language, frameworks, libraries & tooling
+1. [Pattern Matching](scala_akka_cats/PatternMatching.md)
+2. [Traits vs Classes](scala_akka_cats/TraitsClasses.md)
+3. [Collections](scala_akka_cats/Collections.md)
+4. [Option](scala_akka_cats/Option.md)
+5. [Type Hierarchy](scala_akka_cats/TypeHierarchy.md)
+6. [Advanced Functions](scala_akka_cats/AdvancedFunctions.md)
+7. [Objects & Companions](scala_akka_cats/ObjectsCompanions.md)
+8. [For Comprehensions](scala_akka_cats/ForComprehensions.md)
+9. [Generic Classes](scala_akka_cats/GenericClasses.md)
+10. [Implicits & Type Classes](scala_akka_cats/ImplicitsTypeClasses.md)
+11. [Macros & Metaprogramming](scala_akka_cats/MacrosMeta.md)
+12. [Side-Effects & IO Monad](scala_akka_cats/SideEffects_IO.md)
+13. [Cats Effect Concurrency](scala_akka_cats/CatsEffectConcurrency.md)
+14. [Kafka Scala Guide](scala_akka_cats/Kafka_Scala.md)
+15. [Stream Processing](scala_akka_cats/Stream_Processing.md)
+16. [Advanced SBT](scala_akka_cats/SBT_Advanced.md)
+17. [Akka Actors Core](scala_akka_cats/AkkaActorsCore.md)
+18. [Akka Advanced](scala_akka_cats/AkkaAdvanced.md)
+19. [Shapeless HLists](scala_akka_cats/Shapeless_HLists.md)
 
 ## Data stores & transactions
-18. [RDBMS vs NoSQL](RDBMS_vs_NoSQL.md)
-19. [Key-Value Stores](KeyValue_Stores.md)
-20. [Wide-Column vs Document](WideColumn_vs_Document.md)
-21. [Cassandra LSM & Read/Write Path](Cassandra_LSM.md)
-22. [MongoDB Concepts](MongoDB_Concepts.md)
-23. [SQL Transactions & Locks](SQL_Transactions.md)
-24. [Indexing & Query Optimisation](Indexing_Optim.md)
-
-## Messaging, streaming & CAP
-25. [Kafka Scala Guide](Kafka_Scala.md)
-26. [Stream Processing](Stream_Processing.md)
-27. [CAP & Consistency](CAP_Consistency.md)
-28. [Partitioning & Rebalancing](Partitioning_Rebalancing.md)
-29. [Distributed Transactions](Distributed_Transactions.md)
-
-## Search & analytics
-30. [Elasticsearch Basics](Elasticsearch_Basics.md)
+20. [RDBMS vs NoSQL](data_store/RDBMS_vs_NoSQL.md)
+21. [Key-Value Stores](data_store/KeyValue_Stores.md)
+22. [Wide-Column vs Document](data_store/WideColumn_vs_Document.md)
+23. [Cassandra LSM & Read/Write Path](data_store/Cassandra_LSM.md)
+24. [MongoDB Concepts](data_store/MongoDB_Concepts.md)
+25. [SQL Transactions & Locks](data_store/SQL_Transactions.md)
+26. [Indexing & Query Optimisation](data_store/Indexing_Optim.md)
+27. [CAP_Consistency.md](data_store/CAP_Consistency.md)
+28. [Cassandra_LSM.md](data_store/Cassandra_LSM.md)
+29. [Distributed_Transactions.md](data_store/Distributed_Transactions.md)
+30. [Indexing_Optim.md](data_store/Indexing_Optim.md)
+31. [KeyValue_Stores.md](data_store/KeyValue_Stores.md)
+32. [MongoDB_Concepts.md](data_store/MongoDB_Concepts.md)
+33. [Partitioning_Rebalancing.md](data_store/Partitioning_Rebalancing.md)
+34. [RDBMS_vs_NoSQL.md](data_store/RDBMS_vs_NoSQL.md)
+35. [SQL_Transactions.md](data_store/SQL_Transactions.md)
+36. [WideColumn_vs_Document.md](data_store/WideColumn_vs_Document.md)
+37. [Elasticsearch Basics](data_store/Elasticsearch_Basics.md)
+38. [Event Sourcing Guide](data_store/Event-Sourcing-Guide.md)
 
 ## Functional-programming bundle
-31. [Functional-Programming Foundations](Functional-Programming-Foundations.md)  
-32. [Functional Data Structures](Functional-Data-Structures.md)  
-33. [Type-Classes & Category-Theory](Type-Classes-and-CT.md)  
-34. [Functional Design Patterns](Functional-Design-Patterns.md)  
-35. [Purely Functional State](Purely-Functional-State.md)  
-36. [Purely Functional Concurrency](Purely-Functional-Concurrency.md)  
-37. [Advanced Type-System Features](Advanced-TypeSystem.md)
+39. [Functional-Programming Foundations](functional_programming/Functional-Programming-Foundations.md)  
+40. [Functional Data Structures](functional_programming/Functional-Data-Structures.md)  
+41. [Type-Classes & Category-Theory](scala_akka_cats/Type-Classes-and-CT.md)  
+42. [Functional Design Patterns](functional_programming/Functional-Design-Patterns.md)  
+43. [Purely Functional State](scala_akka_cats/Purely-Functional-State.md)  
+44. [Purely Functional Concurrency](scala_akka_cats/Purely-Functional-Concurrency.md)  
+45. [Advanced Type-System Features](scala_akka_cats/Advanced-TypeSystem.md)
 
-## Event sourcing & CQRS
-38. [Event Sourcing Guide](Event-Sourcing-Guide.md)
+## Networking
+46. [Networking & IP Addressing](networking/Networking-IP-Addressing.md)
+47. [Networking Tools](networking/Networking-Network-Tools.md)
+48. [Networking-IPV4-vs-IPV6.md](networking/Networking-IPV4-vs-IPV6.md)
+49. [Networking-NAT-DMZ-VPN.md](networking/Networking-NAT-DMZ-VPN.md)
+50. [Networking-Routing-Reverse-Proxy.md](networking/Networking-Routing-Reverse-Proxy.md)
+51. [Networking-HTTPS-TLS.md](networking/Networking-HTTPS-TLS.md)
+52. [Networking-DNS-DHCP.md](networking/Networking-DNS-DHCP.md)
+53. [Networking-Network-Models.md](networking/Networking-Network-Models.md)
+
+## Messaging & streaming
+54. [Messaging-akka_streams_advanced.md](messaging/Messaging-akka_streams_advanced.md)
+55. [Messaging-akka_streams_basics.md](messaging/Messaging-akka_streams_basics.md)
+56. [Messaging-akka_streams_network.md](messaging/Messaging-akka_streams_network.md)
+57. [Messaging-cloud_messaging_services.md](messaging/Messaging-cloud_messaging_services.md)
+58. [Messaging-delivery_qos_dlq_ha.md](messaging/Messaging-delivery_qos_dlq_ha.md)
+59. [Messaging-fs2_reactive_streams.md](messaging/Messaging-fs2_reactive_streams.md)
+60. [Messaging-fs2_streams_advanced.md](messaging/Messaging-fs2_streams_advanced.md)
+61. [Messaging-fs2_streams_basics.md](messaging/Messaging-fs2_streams_basics.md)
+62. [Messaging-Fundamentals.md](messaging/Messaging-Fundamentals.md)
+63. [Messaging-kafka_advanced.md](messaging/Messaging-kafka_advanced.md)
+64. [Messaging-kafka_fundamentals.md](messaging/Messaging-kafka_fundamentals.md)
+65. [Messaging-point_to_point_pubsub.md](messaging/Messaging-point_to_point_pubsub.md)
+66. [Messaging-rabbitmq_amqp_essentials.md](messaging/Messaging-rabbitmq_amqp_essentials.md)
+
+## Security & cryptography
+67. [Security-authentication.md](security/Security-authentication.md)
+68. [Security-cryptography.md](security/Security-cryptography.md)
+69. [Security-pentesting.md](security/Security-pentesting.md)
+70. [Security-threats.md](security/Security-threats.md)
+71. [Security-transport_protocol.md](security/Security-transport_protocol.md)
+
+## JVM
+72. [JVM-AOT_vs_JIT.md](jvm/JVM-AOT_vs_JIT.md)
+73. [JVM-Classloaders.md](jvm/JVM-Classloaders.md)
+74. [JVM-Garbage_Collection.md](jvm/JVM-Garbage_Collection.md)
+75. [JVM-GC_Profiling_and_Tuning.md](jvm/JVM-GC_Profiling_and_Tuning.md)
+76. [JVM-JVM_and_Tooling.md](jvm/JVM-JVM_and_Tooling.md)
+77. [JVM-Memory_Stack_Heap.md](jvm/JVM-Memory_Stack_Heap.md)
+
+## Datastore
+
+## Algorithms & data structures
+78. [Advanced_DP_Hash_Collision.md](algorithms_data_structures/Advanced_DP_Hash_Collision.md)
+79. [Algorithmic_Complexity.md](algorithms_data_structures/Algorithmic_Complexity.md)
+80. [Architecture-Dev-Process.md](algorithms_data_structures/Architecture-Dev-Process.md)
+81. [Base_Data_Structures.md](algorithms_data_structures/Base_Data_Structures.md)
+82. [Dijkstras_Algorithm.md](algorithms_data_structures/Dijkstras_Algorithm.md)
+83. [Recursion_Dynamic_Programming.md](algorithms_data_structures/Recursion_Dynamic_Programming.md)
+84. [Sorting_Searching.md](algorithms_data_structures/Sorting_Searching.md)
+85. [String_Searching_Algorithms.md](algorithms_data_structures/String_Searching_Algorithms.md)
+86. [Traversal_Graph_Search.md](algorithms_data_structures/Traversal_Graph_Search.md)
+87. [Trees_and_Graphs.md](algorithms_data_structures/Trees_and_Graphs.md)
+
+## Testing & quality
+88. [Testing-frameworks.md](testing/Testing-frameworks.md)
+89. [Testing-load_testing.md](testing/Testing-load_testing.md)
+90. [Testing-microbenchmarking.md](testing/Testing-microbenchmarking.md)
+91. [Testing-mock_frameworks.md](testing/Testing-mock_frameworks.md)
+92. [Testing-mocks_stubs.md](testing/Testing-mocks_stubs.md)
+93. [Testing-property_based.md](testing/Testing-property_based.md)
+94. [Testing-tdd_bdd.md](testing/Testing-tdd_bdd.md)
+95. [Testing-types_levels.md](testing/Testing-types_levels.md)
+96. [Testing-unit_testing.md](testing/Testing-unit_testing.md)
+
+## Live coding & exercises
+97. [index.md](livecoding/index.md)

@@ -16,6 +16,15 @@ Trees are hierarchical structures of nodes connected by edges:
 - **Balanced Trees:** Height-balanced for O(log n) operations:
   - **AVL Tree:** Strict balance factor ≤ 1.
   - **Red-Black Tree:** Color-based balancing; used in Java’s TreeMap/TreeSet.
+    -  example of balanced search tree (sorted, balanced, optimized for same performance)
+    - ```
+      [10B]
+      /   \
+      [5R]   [20R]
+      /  \     \
+      [3B] [7B]  [30B]
+      ```
+
 - **B-Tree / B+ Tree:** Multi-way trees for disk-based storage (e.g., databases).
 
 ```scala

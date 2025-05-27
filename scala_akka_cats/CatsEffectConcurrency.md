@@ -80,8 +80,35 @@ Guarantees release even on error or cancellation.
 ---
 
 ## 6. Interview checklist
-* Differences between `Ref` and `AtomicReference`.  
-* When to pick `Deferred` vs `Semaphore`.  
+* Differences between `Ref` and `AtomicReference`.
+  * AtomicReference is a low-level, eager, side-effecting tool for lock-free mutable references in the JVM. 
+  * Ref[F, T] wraps that same power in a pure, lazy, composable effect, fitting neatly into functional-effect programs (and forming the foundation for higher-level, safe concurrency primitives).
+* When to pick `Deferred` vs `Semaphore`. 
+  * | Feature           | Deferred                                                                     | Semaphore                                                                                      |
+    | ----------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+    | Core concept      | A one-shot, write-once “promise” or “latch”                                  | A mutable counter of permits for controlling concurrency                                       |
+    | State transitions | Starts empty; can be completed **exactly once**, then never changes          | Starts with N permits; can be **acquired** (decrement) and **released** (increment) repeatedly |
+    | Waiting behavior  | Any number of fibers can **wait** on it; they all resume once it’s completed | Fibers wait only if no permits are available; otherwise acquire immediately                    |
+    | Data carried      | Holds a single value of type `A`                                             | Carries no payload; it only tracks permit counts                                               |
+  * Use Deferred when you need a one-time signal or to publish a single result to many consumers:
+    * Initialization barrier 
+      * One fiber performs setup (e.g. loading config), then completes the Deferred. Other fibers .get on it and suspend until setup is done.
+  
+    * Promise/future
+      * You want to hand out a “promise” to consumers and have exactly one producer fill it.
+  
+    * Single event coordination
+      * E.g. signal shutdown, trigger a cleanup, or broadcast that a resource is ready.
+  * Use Semaphore when you need to limit or gate the number of concurrent operations:
+    * Connection pools
+      * Limit to N simultaneous database connections or HTTP clients.
+
+    * Backpressure
+      * Ensure only M fibers can enter a critical section (e.g. writing to a file).
+
+    * Rate limiting
+      * Combined with a refill strategy, you can build simple rate limiters.
+  
 * How `start` returns a **`Fiber`** handle.  
 * `Resource` is just `Kleisli` under the hood.
 

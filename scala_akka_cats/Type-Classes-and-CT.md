@@ -100,6 +100,42 @@ Before Scala 3, `shapeless.Generic` + Magnolia macros derived instances generic
 
 Understanding category‑theory vocabulary helps reason about generic libraries: Functor (map), Applicative (product + map), Monad (Kleisli composition).
 
+### Kleisli
+Kleisli wraps an effectful function A => F[B].
+
+Provides .andThen, .compose, and monadic chaining (flatMap) to build complex pipelines.
+
+It’s ubiquitous in libraries like Cats and is the foundation for things like ReaderT and various monad transformer stacks.
+
+#### Why Use Kleisli?
+Composing effectful functions in a type-safe way, allowing for modular and reusable pipelines.
+
+Modularity: Build small effectful steps and then wire them together.
+
+Reusability: Compose the same pieces in different pipelines.
+
+Abstraction: Work generically over any F[_] that has a Monad[F] (or FlatMap[F]).
+
+```scala 3
+case class User(id: Int, name: String)
+case class Address(street: String)
+
+val findUser: Kleisli[Option, Int, User] =
+  Kleisli(id => if (id > 0) Some(User(id, s"User-$id")) else None)
+
+val userAddress: Kleisli[Option, User, Address] =
+  Kleisli(user => if (user.id % 2 == 0) Some(Address("Even St")) else None)
+
+// Compose them into one pipeline:
+val findAddress: Kleisli[Option, Int, Address] =
+  findUser andThen userAddress
+
+// Use it:
+findAddress.run(2)  // Some(Address("Even St"))
+findAddress.run(1)  // None  (either user not found or address lookup failed)
+
+```
+
 ---
 
 ## 8 · Putting It Together — Example: JSON Encoding

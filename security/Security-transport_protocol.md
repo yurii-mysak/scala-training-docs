@@ -16,7 +16,41 @@ This area covers securing data **in transit**: SSL/TLS fundamentals, preventing 
   5. **Finished**: both parties send encrypted messages to confirm handshake integrity.
 
 **Analogy**:  
-- Exchanging locked boxes with secret combination locks that change per session.
+- Think of TLS/SSL like exchanging locked boxes with secret combination locks:
+
+1. **Initial Contact (ClientHello/ServerHello)**
+The client sends a random nonce (ClientRandom) and a list of supported cipher-suites (e.g. TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256).
+The server picks one cipher-suite, sends its own random nonce (ServerRandom), and its certificate (containing its long-term public key).
+  - Alice wants to send Bob a secret message
+  - She sends Bob an empty box with several different types of locks she can use
+  - Bob picks one lock type they both have and sends back his own empty box
+
+2. **Certificate Exchange**
+This also contains public key
+  - Bob shows Alice his ID card (certificate) certified by a trusted authority
+  - Alice verifies Bob's ID is genuine through the authority's signature
+
+3. **Key Exchange**
+Alice and Bob now derive a shared secret combination:
+  - Alice generates a new secret combination for a lock
+  - She locks a box containing this combination using Bob's public lock
+  - Only Bob can unlock it with his private key
+  - Now both have the same secret combination
+
+4. **Secure Communication**
+For current session, they use the shared secret combination to encrypt messages:
+  - Alice and Bob can now use matching locks with their shared combination
+  - Each message goes in a new box with the same combination
+  - Even if someone intercepts the boxes, they can't open them
+  - The combination is unique to this conversation and discarded afterwards
+
+This is why MITM attacks fail: an interceptor can't pretend to be Bob without his ID and private key, and can't discover the secret combination protected by Bob's lock.
+
+This is symmetric encryption: both parties use the same secret combination to lock and unlock messages.
+
+Symmetric - large data volumes, fast encryption/decryption
+Asymmetric - small data volumes, secure key exchange, slower
+TLS uses both: asymmetric for handshake, symmetric for data transfer.
 
 *Learn more*: https://blog.barracuda.com/2015/07/09/ssl-and-tls-explained/
 

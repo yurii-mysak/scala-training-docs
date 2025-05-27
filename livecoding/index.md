@@ -34,3 +34,4 @@
 32. [task18_serialize_and_deserialize_binary_tree.md](task18_serialize_and_deserialize_binary_tree.md)
 33. [task19_trapping_rain_water.md](task19_trapping_rain_water.md)
 34. [task20_sliding_window_maximum.md](task20_sliding_window_maximum.md)
+35. [task21_bfs_dfs.md](task21_bfs_dfs.md)

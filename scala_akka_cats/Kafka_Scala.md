@@ -44,7 +44,8 @@ ProducerSettings[F]
   * **auto** – simple, at‑least‑once.  
   * **manual commitAsync** – custom control.  
   * **exactly‑once** – use **Kafka Streams** or Transactions API.
-
+  * Commits are like 'ack' in other systems.
+  * Unlike ack, we do not remove message from queue (all are stored according to retention policy - we just set offset, so we know when we should proceed from after restart, etc.).
 ---
 
 ## 4 · Rebalance listeners

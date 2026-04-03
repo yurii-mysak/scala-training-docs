@@ -1,154 +1,141 @@
-# Scala Training — Master Index
+# Scala & Backend Engineering — Training & Interview Guide
 
-## Core Scala language, frameworks, libraries & tooling
-1. [Collections](scala_akka_cats/Collections.md)
-2. [Option](scala_akka_cats/Option.md)
-3. [Pattern Matching](scala_akka_cats/PatternMatching.md)
-4. [Objects & Companions](scala_akka_cats/ObjectsCompanions.md)
-5. [Traits vs Classes](scala_akka_cats/TraitsClasses.md)
-6. [For Comprehensions](scala_akka_cats/ForComprehensions.md)
-7. [Generic Classes](scala_akka_cats/GenericClasses.md)
-8. [Type Hierarchy](scala_akka_cats/TypeHierarchy.md)
-9. [Advanced Functions](scala_akka_cats/AdvancedFunctions.md)
-10. [scala_value_types_boxing.md](scala_akka_cats/scala_value_types_boxing.md)
-11. [Advanced SBT](scala_akka_cats/SBT_Advanced.md)
-12. [Implicits & Type Classes](scala_akka_cats/ImplicitsTypeClasses.md)
-13. [currying-typeclass-summary.md](scala_akka_cats/currying-typeclass-summary.md)
-14. [typeclass_hierarchy.md](scala_akka_cats/typeclass_hierarchy.md)
-15. [scala_akka_futures.md](scala_akka_cats/scala_akka_futures.md)
-16. [Akka Actors Core](scala_akka_cats/AkkaActorsCore.md)
-17. [akka-ask-pipe-summary.md](scala_akka_cats/akka-ask-pipe-summary.md)
-18. [Akka Advanced](scala_akka_cats/AkkaAdvanced.md)
-19. [Akka_Cluster.md](scala_akka_cats/Akka_Cluster.md)
-20. [Akka_Cluster_UltraDeepDive.md](scala_akka_cats/Akka_Cluster_UltraDeepDive.md)
-21. [Stream Processing](scala_akka_cats/Stream_Processing.md)
-22. [akka_streaming_and_backpressure_detailed_guide.md](scala_akka_cats/akka_streaming_and_backpressure_detailed_guide.md)
-23. [Side-Effects & IO Monad](scala_akka_cats/SideEffects_IO.md)
-24. [Cats Effect Concurrency](scala_akka_cats/CatsEffectConcurrency.md)
-25. [cats_effects_memoize.md](scala_akka_cats/cats_effects_memoize.md)
-26. [Kafka Scala Guide](scala_akka_cats/Kafka_Scala.md)
-27. [reactive_readside.md](scala_akka_cats/reactive_readside.md)
-28. [Shapeless HLists](scala_akka_cats/Shapeless_HLists.md)
-29. [Macros & Metaprogramming](scala_akka_cats/MacrosMeta.md)
+A comprehensive knowledge base organized by theme and difficulty level.
+Each section contains study materials and interview question banks for conducting and preparing for technical interviews.
 
-## Data stores & transactions
-30. [Key-Value Stores](data_store/KeyValue_Stores.md)
-31. [RDBMS vs NoSQL](data_store/RDBMS_vs_NoSQL.md)
-32. [Wide-Column vs Document](data_store/WideColumn_vs_Document.md)
-33. [Databases Data Modeling](data_store/Databases-Data-Modeling.md)
-34. [SQL Transactions & Locks](data_store/SQL_Transactions.md)
-35. [Elasticsearch Basics](data_store/Elasticsearch_Basics.md)
-36. [MongoDB Concepts](data_store/MongoDB_Concepts.md)
-37. [Indexing & Query Optimisation](data_store/Indexing_Optim.md)
-38. [db_query_optimization_approaches.md](data_store/db_query_optimization_approaches.md)
-39. [cassandra_partition_clustering.md](data_store/cassandra_partition_clustering.md)
-40. [Cassandra LSM & Read/Write Path](data_store/Cassandra_LSM.md)
-41. [Cassandra Doobie Indexing Guide](data_store/Cassandra_Doobie_Indexing_Guide.md)
-42. [dynamodb_refresher.md](data_store/dynamodb_refresher.md)
-43. [partition_strategies.md](data_store/partition_strategies.md)
-44. [Partitioning & Rebalancing](data_store/Partitioning_Rebalancing.md)
-45. [btree_lsm_comparison.md](data_store/btree_lsm_comparison.md)
-46. [Data Storage Persistence Strategies](data_store/Data_Storage_Persistence_Strategies.md)
-47. [Event Sourcing Guide](data_store/Event-Sourcing-Guide.md)
-48. [CAP_Consistency.md](data_store/CAP_Consistency.md)
-49. [linearizability_vs_serializability.md](data_store/linearizability_vs_serializability.md)
-50. [Distributed Transactions](data_store/Distributed_Transactions.md)
+**Levels**: B = Beginner | I = Intermediate | A = Advanced
 
-## Functional-programming bundle
-51. [Functional-Programming Foundations](functional_programming/Functional-Programming-Foundations.md)
-52. [Functional Data Structures](functional_programming/Functional-Data-Structures.md)
-53. [Functional Design Patterns](functional_programming/Functional-Design-Patterns.md)
-54. [Advanced Type-System Features](scala_akka_cats/Advanced-TypeSystem.md)
-55. [Purely Functional State](scala_akka_cats/Purely-Functional-State.md)
-56. [Purely Functional Concurrency](scala_akka_cats/Purely-Functional-Concurrency.md)
-57. [Type-Classes & Category-Theory](scala_akka_cats/Type-Classes-and-CT.md)
+---
 
-## Infrastructure & design 
-58. [terraform_aws_overview.md](infra_and_design/terraform_aws_overview.md)
-59. [grpc_protobuf_schema_design.md](infra_and_design/grpc_protobuf_schema_design.md)
-60. [event_sourcing_cqrs_sagas_guide.md](infra_and_design/event_sourcing_cqrs_sagas_guide.md)
-61. [payments_interview_prep_expanded.md](infra_and_design/payments_interview_prep_expanded.md)
+## Core Language & Programming
 
-## Networking
-62. [Networking-Network-Models](networking/Networking-Network-Models.md)
-63. [Networking & IP Addressing](networking/Networking-IP-Addressing.md)
-64. [Networking Tools](networking/Networking-Network-Tools.md)
-65. [Networking-DNS-DHCP](networking/Networking-DNS-DHCP.md)
-66. [Networking-IPV4-vs-IPV6](networking/Networking-IPV4-vs-IPV6.md)
-67. [Networking-NAT-DMZ-VPN](networking/Networking-NAT-DMZ-VPN.md)
-68. [Networking-Routing-Reverse-Proxy](networking/Networking-Routing-Reverse-Proxy.md)
-69. [Networking-HTTPS-TLS](networking/Networking-HTTPS-TLS.md)
+### [01 — Scala Language](01-scala-language/)
+| Level | Topics |
+|-------|--------|
+| B | [Collections](01-scala-language/Collections.md), [Option](01-scala-language/Option.md), [Pattern Matching](01-scala-language/PatternMatching.md), [Objects & Companions](01-scala-language/ObjectsCompanions.md), [Traits vs Classes](01-scala-language/TraitsClasses.md), [For-Comprehensions](01-scala-language/ForComprehensions.md), [Generics](01-scala-language/GenericClasses.md), [Type Hierarchy](01-scala-language/TypeHierarchy.md), [Value Types & Boxing](01-scala-language/scala_value_types_boxing.md) |
+| I | [Advanced Functions](01-scala-language/AdvancedFunctions.md), [Implicits & Type Classes](01-scala-language/ImplicitsTypeClasses.md), [Currying & Type Classes](01-scala-language/currying-typeclass-summary.md), [SBT Advanced](01-scala-language/SBT_Advanced.md) |
+| A | [Advanced Type System](01-scala-language/Advanced-TypeSystem.md), [Type Class Hierarchy](01-scala-language/typeclass_hierarchy.md), [Type Classes & Category Theory](01-scala-language/Type-Classes-and-CT.md), [Shapeless & HLists](01-scala-language/Shapeless_HLists.md), [Macros & Metaprogramming](01-scala-language/MacrosMeta.md) |
 
-## Messaging & streaming
-70. [Messaging-Fundamentals](messaging/Messaging-Fundamentals.md)
-71. [Messaging-point_to_point_pubsub](messaging/Messaging-point_to_point_pubsub.md)
-72. [Messaging-delivery_qos_dlq_ha](messaging/Messaging-delivery_qos_dlq_ha.md)
-73. [Messaging-cloud_messaging_services](messaging/Messaging-cloud_messaging_services.md)
-74. [Messaging-kafka_fundamentals](messaging/Messaging-kafka_fundamentals.md)
-75. [Messaging-kafka_advanced](messaging/Messaging-kafka_advanced.md)
-76. [Messaging-rabbitmq_amqp_essentials](messaging/Messaging-rabbitmq_amqp_essentials.md)
-77. [Messaging-akka_streams_basics](messaging/Messaging-akka_streams_basics.md)
-78. [Messaging-akka_streams_advanced](messaging/Messaging-akka_streams_advanced.md)
-79. [Messaging-akka_streams_network](messaging/Messaging-akka_streams_network.md)
-80. [Messaging-fs2_streams_basics](messaging/Messaging-fs2_streams_basics.md)
-81. [Messaging-fs2_streams_advanced](messaging/Messaging-fs2_streams_advanced.md)
-82. [Messaging-fs2_reactive_streams](messaging/Messaging-fs2_reactive_streams.md)
-83. [Messaging-AsyncBoundariesReactiveStreams](messaging/Messaging-AsyncBoundariesReactiveStreams.md)
-84. [Messaging-high_throughput_low_latency_systems_expanded](messaging/Messaging-high_throughput_low_latency_systems_expanded.md)
+### [02 — Functional Programming](02-functional-programming/)
+| Level | Topics |
+|-------|--------|
+| B | [FP Foundations](02-functional-programming/Functional-Programming-Foundations.md) |
+| I | [Functional Data Structures](02-functional-programming/Functional-Data-Structures.md), [Functional Design Patterns](02-functional-programming/Functional-Design-Patterns.md), [Side Effects & IO](02-functional-programming/SideEffects_IO.md), [Purely Functional State](02-functional-programming/Purely-Functional-State.md) |
+| A | [Purely Functional Concurrency](02-functional-programming/Purely-Functional-Concurrency.md) |
 
-## Security & cryptography
-85. [Security-authentication](security/Security-authentication.md)
-86. [Security-transport_protocol](security/Security-transport_protocol.md)
-87. [Security-cryptography](security/Security-cryptography.md)
-88. [Security-threats](security/Security-threats.md)
-89. [Security-pentesting](security/Security-pentesting.md)
+---
 
-## JVM
-90. [JVM-JVM_and_Tooling](jvm/JVM-JVM_and_Tooling.md)
-91. [JVM-Memory_Stack_Heap](jvm/JVM-Memory_Stack_Heap.md)
-92. [JVM-Classloaders](jvm/JVM-Classloaders.md)
-93. [JVM-Garbage_Collection](jvm/JVM-Garbage_Collection.md)
-94. [JVM-AOT_vs_JIT](jvm/JVM-AOT_vs_JIT.md)
-95. [JVM-PerformanceTuning](jvm/JVM-PerformanceTuning.md)
-96. [JVM-GC_Profiling_and_Tuning](jvm/JVM-GC_Profiling_and_Tuning.md)
-97. [scala_app_profiling.md](jvm/scala_app_profiling.md)
+## Frameworks & Runtime
 
-## Algorithms & data structures
-98. [Base_Data_Structures](algorithms_data_structures/Base_Data_Structures.md)
-99. [Algorithmic_Complexity](algorithms_data_structures/Algorithmic_Complexity.md)
-100. [Sorting_Searching](algorithms_data_structures/Sorting_Searching.md)
-101. [String_Searching_Algorithms](algorithms_data_structures/String_Searching_Algorithms.md)
-102. [hashset_hashmap.md](algorithms_data_structures/hashset_hashmap.md)
-103. [binary_heap_summary](algorithms_data_structures/binary_heap_summary.md)
-104. [Trees_and_Graphs](algorithms_data_structures/Trees_and_Graphs.md)
-105. [bfs_dfs_summary](algorithms_data_structures/bfs_dfs_summary.md)
-106. [Traversal_Graph_Search](algorithms_data_structures/Traversal_Graph_Search.md)
-107. [Dijkstras_Algorithm](algorithms_data_structures/Dijkstras_Algorithm.md)
-108. [Recursion_Dynamic_Programming](algorithms_data_structures/Recursion_Dynamic_Programming.md)
-109. [Advanced_DP_Hash_Collision](algorithms_data_structures/Advanced_DP_Hash_Collision.md)
-110. [Architecture-Dev-Process](algorithms_data_structures/Architecture-Dev-Process.md)
+### [03 — Akka Ecosystem](03-akka-ecosystem/)
+| Level | Topics |
+|-------|--------|
+| B | [Actors Core](03-akka-ecosystem/AkkaActorsCore.md), [Ask & Pipe](03-akka-ecosystem/akka-ask-pipe-summary.md) |
+| I | [Advanced Actors](03-akka-ecosystem/AkkaAdvanced.md), [Akka Cluster](03-akka-ecosystem/Akka_Cluster.md), [Stream Processing](03-akka-ecosystem/Stream_Processing.md), [Streaming & Backpressure](03-akka-ecosystem/akka_streaming_and_backpressure_detailed_guide.md) |
+| A | [Cluster Deep Dive](03-akka-ecosystem/Akka_Cluster_UltraDeepDive.md), [Reactive Read-Side](03-akka-ecosystem/reactive_readside.md), [Kafka + Scala](03-akka-ecosystem/Kafka_Scala.md) |
 
-## Testing & quality
-111. [Testing-types_levels](testing/Testing-types_levels.md)
-112. [Testing-unit_testing](testing/Testing-unit_testing.md)
-113. [Testing-frameworks](testing/Testing-frameworks.md)
-114. [Testing-mocks_stubs](testing/Testing-mocks_stubs.md)
-115. [Testing-mock_frameworks](testing/Testing-mock_frameworks.md)
-116. [Testing-tdd_bdd](testing/Testing-tdd_bdd.md)
-117. [Testing-property_based](testing/Testing-property_based.md)
-118. [Testing-load_testing](testing/Testing-load_testing.md)
-119. [Testing-microbenchmarking](testing/Testing-microbenchmarking.md)
+### [04 — Concurrency & Async](04-concurrency-and-async/)
+| Level | Topics |
+|-------|--------|
+| B | [Futures Basics](04-concurrency-and-async/scala_akka_futures.md) |
+| I | [Multiple Futures](04-concurrency-and-async/multiple_futures.md), [Cats Effect Concurrency](04-concurrency-and-async/CatsEffectConcurrency.md) |
+| A | [Cats Effect Memoize](04-concurrency-and-async/cats_effects_memoize.md) |
 
-## DataEngineering
-120. [Data_concepts](data_engineering/Data_concepts.md)
-121. [Data_concepts_2](data_engineering/Data_concepts_2.md)
-122. [delta_parquet_guide](data_engineering/delta_parquet_guide.md)
-123. [lakehouse_unified_platform_and_migration](data_engineering/lakehouse_unified_platform_and_migration.md)
+### [05 — JVM Internals](05-jvm-internals/)
+| Level | Topics |
+|-------|--------|
+| B | [JVM & Tooling](05-jvm-internals/JVM-JVM_and_Tooling.md), [Memory: Stack & Heap](05-jvm-internals/JVM-Memory_Stack_Heap.md) |
+| I | [Classloaders](05-jvm-internals/JVM-Classloaders.md), [Garbage Collection](05-jvm-internals/JVM-Garbage_Collection.md), [AOT vs JIT](05-jvm-internals/JVM-AOT_vs_JIT.md) |
+| A | [Performance Tuning](05-jvm-internals/JVM-PerformanceTuning.md), [GC Profiling & Tuning](05-jvm-internals/JVM-GC_Profiling_and_Tuning.md), [Scala App Profiling](05-jvm-internals/scala_app_profiling.md) |
 
-## AdTech
-124. [openrtb](ad_tech/openrtb.md)
-125. [AdTech_RTB_Fundamentals_Expanded](ad_tech/AdTech_RTB_Fundamentals_Expanded.md)
-126. [High-Scale-Bidding-Engine-Architecture-Expanded](ad_tech/High-Scale-Bidding-Engine-Architecture-Expanded.md)
+---
 
-## Live coding & exercises
-127. [index](livecoding/index.md)
+## Data & Storage
+
+### [06 — Databases & Distributed Data](06-databases-and-distributed-data/)
+| Level | Topics |
+|-------|--------|
+| B | [RDBMS vs NoSQL](06-databases-and-distributed-data/RDBMS_vs_NoSQL.md), [Key-Value Stores](06-databases-and-distributed-data/KeyValue_Stores.md), [Wide-Column vs Document](06-databases-and-distributed-data/WideColumn_vs_Document.md), [Data Modeling](06-databases-and-distributed-data/Databases-Data-Modeling.md) |
+| I | [SQL Transactions](06-databases-and-distributed-data/SQL_Transactions.md), [Indexing & Optimization](06-databases-and-distributed-data/Indexing_Optim.md), [Query Optimization](06-databases-and-distributed-data/db_query_optimization_approaches.md), [B-tree vs LSM](06-databases-and-distributed-data/btree_lsm_comparison.md), [Storage Persistence](06-databases-and-distributed-data/Data_Storage_Persistence_Strategies.md), [Elasticsearch](06-databases-and-distributed-data/Elasticsearch_Basics.md), [MongoDB](06-databases-and-distributed-data/MongoDB_Concepts.md) |
+| A | [CAP & Consistency](06-databases-and-distributed-data/CAP_Consistency.md), [Linearizability vs Serializability](06-databases-and-distributed-data/linearizability_vs_serializability.md), [Distributed Transactions](06-databases-and-distributed-data/Distributed_Transactions.md), [Partitioning & Rebalancing](06-databases-and-distributed-data/Partitioning_Rebalancing.md), [Partition Strategies](06-databases-and-distributed-data/partition_strategies.md), [Cassandra Partitioning](06-databases-and-distributed-data/cassandra_partition_clustering.md), [Cassandra LSM](06-databases-and-distributed-data/Cassandra_LSM.md), [Cassandra + Doobie](06-databases-and-distributed-data/Cassandra_Doobie_Indexing_Guide.md), [DynamoDB](06-databases-and-distributed-data/dynamodb_refresher.md), [Event Sourcing](06-databases-and-distributed-data/Event-Sourcing-Guide.md) |
+
+### [07 — Messaging & Streaming](07-messaging-and-streaming/)
+| Level | Topics |
+|-------|--------|
+| B | [Messaging Fundamentals](07-messaging-and-streaming/Messaging-Fundamentals.md), [Point-to-Point vs Pub/Sub](07-messaging-and-streaming/Messaging-point_to_point_pubsub.md) |
+| I | [Delivery, QoS, DLQ](07-messaging-and-streaming/Messaging-delivery_qos_dlq_ha.md), [Kafka Fundamentals](07-messaging-and-streaming/Messaging-kafka_fundamentals.md), [RabbitMQ & AMQP](07-messaging-and-streaming/Messaging-rabbitmq_amqp_essentials.md), [Akka Streams Basics](07-messaging-and-streaming/Messaging-akka_streams_basics.md), [FS2 Basics](07-messaging-and-streaming/Messaging-fs2_streams_basics.md) |
+| A | [Kafka Advanced](07-messaging-and-streaming/Messaging-kafka_advanced.md), [Akka Streams Advanced](07-messaging-and-streaming/Messaging-akka_streams_advanced.md), [Akka Streams Network](07-messaging-and-streaming/Messaging-akka_streams_network.md), [FS2 Advanced](07-messaging-and-streaming/Messaging-fs2_streams_advanced.md), [FS2 Reactive Streams](07-messaging-and-streaming/Messaging-fs2_reactive_streams.md), [Async Boundaries](07-messaging-and-streaming/Messaging-AsyncBoundariesReactiveStreams.md), [High-Throughput Systems](07-messaging-and-streaming/Messaging-high_throughput_low_latency_systems_expanded.md) |
+
+### [13 — Data Engineering](13-data-engineering/)
+| Level | Topics |
+|-------|--------|
+| B | [Data Concepts](13-data-engineering/Data_concepts.md) |
+| I | [Data Concepts (Extended)](13-data-engineering/Data_concepts_2.md), [Delta & Parquet](13-data-engineering/delta_parquet_guide.md) |
+| A | [Lakehouse Architecture](13-data-engineering/lakehouse_unified_platform_and_migration.md) |
+
+---
+
+## Algorithms & Practice
+
+### [08 — Algorithms & Data Structures](08-algorithms-and-data-structures/)
+| Level | Topics |
+|-------|--------|
+| B | [Base Data Structures](08-algorithms-and-data-structures/Base_Data_Structures.md), [Algorithmic Complexity](08-algorithms-and-data-structures/Algorithmic_Complexity.md), [HashSet & HashMap](08-algorithms-and-data-structures/hashset_hashmap.md), [Binary Heap](08-algorithms-and-data-structures/binary_heap_summary.md) |
+| I | [Sorting & Searching](08-algorithms-and-data-structures/Sorting_Searching.md), [Trees & Graphs](08-algorithms-and-data-structures/Trees_and_Graphs.md), [BFS & DFS](08-algorithms-and-data-structures/bfs_dfs_summary.md), [Graph Traversal](08-algorithms-and-data-structures/Traversal_Graph_Search.md), [Recursion & DP](08-algorithms-and-data-structures/Recursion_Dynamic_Programming.md), [String Searching](08-algorithms-and-data-structures/String_Searching_Algorithms.md) |
+| A | [Dijkstra's Algorithm](08-algorithms-and-data-structures/Dijkstras_Algorithm.md), [Advanced DP & Hash Collisions](08-algorithms-and-data-structures/Advanced_DP_Hash_Collision.md) |
+
+### [09 — Coding Challenges](09-coding-challenges/)
+40 LeetCode problems in Scala, organized by difficulty and pattern.
+| Level | Count | Examples |
+|-------|-------|---------|
+| Easy | 20 | Two Sum, Valid Parentheses, Reverse Linked List, Climbing Stairs |
+| Medium | 17 | Number of Islands, LRU Cache, Course Schedule, Generate Parentheses |
+| Hard | 3 | Trapping Rain Water, Sliding Window Maximum, Serialize Binary Tree |
+
+---
+
+## Infrastructure & Operations
+
+### [10 — Networking](10-networking/)
+| Level | Topics |
+|-------|--------|
+| B | [Network Models](10-networking/Networking-Network-Models.md), [IP Addressing](10-networking/Networking-IP-Addressing.md), [Network Tools](10-networking/Networking-Network-Tools.md) |
+| I | [DNS & DHCP](10-networking/Networking-DNS-DHCP.md), [IPv4 vs IPv6](10-networking/Networking-IPV4-vs-IPV6.md), [NAT, DMZ, VPN](10-networking/Networking-NAT-DMZ-VPN.md) |
+| A | [Routing & Reverse Proxy](10-networking/Networking-Routing-Reverse-Proxy.md), [HTTPS & TLS](10-networking/Networking-HTTPS-TLS.md) |
+
+### [11 — Security](11-security/)
+| Level | Topics |
+|-------|--------|
+| B | [Authentication](11-security/Security-authentication.md), [Common Threats](11-security/Security-threats.md) |
+| I | [Cryptography](11-security/Security-cryptography.md), [Transport Security](11-security/Security-transport_protocol.md) |
+| A | [Penetration Testing](11-security/Security-pentesting.md) |
+
+### [12 — Testing](12-testing/)
+| Level | Topics |
+|-------|--------|
+| B | [Test Types & Levels](12-testing/Testing-types_levels.md), [Unit Testing](12-testing/Testing-unit_testing.md), [TDD & BDD](12-testing/Testing-tdd_bdd.md) |
+| I | [Test Frameworks](12-testing/Testing-frameworks.md), [Mocks & Stubs](12-testing/Testing-mocks_stubs.md), [Mock Frameworks](12-testing/Testing-mock_frameworks.md) |
+| A | [Property-Based Testing](12-testing/Testing-property_based.md), [Load Testing](12-testing/Testing-load_testing.md), [Microbenchmarking](12-testing/Testing-microbenchmarking.md) |
+
+### [14 — Cloud & Infrastructure](14-cloud-and-infrastructure/)
+| Level | Topics |
+|-------|--------|
+| B | [Cloud Messaging Services](14-cloud-and-infrastructure/Messaging-cloud_messaging_services.md) |
+| I | [Terraform & AWS](14-cloud-and-infrastructure/terraform_aws_overview.md) |
+
+### [15 — System Design](15-system-design/)
+| Level | Topics |
+|-------|--------|
+| B | [Architecture & Dev Process](15-system-design/Architecture-Dev-Process.md) |
+| I | [gRPC & Protobuf](15-system-design/grpc_protobuf_schema_design.md), [Event Sourcing, CQRS & Sagas](15-system-design/event_sourcing_cqrs_sagas_guide.md) |
+| A | [Payment Systems Design](15-system-design/payments_interview_prep_expanded.md) |
+
+---
+
+## Domain-Specific
+
+### [16 — AdTech](16-adtech/)
+| Level | Topics |
+|-------|--------|
+| I | [OpenRTB Protocol](16-adtech/openrtb.md), [RTB Fundamentals](16-adtech/AdTech_RTB_Fundamentals_Expanded.md) |
+| A | [High-Scale Bidding Engine](16-adtech/High-Scale-Bidding-Engine-Architecture-Expanded.md) |

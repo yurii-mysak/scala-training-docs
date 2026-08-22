@@ -7,6 +7,42 @@ Each section contains study materials and interview question banks for conductin
 
 ---
 
+## Preparing for a specific interview? Start at [00 — Interview Program](00-interview-program/)
+
+Sections **17–23**, and the extensions to 09, 14 and 15, were written as a complete preparation
+programme for one named loop: **Staff Software Engineer at Lyft, Global Support & Partnerships**
+(Kyiv, remote in Ukraine). They are built from researched evidence about how that loop actually runs
+rather than from generic interview advice.
+
+| Start here | What it gives you |
+|---|---|
+| [00-interview-program/README.md](00-interview-program/README.md) | How the programme works and what the loop tests |
+| [00-interview-program/curriculum.md](00-interview-program/curriculum.md) | Every document tagged Required / Recommended / Optional with time estimates |
+| [00-interview-program/tracker.md](00-interview-program/tracker.md) | Three paths — 22 h, 44 h or 87 h — as a checklist |
+| [00-interview-program/interview-playbook.md](00-interview-program/interview-playbook.md) | How to run each round on the day |
+| [00-interview-program/evidence.md](00-interview-program/evidence.md) | The reported question bank, with sourcing marked |
+| [00-interview-program/hellointerview-map.md](00-interview-program/hellointerview-map.md) | What to use a HelloInterview subscription for, lesson by lesson |
+
+Sections 01–16 remain the general knowledge base and are re-tagged for this loop in
+[curriculum.md, part 2](00-interview-program/curriculum.md).
+
+---
+
+## New sections
+
+| Section | Contents |
+|---------|----------|
+| [00 — Interview Program](00-interview-program/) | The programme: curriculum, tracker, playbook, evidence, HelloInterview map |
+| [17 — Lyft Laptop Round](17-lyft-laptop-round/) | The seven recurring problem families, worked in Python with tests |
+| [18 — I/O Harness](18-io-harness/) | A runnable skeleton project for the 90-minute round. Clone it, do not write it under time pressure |
+| [19 — Observability & On-Call](19-observability-and-oncall/) | SLOs, alerting, on-call health, incident response, debugging distributed systems |
+| [20 — LLM & Agent Systems](20-llm-agent-systems/) | Agent architectures, LangGraph patterns, checkpointing, evaluation, LLMOps |
+| [21 — Python for Interviews](21-python-for-interviews/) | Python from a Lua/Scala background, stdlib, unittest, speed drills |
+| [22 — Behavioural & Staff Scope](22-behavioral-and-staff-scope/) | Story bank, CARL, Senior vs Staff framing, metrics for stories |
+| [23 — Web & Frontend](23-web-and-frontend/) | Conditional track, only if the role is confirmed as Server + Web |
+
+---
+
 ## Core Language & Programming
 
 ### [01 — Scala Language](01-scala-language/)

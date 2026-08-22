@@ -5,13 +5,13 @@
 > **Track:** Both
 > **HelloInterview:** none
 
-Auto-generated from the front-matter of every file in this repo. Regenerate with
-`python3 00-interview-program/build_curriculum.py`.
+Part 1 is generated from the front-matter of every file in this repo. Regenerate with
+`python3 00-interview-program/build_curriculum.py`. Part 2 is hand-maintained inside that script.
 
 **Priority means:** *Required* — you cannot pass this loop without it. *Recommended* — materially
 raises the odds. *Optional* — nice to have, or only relevant if the role turns out to include Web.
 
-**New material:** 85 documents. Required only ≈ 43h 59m. Everything ≈ 62h 19m.
+**New material:** 98 documents. Required only ≈ 47 h 37 m. Everything ≈ 68 h 52 m.
 Existing repo material adds roughly 24 h more if you work all of it; see part 2.
 
 ---
@@ -19,18 +19,19 @@ Existing repo material adds roughly 24 h more if you work all of it; see part 2.
 ## Part 1 — new material written for this loop
 
 ### 09 — Coding challenges (Lyft-evidence set)
-*5 documents · ≈3h 10m*
+*6 documents · ≈3 h 13 m*
 
 | ✓ | Priority | Time | Track | Document |
 |---|---|---|---|---|
 | [ ] | **Required** | 40 min | Both | [LC 158 — Read N Characters Given Read4 II (Call Multiple Times)](../09-coding-challenges/lyft/lc158-read-n-chars-given-read4-ii.md) |
 | [ ] | **Required** | 35 min | Both | [LC 716 — Max Stack](../09-coding-challenges/lyft/lc716-max-stack.md) |
 | [ ] | **Required** | 30 min | Both | [LC 735 — Asteroid Collision](../09-coding-challenges/lyft/lc735-asteroid-collision.md) |
+| [ ] | **Required** | 3 h across the programme | Server | [Sliding window — drill set around LC 76](../09-coding-challenges/lyft/lc76-family-drills.md) |
 | [ ] | **Required** | 45 min | Both | [LC 76 — Minimum Window Substring](../09-coding-challenges/lyft/lc76-minimum-window-substring.md) |
 | [ ] | **Required** | 40 min | Both | [LC 981 — Time Based Key-Value Store](../09-coding-challenges/lyft/lc981-time-based-key-value-store.md) |
 
 ### 14 — Cloud, containers & Kubernetes
-*7 documents · ≈4h 15m*
+*7 documents · ≈4 h 15 m*
 
 | ✓ | Priority | Time | Track | Document |
 |---|---|---|---|---|
@@ -43,7 +44,7 @@ Existing repo material adds roughly 24 h more if you work all of it; see part 2.
 | [ ] | **Recommended** | 30 min | Both | [Service Mesh & Envoy](../14-cloud-and-infrastructure/service-mesh-and-envoy.md) |
 
 ### 15 — System design
-*14 documents · ≈14h 0m*
+*14 documents · ≈14 h 0 m*
 
 | ✓ | Priority | Time | Track | Document |
 |---|---|---|---|---|
@@ -63,7 +64,7 @@ Existing repo material adds roughly 24 h more if you work all of it; see part 2.
 | [ ] | **Recommended** | 45 min | Server | [URL Shortener — full worked design](../15-system-design/url-shortener.md) |
 
 ### 17 — The Lyft laptop round
-*10 documents · ≈6h 35m*
+*10 documents · ≈6 h 35 m*
 
 | ✓ | Priority | Time | Track | Document |
 |---|---|---|---|---|
@@ -79,7 +80,7 @@ Existing repo material adds roughly 24 h more if you work all of it; see part 2.
 | [ ] | **Optional** | 10 min | Both | [Timed Drill Log](../17-lyft-laptop-round/09-timed-drill-log.md) |
 
 ### 18 — I/O harness (runnable project)
-*5 documents · ≈1h 5m*
+*5 documents · ≈1 h 5 m*
 
 | ✓ | Priority | Time | Track | Document |
 |---|---|---|---|---|
@@ -90,7 +91,7 @@ Existing repo material adds roughly 24 h more if you work all of it; see part 2.
 | [ ] | **Optional** | 20 min | Both | [C# Fallback Skeleton](../18-io-harness/CSHARP.md) |
 
 ### 19 — Observability & on-call
-*9 documents · ≈7h 55m*
+*9 documents · ≈7 h 55 m*
 
 | ✓ | Priority | Time | Track | Document |
 |---|---|---|---|---|
@@ -105,7 +106,7 @@ Existing repo material adds roughly 24 h more if you work all of it; see part 2.
 | [ ] | **Recommended** | 60 min | Server | [Instrumenting Python Services](../19-observability-and-oncall/instrumenting-python-services.md) |
 
 ### 20 — LLM & agent systems
-*10 documents · ≈8h 55m*
+*10 documents · ≈8 h 55 m*
 
 | ✓ | Priority | Time | Track | Document |
 |---|---|---|---|---|
@@ -121,21 +122,27 @@ Existing repo material adds roughly 24 h more if you work all of it; see part 2.
 | [ ] | **Recommended** | 40 min | Server | [RAG and Retrieval](../20-llm-agent-systems/rag-and-retrieval.md) |
 
 ### 21 — Python for interviews
-*8 documents · ≈5h 10m*
+*14 documents · ≈9 h 30 m*
 
 | ✓ | Priority | Time | Track | Document |
 |---|---|---|---|---|
 | [ ] | **Required** | 10 min | Both | [Python for Interviews](../21-python-for-interviews/README.md) |
+| [ ] | **Required** | 60 min | Both | [Async & Concurrency in Python](../21-python-for-interviews/async-and-concurrency.md) |
 | [ ] | **Required** | 45 min | Both | [Data Structures & Idioms](../21-python-for-interviews/data-structures-and-idioms.md) |
 | [ ] | **Required** | 45 min | Both | [From Lua & Scala to Python](../21-python-for-interviews/from-lua-and-scala-to-python.md) |
+| [ ] | **Required** | 40 min | Both | [Generators & Coroutines](../21-python-for-interviews/generators-and-coroutines.md) |
 | [ ] | **Required** | 40 min | Both | [I/O and Parsing](../21-python-for-interviews/io-and-parsing.md) |
 | [ ] | **Required** | 60 min | Both | [OOP & Design in Python](../21-python-for-interviews/oop-and-design-in-python.md) |
 | [ ] | **Required** | 10 min to read; ~5-6 h spread over 2-3 weeks to run the drills | Both | [Speed Drills — Python Muscle Memory](../21-python-for-interviews/speed-drills.md) |
 | [ ] | **Required** | 60 min | Both | [Standard Library for Interviews](../21-python-for-interviews/stdlib-for-interviews.md) |
 | [ ] | **Required** | 40 min | Both | [Testing with `unittest`](../21-python-for-interviews/testing-with-unittest.md) |
+| [ ] | **Recommended** | 35 min | Both | [Exceptions & Error Handling](../21-python-for-interviews/exceptions-and-errors.md) |
+| [ ] | **Recommended** | 35 min | Server | [Python performance notes — what is fast, what is not, and what an interviewer will ask](../21-python-for-interviews/performance-notes.md) |
+| [ ] | **Recommended** | 40 min | Both | [Scoping, Closures & MRO](../21-python-for-interviews/scoping-closures-and-mro.md) |
+| [ ] | **Optional** | 50 min | Server + Web | [Web Frameworks: Flask, FastAPI, Django](../21-python-for-interviews/web-frameworks.md) |
 
 ### 22 — Behavioural & Staff scope
-*10 documents · ≈6h 59m*
+*10 documents · ≈6 h 59 m*
 
 | ✓ | Priority | Time | Track | Document |
 |---|---|---|---|---|
@@ -151,7 +158,7 @@ Existing repo material adds roughly 24 h more if you work all of it; see part 2.
 | [ ] | **Recommended** | 30 min | Both | [Questions to Ask Them](../22-behavioral-and-staff-scope/questions-to-ask-them.md) |
 
 ### 23 — Web & frontend (conditional track)
-*7 documents · ≈4h 15m*
+*7 documents · ≈4 h 15 m*
 
 | ✓ | Priority | Time | Track | Document |
 |---|---|---|---|---|
@@ -173,14 +180,14 @@ across each section.
 
 | ✓ | Priority | Time | Section | Why |
 |---|---|---|---|---|
-| [ ] | **Required** | ~6 h | [06-databases-and-distributed-data](../06-databases-and-distributed-data/) | Your strongest existing asset. CAP, linearizability vs serializability, partitioning & rebalancing, distributed transactions, DynamoDB, Cassandra LSM, event sourcing. Feeds the design rounds directly — DynamoDB is what Lyft uses for agent state. |
-| [ ] | **Required** | ~5 h | [07-messaging-and-streaming](../07-messaging-and-streaming/) | Kafka fundamentals and advanced, delivery QoS/DLQ/HA, backpressure, high-throughput/low-latency systems. Directly reusable in every design round. |
-| [ ] | **Required** | ~4 h | [08-algorithms-and-data-structures](../08-algorithms-and-data-structures/) | Foundation for the CoderPad screen. Re-read Sorting/Searching, Trees & Graphs, Traversal, Recursion & DP, binary heap, hashset/hashmap. |
+| [ ] | **Required** | ~6 h | [06-databases-and-distributed-data](../06-databases-and-distributed-data/) | Your strongest existing asset. CAP, linearizability vs serializability, partitioning and rebalancing, distributed transactions, DynamoDB, Cassandra LSM, event sourcing. Feeds the design rounds directly — DynamoDB is what Lyft uses for agent state. |
+| [ ] | **Required** | ~5 h | [07-messaging-and-streaming](../07-messaging-and-streaming/) | Kafka fundamentals and advanced, delivery QoS/DLQ/HA, backpressure, high-throughput low-latency systems. Directly reusable in every design round. |
+| [ ] | **Required** | ~4 h | [08-algorithms-and-data-structures](../08-algorithms-and-data-structures/) | Foundation for the CoderPad screen. Re-read Sorting/Searching, Trees and Graphs, Traversal, Recursion and DP, binary heap, hashset/hashmap. |
 | [ ] | **Recommended** | ~2 h | [10-networking](../10-networking/) | HTTP/TLS, load balancing, reverse proxies. Feeds the Envoy and API-design parts of design rounds. |
-| [ ] | **Recommended** | ~1.5 h | [12-testing](../12-testing/) | Testing strategy is explicitly probed in Lyft's design round ('library preferences and testing strategies'). Skim for vocabulary. |
-| [ ] | **Recommended** | ~1.5 h | [11-security](../11-security/) | One Staff report included a cloud-security domain round. Worth a skim, not a deep dive, unless the recruiter names security. |
+| [ ] | **Recommended** | ~1.5 h | [12-testing](../12-testing/) | Testing strategy is explicitly probed in Lyft's design round. Skim for vocabulary. |
+| [ ] | **Recommended** | ~1.5 h | [11-security](../11-security/) | One Staff report included a cloud-security domain round. A skim, not a deep dive, unless the recruiter names security. |
 | [ ] | **Recommended** | ~3 h | [03-akka-ecosystem](../03-akka-ecosystem/) | Do not present as Akka knowledge. Re-read cluster, streams and backpressure as transferable distributed-systems concepts: actor-per-conversation maps onto agent session state, supervision onto escalation. |
-| [ ] | **Optional** | ~0 h | [05-jvm-internals](../05-jvm-internals/) | Deep and excellent, but Lyft runs Python and Go. Only relevant if an interviewer asks about your background. |
+| [ ] | **Optional** | ~0 h | [05-jvm-internals](../05-jvm-internals/) | Deep and excellent, but Lyft runs Python and Go. Relevant only if an interviewer asks about your background. |
 | [ ] | **Optional** | ~0 h | [13-data-engineering](../13-data-engineering/) | Lakehouse/Delta/Parquet. Relevant only to Lyft's data-platform org, which is not this team. |
 | [ ] | **Optional** | ~0 h | [01-scala-language](../01-scala-language/) | Skip for this loop. Retain for LotusFlare and for the fallback plan. |
 | [ ] | **Optional** | ~0 h | [02-functional-programming](../02-functional-programming/) | Skip for this loop. |

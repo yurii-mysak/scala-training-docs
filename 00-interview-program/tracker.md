@@ -15,8 +15,8 @@ choosing how much of it to do.
 | Path | Time | Covers | Choose it if |
 |---|---|---|---|
 | **A — Minimum viable** | ~22 h | The gatekeeping risks only | The loop starts in under two weeks |
-| **B — Default** | ~44 h | Everything marked Required | You have six weeks at 8–10 h/week |
-| **C — Full** | ~87 h | Required + Recommended + relevant legacy | You have ten weeks, or want the material regardless of outcome |
+| **B — Default** | ~48 h | Everything marked Required | You have six weeks at 8–10 h/week |
+| **C — Full** | ~93 h | Required + Recommended + relevant legacy | You have ten weeks, or want the material regardless of outcome |
 
 Nothing here assumes the Web track. If the role is confirmed as Server + Web, add ~7 h for
 [section 23](../23-web-and-frontend/).
@@ -32,6 +32,7 @@ early: the gatekeeping screen, the I/O trap, and a Senior-shaped behavioural.
 - [ ] **Email the recruiter** — example problems, which req, level, environment, Server vs Web — [questions-to-ask-them.md](../22-behavioral-and-staff-scope/questions-to-ask-them.md) · 30 min
 - [ ] **The I/O harness, until it is automatic** — [18-io-harness](../18-io-harness/) · 3 h
 - [ ] **Python speed drills** — [speed-drills.md](../21-python-for-interviews/speed-drills.md) · 3 h
+- [ ] **Generators and the iterator protocol** — [generators-and-coroutines.md](../21-python-for-interviews/generators-and-coroutines.md) · 40 min
 - [ ] **LC 76 Minimum Window Substring** until cold-solvable — [lc76](../09-coding-challenges/lyft/lc76-minimum-window-substring.md) · 1 h
 - [ ] **Three laptop families**: paginated fetch, versioned KV, in-memory KV with transactions — [17](../17-lyft-laptop-round/) · 5 h
 - [ ] **Laptop-round protocol** — [00-protocol.md](../17-lyft-laptop-round/00-protocol.md) · 30 min
@@ -44,7 +45,7 @@ early: the gatekeeping screen, the I/O trap, and a Senior-shaped behavioural.
 
 ---
 
-## Path B — the default six weeks (~44 h)
+## Path B — the default six weeks (~48 h)
 
 Everything marked **Required** in [curriculum.md](curriculum.md), sequenced.
 
@@ -60,6 +61,8 @@ Everything marked **Required** in [curriculum.md](curriculum.md), sequenced.
 - [ ] [stdlib-for-interviews.md](../21-python-for-interviews/stdlib-for-interviews.md)
 - [ ] [data-structures-and-idioms.md](../21-python-for-interviews/data-structures-and-idioms.md)
 - [ ] [io-and-parsing.md](../21-python-for-interviews/io-and-parsing.md)
+- [ ] [generators-and-coroutines.md](../21-python-for-interviews/generators-and-coroutines.md) — underlies two of the seven laptop families
+- [ ] [async-and-concurrency.md](../21-python-for-interviews/async-and-concurrency.md) — the JD asks for concurrency tradeoffs verbatim
 - [ ] [testing-with-unittest.md](../21-python-for-interviews/testing-with-unittest.md)
 - [ ] [speed-drills.md](../21-python-for-interviews/speed-drills.md) — start; continue all six weeks
 - [ ] [18-io-harness](../18-io-harness/) — clone, run, modify, until under three minutes from empty directory
@@ -119,7 +122,7 @@ Everything marked **Required** in [curriculum.md](curriculum.md), sequenced.
 
 ---
 
-## Path C — full (~87 h)
+## Path C — full (~93 h)
 
 Path B, plus everything marked **Recommended**, plus the legacy sections tagged Required or Recommended
 in [curriculum.md §Part 2](curriculum.md) — principally

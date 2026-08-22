@@ -46,7 +46,7 @@ Every document written for this program carries a block directly under its title
   full-stack variant; the recruiter's message said *"Server або Server + Web"*, so this is genuinely
   undecided. Ask before spending time on section 23.
 
-Current totals: **86 tagged documents. Required only ≈ 44 h. Everything ≈ 63 h.** Existing repo material
+Current totals: **98 tagged documents. Required only ≈ 48 h. Everything ≈ 69 h.** Existing repo material
 adds roughly 24 h more. The programme is deliberately larger than any one person needs — pick from it.
 
 ---
@@ -120,9 +120,10 @@ Full list in [../22-behavioral-and-staff-scope/questions-to-ask-them.md](../22-b
   from 2023. Ask.
 - **Reddit was inaccessible during research**, and 一亩三分地 thread bodies are paywalled. Both are real
   gaps in the corpus, not evidence of absence.
-- **A Python guide shared by a friend could not be read** — the Evernote link is login-gated. If it turns
-  out to contain material this programme lacks, section 21 is where it belongs.
-- Priorities skew heavy on Required (56 of 86). That is a deliberate choice for a single named loop, but
+- **The Evernote Python reference has been folded in.** Its genuinely-missing topics became five new files
+  in section 21 (async, generators/coroutines, scoping/closures/MRO, exceptions, web frameworks). Its
+  Python-2-era content and low-value stdlib tours were deliberately left out — see section 21's README.
+- Priorities skew heavy on Required (63 of 98). That is a deliberate choice for a single named loop, but
   it means "Required" here is closer to "clearly relevant" than to "absolutely non-negotiable."
 
 ---

@@ -33,7 +33,7 @@ DIAGRAM to draw in mermaid: {{diagram}} -->
 {{/core}}
 
 ## Worked example
-<!-- WRITER: 5-10 minutes, concrete and copy-pasteable (code, numbers, or a small lab). You may rename this heading to "## Lab" when the reader runs something. Delete this comment. -->
+<!-- WRITER: 5-10 minutes, concrete and copy-pasteable. You may rename this heading to "## Lab" when the reader runs something. Follow the LAB RULE (SPEC section 4): one sentence stating the question the lab answers; ### Step 1/2/... headings; code that prints intermediate values (per row / per step), not only totals; RUN it and paste the real output; then a '### Reading the output' section: what each column/number means and which direction is better, the output as a table, the arithmetic traced with digits for at least one case, and a bold **Verdict** after each output block; finish with a numbered cause -> mechanism -> consequence -> what it means in practice chain. Delete this comment. -->
 {{#core}}
 <!-- EXAMPLE / LAB from the curriculum: {{example}} -->
 {{/core}}

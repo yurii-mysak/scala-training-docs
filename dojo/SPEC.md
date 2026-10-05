@@ -139,6 +139,21 @@ One sentence naming the next rung.
 Fresh lessons add a `## Primer` section right after "Why this matters" when the item sits
 above the reader's current level in that domain.
 
+### Lab rule (hard requirement, every lesson with code or numbers)
+
+The reader must be able to follow the lab from input to verdict without reverse-engineering it:
+1. **The question first** — one sentence saying what the lab will decide or show.
+2. **Steps** — `### Step 1 …`, `### Step 2 …` headings; the code prints intermediate values
+   (per-row predictions, per-step state), not only the final aggregates.
+3. **`### Reading the output`** — required whenever the lab shows output: what each column or
+   number means and which direction is better; the output reproduced (tables preferred); the
+   arithmetic traced for at least one case, digits shown; a bold **Verdict** after each block.
+4. **Cause → consequence** — a short numbered chain: cause, mechanism, consequence, what it
+   means in practice for the reader's work.
+5. The writer runs the code and pastes the real output; numbers in the text must match it.
+`engine/check_lesson.py` rejects a lab that shows output without a `Reading the output`
+section or without a **Verdict**.
+
 ### Evidence rule (hard requirement, every lesson)
 
 The reader must be able to check every claim he decides to follow up on. Anything that is not

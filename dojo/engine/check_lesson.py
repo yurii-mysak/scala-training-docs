@@ -111,6 +111,13 @@ def check(path: Path, strict: bool = False) -> dict:
         if not re.search(r"\b(ch(apter)?\.?\s*\d+|§|section\s+\d)", body, re.I):
             errors.append("book-based lesson must cite the chapter/section inline (e.g. 'DDIA ch. 3, \"Hash Indexes\"')")
 
+    # Lab rule (SPEC §4): a lab that shows output must explain how to read it and give a verdict.
+    lab = section_text(body, "Lab") or section_text(body, "Worked example")
+    if re.search(r"(?m)^```(text|console|output)?\s*$", lab) and re.search(r"(?m)^```(python|scala|bash|sh|sql)", lab):
+        if not re.search(r"(?mi)^#{3,4} .*reading the output", lab):
+            errors.append("Lab shows code output but has no '### Reading the output' section (SPEC §4 Lab rule)")
+        if "**Verdict" not in lab:
+            errors.append("Lab has no bold **Verdict** after its output (SPEC §4 Lab rule)")
     stats = {"idea_words": idea_words, "mermaid_blocks": mermaid, "self_check": len(items),
              "source_urls": len(urls), "quotes": len(quote_blocks), "est_min": est}
     ok = not errors and (not strict or not warnings)

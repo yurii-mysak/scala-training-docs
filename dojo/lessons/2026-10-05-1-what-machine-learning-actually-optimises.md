@@ -8,7 +8,7 @@ domain: ai-ml
 rung: ai-ml-01
 level: B
 title: What machine learning actually optimises
-est_min: 20
+est_min: 25
 files_to: 24-ai-ml-foundations
 status: sent
 sent_at: 2026-10-05T07:47:09Z
@@ -25,7 +25,7 @@ sources:
 ---
 # What machine learning actually optimises
 
-> AI / ML foundations · Beginner · ~20 min · rung 1 of 38 · needs: —
+> AI / ML foundations · Beginner · ~25 min · rung 1 of 38 · needs: —
 
 ## Why this matters
 Every ML system you will touch — a wash-count forecast, a tool router inside an agent, an LLM — is built from the same four parts: data, model, loss, optimiser.
@@ -104,7 +104,18 @@ Rung 24 shows that LLM pretraining fills the same four parts. The order follows 
 > — Volodymyr Kubytskyi (The Fourth Law), *Що вчити, щоб стати ML / CV Engineer у 2026? Базова програма підготовки від команди The Fourth Law*, DOU, 16 Sep 2026, https://dou.ua/forums/topic/62000/
 
 ## Lab
-About 5 minutes. Open a Kaggle notebook (Code → New Notebook) or run `python3` locally with numpy. Five homes, two candidate lines, two losses.
+About 10 minutes. Open a Kaggle notebook (Code → New Notebook) or run `python3` locally with numpy.
+
+**The question the lab answers:** two people each propose a line for predicting house prices. Which line is better? The answer turns out to depend on how you score "wrong", and you will see exactly where that happens.
+
+### Step 1 — the data and the two candidate models
+
+Five ordinary homes: size in m² (the feature *x*) and price in k$ (the target *y*). Two candidate models, each a straight line `price = a·size + b`:
+
+- **Line A:** `2·size + 20`
+- **Line B:** `3·size − 30`
+
+### Step 2 — run this
 
 ```python
 import numpy as np
@@ -112,42 +123,100 @@ import numpy as np
 size  = np.array([40, 60, 80, 100, 120])    # m^2  -> feature x
 price = np.array([95, 145, 175, 225, 255])  # k$   -> target y
 
-def report(size, price):
-    for name, a, b in [("A: 2*size + 20", 2, 20), ("B: 3*size - 30", 3, -30)]:
-        err = (a * size + b) - price        # prediction minus truth
-        print(f"{name}   MAE = {np.abs(err).mean():7.1f}   MSE = {(err**2).mean():8.1f}")
+LINES = [("A", 2, 20), ("B", 3, -30)]       # price = a*size + b
 
-report(size, price)
-print("--- add one mansion: 150 m^2, 700 k$ ---")
-report(np.append(size, 150), np.append(price, 700))
+def per_house(size, price):
+    print(" size  true |  A pred  A err | B pred  B err")
+    for x, y in zip(size, price):
+        pa, pb = 2*x + 20, 3*x - 30
+        print(f"{x:5} {y:5} | {pa:7} {pa-y:6} | {pb:6} {pb-y:6}")
+
+def scores(size, price):
+    for name, a, b in LINES:
+        err = (a*size + b) - price           # one error per house: prediction minus truth
+        print(f"line {name}:  MAE = {np.abs(err).mean():7.1f}   MSE = {(err**2).mean():8.1f}")
+
+per_house(size, price); scores(size, price)
+
+print("\n--- add one mansion: 150 m^2, 700 k$ ---")
+size2, price2 = np.append(size, 150), np.append(price, 700)
+per_house(size2, price2); scores(size2, price2)
 ```
 
-Output:
+### Step 3 — reading the output
+
+The program prints two blocks of the same shape: a **per-house table**, then two **scores**, one per line.
+
+**How to read the per-house table.** Each row is one house. `A pred` is what line A predicts for it; `A err` is prediction minus true price. A negative error means the line guessed too low; positive, too high. Same for B.
+
+**How to read the scores.** Both scores turn the list of per-house errors into one number, and **smaller is better**:
+- **MAE** (mean absolute error): drop the minus signs, then average. "On average, how many k$ off are we?"
+- **MSE** (mean squared error): square each error, then average. Same idea, but a miss twice as big costs four times as much.
+
+**Block 1 — five ordinary homes**
+
+| size | true | A pred | A err | B pred | B err |
+|---:|---:|---:|---:|---:|---:|
+| 40 | 95 | 100 | +5 | 90 | −5 |
+| 60 | 145 | 140 | −5 | 150 | +5 |
+| 80 | 175 | 180 | +5 | 210 | +35 |
+| 100 | 225 | 220 | −5 | 270 | +45 |
+| 120 | 255 | 260 | +5 | 330 | +75 |
 
 ```text
-A: 2*size + 20   MAE =     5.0   MSE =     25.0
-B: 3*size - 30   MAE =    33.0   MSE =   1785.0
---- add one mansion: 150 m^2, 700 k$ ---
-A: 2*size + 20   MAE =    67.5   MSE =  24087.5
-B: 3*size - 30   MAE =    74.2   MSE =  14554.2
+line A:  MAE =     5.0   MSE =     25.0
+line B:  MAE =    33.0   MSE =   1785.0
 ```
 
-How to read it:
+Trace: A misses every house by exactly 5 → MAE = 5, MSE = 5² = 25. B is fine on small homes but drifts upward on big ones (+35, +45, +75) → MAE = (5+5+35+45+75)/5 = 33. Squaring makes B's big misses heavier: (25+25+1225+2025+5625)/5 = 1785.
+**Verdict 1:** both scores say **A is better**. No disagreement.
 
-1. **Five ordinary homes:** both losses pick line A (MAE 5.0 vs 33.0, MSE 25 vs 1 785). No disagreement.
-2. **Add the mansion:** MAE still picks A (67.5 vs 74.2); MSE switches to B (24 087.5 vs 14 554.2).
-3. **Why:** A predicts 320 for the mansion (miss 380); B predicts 420 (miss 280). On the five normal homes B misses by 140 k$ more in total than A, which outweighs the 100 k$ it saves on the mansion, so MAE keeps A. Squared, the mansion misses are 144 400 vs 78 400: a 66 000 difference that swamps B's extra 8 800 on the five homes. One house decided the MSE result.
+**Block 2 — the same five homes plus one mansion (150 m², 700 k$)**
+
+The first five rows are unchanged. One new row:
+
+| size | true | A pred | A err | B pred | B err |
+|---:|---:|---:|---:|---:|---:|
+| 150 | 700 | 320 | −380 | 420 | −280 |
+
+Both lines badly under-predict the mansion, but **B misses it by less** (280 vs 380), because B's steeper slope climbs faster.
+
+```text
+line A:  MAE =    67.5   MSE =  24087.5
+line B:  MAE =    74.2   MSE =  14554.2
+```
+
+Trace for **MAE** (add up the misses, divide by 6):
+- A: 25 (five homes) + 380 (mansion) = 405 → 405 / 6 = **67.5**
+- B: 165 (five homes) + 280 (mansion) = 445 → 445 / 6 = **74.2**
+- B saves 100 on the mansion but loses 140 on the normal homes → **A still wins** under MAE.
+
+Trace for **MSE** (add up the squared misses, divide by 6):
+- A: 125 + 380² = 125 + 144 400 = 144 525 → / 6 = **24 087.5**
+- B: 8 925 + 280² = 8 925 + 78 400 = 87 325 → / 6 = **14 554.2**
+- Squaring turns the mansion's 100 k$ gap into a 66 000 gap. That is far bigger than B's extra 8 800 on the normal homes → **B wins** under MSE.
+
+**Verdict 2:** MAE says **A**, MSE says **B**. One house flipped MSE's answer, and did not move MAE's.
+
+### Step 4 — the cause-and-effect chain
+
+1. **Cause:** one unusual data point (the mansion) that both lines miss by hundreds of k$.
+2. **Mechanism:** MAE counts a 380 k$ miss as 380 — the mansion is just a large miss. MSE counts it as 144 400 — the mansion is worth about 1 000 normal-sized misses.
+3. **Consequence:** under MSE, whichever line misses the mansion by less wins, almost regardless of the other five houses. Under MAE, the five normal homes still decide.
+4. **What it means in practice:** if you train a model by minimising MSE (the default for regression), a few outliers in your data can drag the whole model toward them. If your data has outliers you don't care about, MAE (or cleaning the data) keeps the model faithful to the typical case. If big misses are genuinely expensive (e.g. under-pricing a mansion costs real money), MSE is the right choice precisely *because* it punishes them.
 
 **The loss you choose decides what "good" means.** Neither answer is wrong; they answer different questions.
 
-Stretch (1 minute): let an optimiser choose θ under squared error. `np.polyfit` is a least-squares fit (its docstring opens with "Least squares polynomial fit."):
+### Stretch (1 minute) — let the optimiser choose
+
+So far *you* proposed the lines. Training means letting an algorithm search for the best `a, b`. `np.polyfit` finds the line that minimises squared error (its docstring opens with "Least squares polynomial fit."):
 
 ```python
-print(np.polyfit(size, price, 1).round(2))                                   # [ 2. 19.]
-print(np.polyfit(np.append(size, 150), np.append(price, 700), 1).round(2))  # [   4.75 -169.54]
+print(np.polyfit(size, price, 1).round(2))      # [ 2. 19.]      -> a≈2, b≈19: almost exactly line A
+print(np.polyfit(size2, price2, 1).round(2))    # [   4.75 -169.54] -> slope more than doubles
 ```
 
-Without the mansion the best line is almost exactly A. With it, one house more than doubles the slope. A grid search that minimises MAE instead lands near `2.2·size + 8`, still close to A.
+Read it as `[a, b]`. Without the mansion, the best squared-error line is essentially A. Add one mansion and the slope jumps from 2 to 4.75: the optimiser rotates the whole line toward that single house, which is the cause-and-effect chain above happening automatically during training. A search that minimises MAE instead lands near `2.2·size + 8`, still close to A.
 
 ## Self-check
 1. A model reaches training MSE of 0.0 on 10 000 rows. What do you still not know, and how do you find out? <details><summary>Answer</summary>Whether it generalises. Zero training loss fits memorisation just as well as real learning. Measure loss on labelled data the optimiser never saw (a held-out set). A large gap between training and held-out loss is overfitting.</details>

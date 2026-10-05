@@ -107,7 +107,10 @@ passages (fresh); the next-rung title (core); and these instructions verbatim:
 > (3 lines) · [Primer, fresh lessons above the reader's level] · The idea (600–1200 words, one or
 > two ```mermaid diagrams: `flowchart LR|TD` or `sequenceDiagram`; quote any label containing
 > parentheses, colons or slashes in double quotes; no HTML inside labels) · Worked example or Lab
-> (5–10 minutes, copy-pasteable, concrete) · Self-check (3 numbered questions, each answer in
+> (5–10 minutes, copy-pasteable, concrete, following SPEC §4 "Lab rule": the question first,
+> numbered steps, code that prints intermediate values, a `### Reading the output` section that
+> explains every column, traces the arithmetic and ends each block with a bold **Verdict**, then a
+> numbered cause → consequence chain; run the code and paste its real output) · Self-check (3 numbered questions, each answer in
 > `<details><summary>Answer</summary>…</details>`) · Sources (every URL used, one line on what it
 > contributed, `accessed <today>`) · Next on this track (one sentence; core lessons only).
 > Evidence rule: cite books/courses inline with chapter, section or timestamp; back every claim from

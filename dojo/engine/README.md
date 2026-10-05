@@ -11,7 +11,7 @@ JSON (or a path) to stdout. Failures print one `error: ...` line and exit 2.
 | `pick.py` | `core [--commit]`, `fresh`, `--dry-run N`; smooth weighted round-robin + prerequisites (SPEC §6) |
 | `new_lesson.py` | `core` / `fresh`: writes the lesson scaffold, commits picker state, logs `sent` |
 | `mermaid.py` | renders each ```` ```mermaid ```` block to `lessons/assets/<id>-<k>.png`; never fails the run |
-| `render_email.py` | lessons -> `dojo/out/email.json` `{subject, html, text, attachments}` (SPEC §9) |
+| `render_email.py` | optional: lessons -> `dojo/out/email.json` for an explicit "resend by email" request; the daily run delivers by push + Dojo (SPEC §9) |
 | `mark.py` | `<id> passed\|review\|skipped\|sent`: front matter, state, log; idempotent |
 | `file_passed.py` | files passed lessons into the KB: section README row, root README link (SPEC §8) |
 | `sync_db.py` | `export <id>…\|--all`, `tracks`, `meta`, `all` -> `dojo/out/db/<collection>/<id>.json` |
@@ -29,8 +29,8 @@ python3 dojo/engine/new_lesson.py fresh --date D --n 2 --title "..." --domain X 
 #    ... fill both scaffolds (delete every <!-- hint -->; follow the Evidence rule) ...
 # 3. diagrams, email, dashboard cache
 python3 dojo/engine/mermaid.py D-1 && python3 dojo/engine/mermaid.py D-2
-python3 dojo/engine/render_email.py D-1 D-2                          # send dojo/out/email.json via Gmail
-python3 dojo/engine/sync_db.py all                                   # upload dojo/out/db/** to the dashboard DB
+python3 dojo/engine/sync_db.py all                                   # upload dojo/out/db/** to the dashboard DB = delivery
+#    ... then one PushNotification naming both lessons ...
 python3 dojo/engine/state.py touch                                   # last_run_at = now; then commit + push
 ```
 

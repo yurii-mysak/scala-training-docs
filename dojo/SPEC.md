@@ -20,9 +20,10 @@ deliberately; everything else follows it.
 - Everything is trackable: every lesson ever sent is a file under `dojo/lessons/`, every
   status change is a line in `dojo/progress/log.jsonl`, and the dashboard shows the same.
 - On demand: two more lessons can be requested, but only when no sent lesson is still open.
-- Delivery by 09:00 Europe/Kyiv daily (email + push; the task is scheduled at 08:52 because
-  on-the-hour runs queue behind everyone else's). Reminder 20:00 Europe/Kyiv only if lessons
-  are still open (push + short email).
+- Delivery by 09:00 Europe/Kyiv daily: a push notification to the Claude app (phone + Mac) that
+  names the two lessons; the lessons themselves are read on the Dojo dashboard (and live in the
+  repo). No email. The task is scheduled at 08:52 because on-the-hour runs queue behind
+  everyone else's. Reminder 20:00 Europe/Kyiv, push only, only if lessons are still open.
 - One repo. This repository is the single source of truth. The dashboard database is a cache.
 
 ## 2. Repository layout
@@ -231,14 +232,14 @@ mirrors it into the repo (front matter, log, filing).
    the right heading group.
 5. Set `filed_to` in the lesson front matter, log `filed`.
 
-## 9. Email (`engine/render_email.py <id1> <id2> …`)
+## 9. Delivery (push + Dojo; `engine/render_email.py` is optional)
 
-Subject: `IT Iaido · Day N · <title 1> · <title 2>`. HTML body: header (day, date, total
-minutes), one card per lesson (meta line, the full lesson rendered from Markdown, diagrams as
-`<img src="cid:...">`), footer with the dashboard link and the sentence "Mark them on the
-Dojo, or tell Claude in the IT Iaido project: 'passed both' / 'review 1' / 'skip 2'".
-Output: `out/email.json` = `{subject, html, text, attachments:[{filename, cid, path}]}` for
-the Gmail connector (`inline: true`, `mimeType: image/png`).
+The reader asked for push notifications only (no email). The job's delivery is:
+1. the two lesson documents written to the Dojo database (`lessons/{id}` with full `md`), and
+2. one `PushNotification` (≤ 200 characters): `IT Iaido · Day N: <title 1> (<m> min) · <title 2>
+   (<m> min) — open the Dojo`.
+`engine/render_email.py` still renders an HTML version (`out/email.json`) for an explicit
+"resend today by email" request; it is not part of the daily run.
 
 ## 10. Chat commands (handled by Claude in the project, applied to DB + repo)
 

@@ -13,15 +13,15 @@ Constants
   this course under `dojo/`.
 - Dashboard (artifact): https://claude.ai/artifact/Eedt4UPNqrameHt3dahkHp — its database is read
   and written with the `ArtifactData` tool using this URL.
-- Delivery: one HTML email per run via the Gmail connector (`mcp__Gmail__send_message`), one push
-  notification (`PushNotification`).
+- Delivery: push notifications only (`PushNotification`), by the reader's choice — no email. The
+  lessons are read on the Dojo, so the database write in step 9 IS the delivery.
 - Hard rules: two lessons per daily run, each 15–30 minutes; slot 1 from the curriculum, slot 2
   researched today; basics before advanced; the Evidence rule (SPEC §4) on every claim; only
   `passed` lessons are filed into the knowledge base; never send the same day's pair twice.
 
 ## 0. Setup (every run)
 
-1. Load tools: `ToolSearch` with `select:ArtifactData,mcp__Gmail__send_message,PushNotification`.
+1. Load tools: `ToolSearch` with `select:ArtifactData,PushNotification`.
 2. Attach and clone the repo: `add_repo` owner `yurii-mysak`, repo `scala-training-docs`,
    access `push`; then `git clone --depth 50 https://github.com/yurii-mysak/scala-training-docs /home/claude/scala-training-docs`
    (generous timeout; if the folder already exists and `git -C … rev-parse HEAD` works, reuse it
@@ -61,19 +61,17 @@ into its `files_to` section (creating `24-ai-ml-foundations/`, `25-software-arch
 
 In **on-demand** mode, after step 1: `python3 dojo/engine/state.py show` → `open`. If any lesson
 is still `sent`, do NOT generate lessons (`new_lesson.py … --on-demand` refuses with exit 2 as a
-second guard; pass `--on-demand` on both scaffolds in this mode). Send a short email (subject `IT Iaido · still open`) and a
-push: "Two more unlock once <titles> are marked. Open the Dojo: <dashboard url>", set the request
+second guard; pass `--on-demand` on both scaffolds in this mode). Send one push:
+"IT Iaido: two more unlock once <titles> are marked — open the Dojo", set the request
 documents to `handled: true` (ArtifactData `update` with `if_version`), commit any filing from
 step 2, push, and finish. Otherwise continue.
 
-## 4. Review recaps (daily mode only)
+## 4. Review returns (daily mode only)
 
-Lessons with `status: review` and `review_due <= today` (front matter) get a recap: for each,
-write 4–6 lines (the core idea in two sentences, the one thing to re-read, the self-check question
-he most likely missed) into `dojo/out/recaps.md` — the email renderer appends it when the file
-exists — then `python3 dojo/engine/mark.py <id> review --by job` to move `review_due` a week on.
-(`render_email.py` renders `dojo/out/recaps.md` as a "Quick recap" card before the lessons; delete the
-file afterwards so it is not reused.)
+Lessons with `status: review` and `review_due <= today` (front matter) come back: run
+`python3 dojo/engine/mark.py <id> sent --by job` for each, so the lesson is open again on the Dojo
+(it keeps its original text; the reader re-reads it and marks it passed or review again), and name
+them in the push notification of step 9 as `review: <title>`. No separate recap document.
 
 ## 5. Slot 1 — the core lesson
 
@@ -128,26 +126,16 @@ remain, fix them directly (you may use `WebFetch` to recover a quote). Then
 `python3 dojo/engine/mermaid.py <id>` for both; if a diagram fails to render, simplify its Mermaid
 source until it renders (the error text names the line).
 
-## 8. Publish: commit, push, email, push notification
-
-Order matters: the email links diagram PNGs from GitHub, so push first.
+## 8. Publish: commit, push
 
 1. `python3 dojo/engine/sync_db.py all` (produces `dojo/out/db/**`; nothing is uploaded yet).
 2. `git add -A dojo 2[0-9]-* [0-9][0-9]-*/ README.md .gitignore` (lesson files, assets, progress,
    filed copies, READMEs), `git commit -m "dojo: day <day> — <title 1> · <title 2>"`, then
    `git fetch origin main && git rebase origin/main && git push origin main`. If the push is
-   refused, retry once after `git pull --rebase`; if it still fails, continue with `--img-mode dojo`
-   below and say so in the report.
-3. `python3 dojo/engine/render_email.py <id1> <id2>` (add `--img-mode dojo` only if the push
-   failed: the email then links to the Dojo for the diagrams instead of embedding images) →
-   `dojo/out/email.json`. Never use `--img-mode cid` from a job: base64 attachments do not pass
-   reliably through a tool call.
-4. Send with `mcp__Gmail__send_message`: `to: ["yura.mysak@gmail.com"]`, `subject`, `htmlBody`
-   = html, `body` = text. Read the two strings from `dojo/out/email.json` and pass them
-   complete and unchanged. If Gmail answers "Insufficient scope", the Gmail connector was
-   connected without send permission: skip the email, still do the push notification with the
-   words "email failed — read today's lessons on the Dojo", and say so in the final report.
-5. `PushNotification` (status `proactive`): `IT Iaido · Day <day>: <title 1> · <title 2> — in your inbox (<total> min)`.
+   refused, retry once after `git pull --rebase`; if it still fails, continue (the Dojo gets the
+   lessons anyway) and say so in the report.
+3. No email: the reader asked for push notifications only. (`render_email.py` exists for an
+   explicit "resend today by email" request from chat; never run it from the job.)
 
 ## 9. Dashboard database
 
@@ -160,7 +148,9 @@ Using the versions from step 1 (re-`list` if you wrote anything since):
    `if_version` of the existing document. It must keep `trigger_id`, `reminder_trigger_id`,
    `repo_url`, `dashboard_url` — they are in the file because they live in `progress/state.json`.
 4. On-demand: `update` each request from step 1.3 with `{handled: true}` and its `if_version`.
-5. Read back one lesson document (`get`) to confirm the write landed.
+5. Read back one lesson document (`get`) to confirm the write landed — this is the delivery.
+6. `PushNotification` (status `proactive`, ≤ 200 characters):
+   `IT Iaido · Day <day>: <title 1> (<m> min) · <title 2> (<m> min) — open the Dojo`.
 
 ## 10. Finish
 
@@ -169,10 +159,10 @@ Using the versions from step 1 (re-`list` if you wrote anything since):
    `dojo/out/db/meta/state.json` with its `if_version`, so the Dojo shows this delivery time.
 2. `git add -A dojo && git commit -m "dojo: state after day <day>" && git push origin main`.
 3. Final response, 3–6 lines: mode, the two titles with tracks/levels/minutes, marks synced,
-   lessons filed, anything that failed (push, Gmail, diagram) and what you did instead.
+   lessons filed, anything that failed (git push, database write, diagram) and what you did instead.
 
-Failure policy: never send the pair twice; if Gmail fails, write the lessons to the database
-anyway and send the push with "email failed — read today's lessons on the Dojo"; if the fresh
+Failure policy: never send the pair twice; if the database write fails, retry it once, then send
+the push with "Dojo write failed — lessons are in the repo" and the GitHub link; if the fresh
 research finds nothing within 90 days, use a timeless classic from the same feeds and say so in
 the lesson; if a writer subagent fails, write that lesson yourself to the same standard.
 
@@ -180,14 +170,11 @@ the lesson; if a writer subagent fails, write that lesson yourself to the same s
 
 ## R. The 20:00 reminder (separate scheduled task)
 
-1. `ToolSearch` `select:ArtifactData,mcp__Gmail__send_message,PushNotification`.
+1. `ToolSearch` `select:ArtifactData,PushNotification`.
 2. `ArtifactData` → `query` collection `lessons` where `status == "sent"` (dashboard URL above).
 3. If none: finish silently with one line ("nothing open").
-4. Otherwise: `PushNotification` (proactive): `IT Iaido: <n> lesson(s) still open — <titles, trimmed>. 15–30 min each.`
-   and a short Gmail message (subject `IT Iaido · reminder · <titles>`, 3 lines: the open titles
-   with minutes, the Dojo link https://claude.ai/artifact/Eedt4UPNqrameHt3dahkHp, "mark them there or
-   tell Claude in the IT Iaido project").
+4. Otherwise one `PushNotification` (proactive, ≤ 200 characters):
+   `IT Iaido: <n> lesson(s) still open — <titles, trimmed>. 15–30 min each — open the Dojo.`
+   No email, by the reader's choice.
 5. `ArtifactData` → `update` `meta/state` with `{last_reminder_at: <now iso>}` and the document's
    `if_version` (`get` it first). No repo work. Final response: one line.
-6. If Gmail answers "Insufficient scope", the connector lacks send permission: the push already
-   went out, so just say so in the final response. Never retry the email in a loop.

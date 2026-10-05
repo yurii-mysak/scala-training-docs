@@ -1,0 +1,185 @@
+# IT Iaido — configuration for the daily "fresh" slot (slot 2), see dojo/SPEC.md sections 1, 4 and 6.
+# The fresh lesson is researched the same morning from the feeds below. engine/pick.py fresh reads
+# domain_shares; engine/new_lesson.py fresh records the chosen domain in state.last_fresh_domains.
+# Feed URLs are marked verified: false until the batch verification step fetches them.
+
+domain_shares:            # target mix of fresh lessons over time; must sum to 1.0
+  ai-ml: 0.5
+  architecture: 0.25      # includes distributed systems, data systems, platform engineering
+  networking: 0.15
+  fp-scala: 0.05          # Scala/FP ecosystem news
+  rust: 0.05
+
+freshness_days: 30        # prefer items published in the last N days
+freshness_days_max: 90    # widen to this window only if nothing fits within freshness_days
+
+level_rule: >-
+  The reader's level in a domain is the reader_level that `engine/pick.py fresh` returns: the
+  level of the last passed core rung in the matching track, or B if none. Tag each candidate with
+  its own level: B explains a concept from scratch, I assumes working knowledge and adds mechanism
+  or production detail, A covers internals, research or design trade-offs at scale. Prefer items
+  at the reader's level or one level above. An item one level above gets a `## Primer` section
+  (SPEC section 4) of about five minutes that bridges from the reader's last passed rung and names
+  the core rungs it relies on. An item two levels above (A for a B reader) is allowed only if that
+  primer can bridge the gap within the same budget; otherwise pick another candidate. An item
+  below the reader's level is used only when it carries genuinely new information (a release, a
+  measurement, an incident) and is written as "what changed", not as re-teaching. The lesson's
+  `level` field is the item's level, not the reader's.
+
+evidence_rule: >-
+  Every fresh lesson follows the SPEC section 4 Evidence rule. It is built from sources, so it
+  quotes them verbatim: each quote is 1–3 sentences in a blockquote with the citation directly
+  under it in the form `> "…" — Author or organisation, *Title*, YYYY-MM-DD, URL`, and the lesson
+  contains at least two such quoted passages. Quotes are copied from the fetched page, never
+  paraphrased as if verbatim and never invented; if the primary source cannot be quoted
+  (paywall, a PDF the fetcher cannot read), the lesson says so and quotes a secondary source
+  instead. Every number, benchmark and date carries its citation in the same sentence. Claims
+  taken from books, RFCs or docs the reader can open are cited inline with chapter or section
+  (for example `(RFC 9000 §9)`). The `## Sources` list carries every URL used with one line on
+  what it contributed and the date accessed; every link is fetched before sending, and a claim
+  whose link fails is replaced or dropped.
+
+feeds:
+  # ------------------------------------------------------------------ ai-ml
+  - name: Anthropic Engineering
+    url: https://www.anthropic.com/engineering
+    domains: [ai-ml]
+    why: "First-party write-ups on building agents, tool use, evals and Claude Code practice; directly usable by a reader who writes Skills and sets up Claude Code for other teams."
+    how_to_scan: "WebFetch the index page; list post titles and dates; pick ones within freshness_days"
+    verified: false
+  - name: Anthropic engineering / claude.dev
+    url: https://claude.dev/
+    domains: [ai-ml]
+    why: "Developer-facing material on building with Claude (agents, MCP, Claude Code); a second first-party view aimed at practitioners."
+    how_to_scan: "WebFetch the page; follow at most one link to a posts, news or changelog listing; list dated items within freshness_days; skip undated pages"
+    verified: false
+  - name: Simon Willison's Weblog
+    url: https://simonwillison.net/
+    domains: [ai-ml]
+    why: "Near-daily, hands-on notes on LLM tools, model releases, prompt injection and agent engineering, always linking the primary source; good both as a candidate and as a pointer to the original."
+    how_to_scan: "WebFetch the home page; list entries with dates, preferring long-form posts over short link-blog items; follow the item's primary-source link and quote that when possible"
+    verified: false
+  - name: Hugging Face Blog
+    url: https://huggingface.co/blog
+    domains: [ai-ml]
+    why: "Open-model releases and training, fine-tuning and inference techniques explained with code; balances the closed-model view."
+    how_to_scan: "WebFetch the index page; list post titles and dates; prefer technical explainers over release announcements"
+    verified: false
+  - name: arXiv cs.LG (recent)
+    url: https://arxiv.org/list/cs.LG/recent
+    domains: [ai-ml]
+    why: "Primary source for new ML methods; used sparingly, only for papers whose abstract states a clear mechanism and result the reader can follow at his level."
+    how_to_scan: "WebFetch the recent listing; scan titles from the newest announcement day; open at most 2 abstract pages (arxiv.org/abs/<id>); prefer papers already discussed by a practitioner feed; the date is the v1 submission date"
+    verified: false
+  - name: arXiv cs.CL (recent)
+    url: https://arxiv.org/list/cs.CL/recent
+    domains: [ai-ml]
+    why: "Language-model papers (reasoning, agents, retrieval, evaluation); same sparing use as cs.LG."
+    how_to_scan: "WebFetch the recent listing; scan titles from the newest announcement day; open at most 2 abstract pages (arxiv.org/abs/<id>); the date is the v1 submission date"
+    verified: false
+  - name: Lil'Log (Lilian Weng)
+    url: https://lilianweng.github.io/
+    domains: [ai-ml]
+    why: "Long, carefully referenced surveys (agents, hallucination, RL, diffusion); rarely new, so mainly the timeless fallback for ai-ml."
+    how_to_scan: "WebFetch the home page; list post titles and dates; use only if within freshness_days_max or as the classic fallback"
+    verified: false
+
+  # ------------------------------------------------------------------ architecture
+  - name: Spotify Engineering
+    url: https://engineering.atspotify.com/
+    domains: [architecture]
+    why: "Platform engineering and large-scale backend and data stories (Backstage, event delivery) from a JVM-heavy, service-oriented organisation."
+    how_to_scan: "WebFetch the index page; list post titles and dates; pick ones within freshness_days"
+    verified: false
+  - name: Netflix TechBlog
+    url: https://netflixtechblog.com/
+    domains: [architecture]
+    why: "Deep dives on resilience, data platforms and large-scale JVM services, usually with concrete architecture diagrams and trade-offs."
+    how_to_scan: "WebFetch the index page; list post titles and dates; pick ones within freshness_days"
+    verified: false
+  - name: Martin Fowler
+    url: https://martinfowler.com/
+    domains: [architecture, ai-ml]
+    why: "Architecture patterns, evolutionary design and delivery essays, plus recent writing on generative AI in software delivery; fits the reader's engineer-and-Product-Owner seat."
+    how_to_scan: "WebFetch the home page; list the recent-changes entries with dates; prefer full articles over short bliki updates"
+    verified: false
+  - name: InfoQ
+    url: https://www.infoq.com/
+    domains: [architecture, ai-ml]
+    why: "Conference talk write-ups and transcripts (QCon) on architecture, data and platform engineering; good for how company X did Y, with trade-offs."
+    how_to_scan: "WebFetch the home page (or the Architecture & Design topic page linked from it if the home page is news-heavy); prefer articles and presentations over short news items; list titles and dates"
+    verified: false
+  - name: Jepsen analyses
+    url: https://jepsen.io/analyses
+    domains: [architecture]
+    why: "Rigorous consistency testing of real databases and queues, the evidence behind many DDIA claims; new reports are rare but each is a high-value lesson."
+    how_to_scan: "WebFetch the analyses index; take the newest entries with their dates; expect to need freshness_days_max or the classic fallback"
+    verified: false
+
+  # ------------------------------------------------------------------ networking
+  - name: The Cloudflare Blog
+    url: https://blog.cloudflare.com/
+    domains: [networking, architecture]
+    why: "Deep, data-backed posts on protocols (QUIC, TLS, DNS, BGP), incident postmortems and edge architecture; also the backbone of the networking track."
+    how_to_scan: "WebFetch the index page; list post titles and dates; prefer engineering deep dives and postmortems over product announcements"
+    verified: false
+  - name: APNIC Blog
+    url: https://blog.apnic.net/
+    domains: [networking]
+    why: "Measurement-driven articles on routing, DNS, IPv6 and transport by operators and researchers; the counterweight to vendor blogs."
+    how_to_scan: "WebFetch the index page; list post titles and dates; pick ones within freshness_days"
+    verified: false
+
+  # ------------------------------------------------------------------ fp-scala
+  - name: Scala blog
+    url: https://www.scala-lang.org/blog/
+    domains: [fp-scala]
+    why: "Official Scala 3 language and tooling news (releases, Scala Center updates) for the reader's main language."
+    how_to_scan: "WebFetch the index page; list post titles and dates; prefer posts that explain a language or tooling change over release lists"
+    verified: false
+  - name: Typelevel blog
+    url: https://typelevel.org/blog/
+    domains: [fp-scala]
+    why: "Cats, Cats Effect, fs2 and http4s ecosystem posts; the pure-FP side of Scala that complements the reader's Akka background."
+    how_to_scan: "WebFetch the index page; list post titles and dates; pick ones within freshness_days"
+    verified: false
+  - name: Akka blog
+    url: https://akka.io/blog
+    domains: [fp-scala, architecture]
+    why: "Actor-model and distributed-systems posts from the toolkit the reader uses at work."
+    how_to_scan: "WebFetch the index page; list post titles and dates; skip marketing and webinar announcements"
+    verified: false
+
+  # ------------------------------------------------------------------ rust
+  - name: This Week in Rust
+    url: https://this-week-in-rust.org/
+    domains: [rust]
+    why: "Weekly curated digest; one issue gives a dated list of Rust articles, ideal for a low-share trickle domain."
+    how_to_scan: "WebFetch the index page; open the latest issue; pick from its community articles and follow the link to the original post"
+    verified: false
+  - name: Rust Blog
+    url: https://blog.rust-lang.org/
+    domains: [rust]
+    why: "Official release notes and project updates; pick when a release ships a feature worth a lesson."
+    how_to_scan: "WebFetch the index page; list post titles and dates; pick ones within freshness_days"
+    verified: false
+
+  # ------------------------------------------------------------------ cross-domain discovery
+  - name: Hacker News front page
+    url: https://news.ycombinator.com/
+    domains: [ai-ml, architecture, networking, fp-scala, rust]
+    why: "Discovery layer only: surfaces engineering posts the other feeds miss; the lesson cites the linked article, never the HN thread."
+    how_to_scan: "WebFetch the front page; keep only links to engineering write-ups (deep dives, postmortems, papers, release notes) in today's domain; ignore launches, news and opinion; use the article's own publication date"
+    verified: false
+
+selection_protocol:       # ordered steps the job follows; each step is one sentence
+  - "Compute today's target domain and the reader's level with `engine/pick.py fresh` (the domain furthest below its share in domain_shares)."
+  - "Scan the feeds tagged with that domain (max 5 WebFetch calls) and collect candidates with title, url, publication date and a one-line gist."
+  - "Keep candidates published within freshness_days, widening to freshness_days_max only if none remain."
+  - "Never pick an item already present in dojo/lessons/ (grep the url)."
+  - "Prefer a candidate that connects to today's core lesson or to the reader's current rung in that domain; otherwise the most substantive recent item (mechanism and evidence over announcement)."
+  - "If no candidate fits within freshness_days_max, fall back to a timeless classic post from the same feeds and say so in the lesson."
+  - "Fetch the chosen item in full and extract: the claim, the mechanism, the evidence, the trade-offs, and two or three verbatim passages to quote."
+  - "Tag it with a level (B/I/A) per level_rule; if above the reader's level, the lesson gets a Primer section."
+  - "Create the lesson with `engine/new_lesson.py fresh` (title, domain, level, est_min 15–30, and --primer when needed), which also records the domain in last_fresh_domains."
+  - "Write the lesson to SPEC section 4 under evidence_rule and fetch every link before it is sent."

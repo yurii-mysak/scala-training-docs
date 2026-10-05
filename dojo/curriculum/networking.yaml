@@ -1,0 +1,788 @@
+# IT Iaido curriculum — schema: dojo/SPEC.md section 3.
+# Sources are marked verified: false until the batch verification step fetches them.
+track: networking
+name: Networking, modern
+weight: 2
+files_to: 10-networking
+description: >-
+  A ladder from what is actually on the wire (TCP handshake, latency, congestion control, UDP)
+  through the modern web transport stack (TLS 1.3, HTTP/2, HTTP/3 and QUIC, DNS, load balancing,
+  CDNs, streaming transports) to production networking for distributed systems (service mesh and
+  eBPF, zero trust and WireGuard, IPv6, path observability), ending in an end-to-end debugging
+  runbook. Each rung builds on the ones before it, deepens rather than repeats the existing notes
+  in 10-networking, and has a lab the reader can run on a Mac.
+primary_sources:
+  - title: High Performance Browser Networking (Ilya Grigorik, O'Reilly), free online edition
+    url: https://hpbn.co/
+  - title: Cloudflare Learning Center
+    url: https://www.cloudflare.com/learning/
+  - title: The Cloudflare Blog
+    url: https://blog.cloudflare.com/
+  - title: "RFC 9000: QUIC, a UDP-Based Multiplexed and Secure Transport"
+    url: https://www.rfc-editor.org/rfc/rfc9000.html
+  - title: "RFC 8446: The Transport Layer Security (TLS) Protocol Version 1.3"
+    url: https://www.rfc-editor.org/rfc/rfc8446.html
+  - title: APNIC Blog
+    url: https://blog.apnic.net/
+  - title: Cilium documentation
+    url: https://docs.cilium.io/
+  - title: WireGuard
+    url: https://www.wireguard.com/
+  - title: Julia Evans' blog
+    url: https://jvns.ca/
+
+rungs:
+  # ------------------------------------------------------------------ B: on the wire
+  - id: networking-01
+    title: What really happens in a TCP handshake and teardown
+    level: B
+    est_min: 20
+    prereqs: []
+    summary: >-
+      Every request a Scala service makes starts with a three-way handshake and ends with FIN/ACK
+      or RST, and many "mysterious" latency spikes and connection errors live right here. The
+      lesson follows one connection on the wire from SYN to TIME_WAIT, so the later rungs
+      (latency, congestion, TLS, HTTP/2) have a concrete picture to build on. Deepens the existing
+      note Networking-Network-Tools.md by actually reading a tcpdump capture rather than listing
+      the tool.
+    key_points:
+      - "SYN, SYN-ACK, ACK: what each side learns (initial sequence numbers, MSS, window scale, SACK) and why the handshake costs one full RTT before any data (RFC 9293 §3.5)."
+      - "Sequence and acknowledgement numbers are byte counters; relative vs absolute numbers in tcpdump and Wireshark."
+      - "Graceful close (FIN/ACK in each direction, half-close) vs abortive close (RST); who ends up in TIME_WAIT and why it lasts 2×MSL (RFC 9293 §3.6)."
+      - "The listen backlog: SYN queue vs accept queue, and what a client sees when either overflows (retransmitted SYNs, timeouts)."
+      - "Reading tcpdump flags: [S], [S.], [.], [P.], [F.], [R]."
+    diagram: >-
+      Sequence diagram client <-> server: SYN (seq=x), SYN-ACK (seq=y, ack=x+1), ACK, one
+      request/response pair with PSH-ACK, then FIN/ACK in both directions. Connection states are
+      annotated on the lifelines: client SYN-SENT, ESTABLISHED, FIN-WAIT-1/2, TIME_WAIT; server
+      LISTEN, SYN-RECEIVED, ESTABLISHED, CLOSE-WAIT, LAST-ACK.
+    example: >-
+      Lab on a Mac (5–10 min). Find your interface with `route get default | grep interface`
+      (usually en0). Terminal 1: `sudo tcpdump -i en0 -nn -S 'host example.com and tcp port 80'`.
+      Terminal 2: `curl -s -o /dev/null http://example.com/`. Label the three handshake packets,
+      the options in the SYN (mss, wscale, sackOK, TS), the request and response segments and the
+      FIN exchange; note which side sent the first FIN. Then `netstat -an -p tcp | grep TIME_WAIT`
+      to find the leftover state. Optional: add `-w handshake.pcap`, open it in Wireshark and use
+      Statistics -> Flow Graph.
+    presentation: minimal
+    sources:
+      - title: High Performance Browser Networking, ch. 2 "Building Blocks of TCP"
+        url: https://hpbn.co/building-blocks-of-tcp/
+        locator: ch. 2, "Three-Way Handshake"
+        kind: book
+        verified: false
+      - title: "RFC 9293: Transmission Control Protocol (TCP)"
+        url: https://www.rfc-editor.org/rfc/rfc9293.html
+        locator: §3.5 "Establishing a Connection", §3.6 "Closing a Connection"
+        kind: docs
+        verified: false
+      - title: SYN packet handling in the wild (Cloudflare blog)
+        url: https://blog.cloudflare.com/syn-packet-handling-in-the-wild/
+        locator: sections on the SYN queue and the accept queue
+        kind: blog
+        verified: false
+
+  - id: networking-02
+    title: Latency vs bandwidth, RTT, and why the speed of light is the budget
+    level: B
+    est_min: 20
+    prereqs: [networking-01]
+    summary: >-
+      For the small requests that services exchange, latency rather than bandwidth is almost
+      always the constraint, and the floor on latency is set by physics. The lesson separates the
+      four delay components, shows how to compute a speed-of-light RTT floor between two cities,
+      and explains why more bandwidth stops helping small transfers. This frames every later
+      optimisation: fewer round trips, closer servers, connection reuse.
+    key_points:
+      - "Propagation, transmission, processing and queuing delay, and which one dominates for a small API call vs a large file."
+      - "Light in fibre travels at roughly two thirds of c (refractive index about 1.5), so distance sets a hard RTT floor, and real fibre paths are longer than the great-circle distance (HPBN ch. 1)."
+      - "RTT vs one-way latency; every protocol round trip (DNS, TCP, TLS, request) multiplies it."
+      - "Bandwidth-delay product: how much data must be in flight to fill a path, and why it drives window sizes."
+      - "Last-mile latency and bufferbloat: latency under load is not the latency an idle ping shows."
+    diagram: >-
+      Horizontal timeline of one HTTPS request from Lviv to a server in Frankfurt and to one in
+      Virginia: stacked bars for DNS, TCP handshake, TLS handshake and request/TTFB, each a
+      multiple of the RTT, so the far server's total grows by the RTT difference times the number
+      of round trips.
+    example: >-
+      Lab (5–10 min). `ping -c 10 1.1.1.1` (anycast, nearby) and `ping -c 10` a host on another
+      continent; compute the fibre floor as 2 × distance / 200 000 km/s and compare it with the
+      measured RTT. Then run
+      `curl -s -o /dev/null -w 'dns %{time_namelookup} tcp %{time_connect} tls %{time_appconnect} ttfb %{time_starttransfer} total %{time_total}\n' https://example.com`
+      and express each phase as a number of RTTs. Finish with macOS `networkQuality -v` to compare
+      idle and loaded latency.
+    presentation: minimal
+    sources:
+      - title: High Performance Browser Networking, ch. 1 "Primer on Latency and Bandwidth"
+        url: https://hpbn.co/primer-on-latency-and-bandwidth/
+        locator: ch. 1, "Speed of Light and Propagation Latency", "Last-Mile Latency"
+        kind: book
+        verified: false
+      - title: What is latency? (Cloudflare Learning Center)
+        url: https://www.cloudflare.com/learning/performance/glossary/what-is-latency/
+        kind: docs
+        verified: false
+
+  - id: networking-03
+    title: "Congestion control intuition: slow start, CUBIC vs BBR"
+    level: B
+    est_min: 25
+    prereqs: [networking-01, networking-02]
+    summary: >-
+      TCP does not know the capacity of the path, so it probes for it, and that probing explains
+      why new connections are slow, why connection reuse matters, and why a single lost packet can
+      cut throughput sharply. The lesson builds intuition for slow start and congestion avoidance,
+      then contrasts loss-based CUBIC with model-based BBR. Keep it to one idea (the congestion
+      window), one diagram and one calculation.
+    key_points:
+      - "Receive window vs congestion window: the sender may have min(rwnd, cwnd) bytes in flight."
+      - "Slow start: cwnd starts at the initial window (10 segments, RFC 6928) and roughly doubles every RTT until loss or ssthresh, so small responses finish inside slow start and are RTT-bound."
+      - "Congestion avoidance and multiplicative decrease; CUBIC grows the window as a cubic function of time since the last loss (RFC 9438 §4)."
+      - "BBR models bottleneck bandwidth and minimum RTT instead of treating loss as the signal, which helps on lossy or deep-buffered paths and changes fairness against CUBIC."
+      - "Practical consequences: keep connections warm, avoid a new connection per request, and know which algorithm your servers run (`sysctl net.ipv4.tcp_congestion_control` on Linux)."
+    diagram: >-
+      cwnd (segments) against time (RTTs): exponential slow start up to ssthresh, then growth in
+      congestion avoidance, a loss event that cuts the window, and CUBIC's concave-then-convex
+      recovery curve; a second, flatter line shows BBR pacing near the estimated bottleneck
+      bandwidth with periodic probing bumps.
+    example: >-
+      Pencil-and-terminal exercise. With MSS 1460 bytes and an initial window of 10 segments,
+      compute how many RTTs a 100 KB JSON response needs in slow start (10 + 20 + 40 segments is
+      about 102 KB, so 3 RTTs) and convert that to milliseconds using the RTTs measured in rung 2
+      for a near and a far server. Optional on any Linux box or container:
+      `sysctl net.ipv4.tcp_congestion_control` and `ss -ti` during a `curl` download to watch
+      cwnd and rtt change.
+    presentation: minimal
+    sources:
+      - title: High Performance Browser Networking, ch. 2 "Building Blocks of TCP"
+        url: https://hpbn.co/building-blocks-of-tcp/
+        locator: ch. 2, "Congestion Avoidance and Control", "Slow-Start", "Bandwidth-Delay Product"
+        kind: book
+        verified: false
+      - title: "RFC 9438: CUBIC for Fast and Long-Distance Networks"
+        url: https://www.rfc-editor.org/rfc/rfc9438.html
+        locator: §4 "CUBIC Congestion Control"
+        kind: docs
+        verified: false
+      - title: "BBR: Congestion-Based Congestion Control (Cardwell et al., ACM Queue, 2016)"
+        url: https://queue.acm.org/detail.cfm?id=3022184
+        kind: paper
+        verified: false
+
+  - id: networking-04
+    title: UDP and when to choose it
+    level: B
+    est_min: 20
+    prereqs: [networking-01, networking-03]
+    summary: >-
+      UDP gives almost nothing (no connection, ordering, retransmission or congestion control),
+      and that is exactly why DNS, QUIC, WireGuard, media and game traffic are built on it. The
+      lesson explains what an application takes on when it chooses UDP, how NATs and firewalls
+      treat it, and the short list of cases where it is the right choice for a backend engineer.
+      It sets up the HTTP/3, DNS and WireGuard rungs.
+    key_points:
+      - "The 8-byte UDP header and the 'null protocol services' it offers: message boundaries are preserved, delivery and order are not (HPBN ch. 3)."
+      - "What the application must add itself: timeouts and retries, idempotency, ordering, congestion control and pacing (RFC 8085 §3)."
+      - "NAT bindings and firewall state for UDP expire quickly, so long-lived UDP flows need keepalives."
+      - "Datagram size limits: MTU, fragmentation, and why large DNS answers use EDNS and fall back to TCP."
+      - "Choose UDP when latency beats completeness (voice, games), when you build a transport on top (QUIC, WireGuard), or for request/response that fits one datagram (DNS); otherwise use TCP or QUIC."
+    diagram: >-
+      Side by side: a TCP exchange (handshake, data, ACKs, FIN) vs a UDP DNS query (one datagram
+      out, one back), with an annotation for a lost UDP reply that only the application's timeout
+      can detect.
+    example: >-
+      Lab (5–10 min). `sudo tcpdump -i en0 -nn 'port 53'` while running
+      `dig example.com @1.1.1.1` (one UDP datagram each way), then `dig +tcp example.com @1.1.1.1`
+      (a handshake first, then the same query over TCP). On loopback: `nc -u -l 9999` in one
+      terminal and `nc -u 127.0.0.1 9999` in another, type a few lines, kill the listener and keep
+      typing; watch `sudo tcpdump -i lo0 -nn 'udp port 9999 or icmp'` to see that only an ICMP
+      port-unreachable, if anything, tells the sender.
+    presentation: standard
+    sources:
+      - title: High Performance Browser Networking, ch. 3 "Building Blocks of UDP"
+        url: https://hpbn.co/building-blocks-of-udp/
+        locator: ch. 3, "Null Protocol Services", "UDP and Network Address Translators"
+        kind: book
+        verified: false
+      - title: "RFC 8085: UDP Usage Guidelines"
+        url: https://www.rfc-editor.org/rfc/rfc8085.html
+        locator: §3 "UDP Usage Guidelines"
+        kind: docs
+        verified: false
+      - title: What is the User Datagram Protocol (UDP)? (Cloudflare Learning Center)
+        url: https://www.cloudflare.com/learning/ddos/glossary/user-datagram-protocol-udp/
+        kind: docs
+        verified: false
+
+  # ------------------------------------------------------------------ I: the modern web stack
+  - id: networking-05
+    title: TLS 1.3 handshake and certificates in practice
+    level: I
+    est_min: 25
+    prereqs: [networking-01]
+    summary: >-
+      Deepens the existing note Networking-HTTPS-TLS.md: instead of describing the handshake
+      again, the reader takes a live TLS 1.3 connection apart with `openssl s_client` and learns
+      to read what it prints. Covers the 1-RTT handshake and key share, SNI and ALPN, the
+      certificate chain and how it is validated, and resumption and 0-RTT with the replay caveat.
+      These are the facts needed later to debug handshake failures, missing intermediates and mTLS
+      in a service mesh.
+    key_points:
+      - "The 1-RTT full handshake: ClientHello with key_share, ServerHello, then encrypted EncryptedExtensions, Certificate, CertificateVerify and Finished (RFC 8446 §2, §4)."
+      - "SNI selects the certificate and ALPN selects the application protocol (h2, http/1.1); both travel in the ClientHello."
+      - "The certificate chain: leaf, intermediates, root in the trust store; SAN matching, validity dates, and why a missing intermediate breaks some clients (often JVM ones) but not browsers."
+      - "Resumption with a PSK and 0-RTT early data; 0-RTT data can be replayed, so only idempotent requests may use it (RFC 8446 §2.3, §8)."
+      - "mTLS: the server sends CertificateRequest and the client proves its own identity, the basis of mesh and zero-trust identity later in the track."
+    diagram: >-
+      Sequence diagram of a TLS 1.3 full handshake over an established TCP connection, marking
+      which messages are protected with handshake keys and where application data can start
+      (client side after 1 RTT), with a dashed alternative lane for PSK resumption carrying 0-RTT
+      early data.
+    example: >-
+      Lab (10 min). macOS ships LibreSSL, so install OpenSSL 3 (`brew install openssl@3`) and use
+      its binary. Run
+      `openssl s_client -connect www.cloudflare.com:443 -servername www.cloudflare.com -tls1_3 -alpn h2,http/1.1 -brief </dev/null`
+      and read the protocol, cipher, ALPN and peer certificate lines. Then
+      `openssl s_client -connect www.cloudflare.com:443 -servername www.cloudflare.com -showcerts </dev/null`,
+      save the first certificate and inspect it with
+      `openssl x509 -noout -subject -issuer -dates -ext subjectAltName`. Optional: test resumption
+      with `-sess_out s.pem` on one run and `-sess_in s.pem` on the next and look for "Reused".
+    presentation: standard
+    sources:
+      - title: What happens in a TLS handshake? (Cloudflare Learning Center)
+        url: https://www.cloudflare.com/learning/ssl/what-happens-in-a-tls-handshake/
+        kind: docs
+        verified: false
+      - title: "RFC 8446: The Transport Layer Security (TLS) Protocol Version 1.3"
+        url: https://www.rfc-editor.org/rfc/rfc8446.html
+        locator: §2 "Protocol Overview", §2.3 "0-RTT Data", §4.1 "Key Exchange Messages", §8 "0-RTT and Anti-Replay"
+        kind: docs
+        verified: false
+      - title: High Performance Browser Networking, ch. 4 "Transport Layer Security (TLS)"
+        url: https://hpbn.co/transport-layer-security-tls/
+        locator: ch. 4, "TLS Handshake", "Chain of Trust and Certificate Authorities"
+        kind: book
+        verified: false
+
+  - id: networking-06
+    title: "HTTP/1.1 vs HTTP/2: multiplexing, HPACK, head-of-line blocking"
+    level: I
+    est_min: 25
+    prereqs: [networking-03, networking-05]
+    summary: >-
+      HTTP/2 kept HTTP's semantics but replaced the wire format with binary frames on multiplexed
+      streams over one TCP connection, plus header compression. The lesson shows what that fixed
+      (application-level head-of-line blocking, a connection per request, repetitive headers) and
+      what it could not fix (TCP-level head-of-line blocking on loss), which motivates HTTP/3.
+      Deepens the "Versions at a Glance" table in Networking-HTTPS-TLS.md and matters directly for
+      gRPC and Akka HTTP clients, which ride on HTTP/2.
+    key_points:
+      - "HTTP/1.1 allows one outstanding request per connection in practice, so clients open several connections; pipelining never worked out."
+      - "HTTP/2 frames, streams and messages: stream IDs, interleaving, and per-stream flow control (RFC 9113 §5)."
+      - "HPACK: static and dynamic tables plus Huffman coding, and why generic compression of headers (the CRIME attack) was unsafe (RFC 7541)."
+      - "Head-of-line blocking moves from HTTP down to TCP: one lost segment stalls every stream on the connection."
+      - "Operational effects: one long-lived connection per origin, connection coalescing, and load balancers that must spread HTTP/2 per request rather than per connection."
+    diagram: >-
+      Two lanes: HTTP/1.1 with three TCP connections, each carrying one request/response at a
+      time, vs HTTP/2 with a single TCP connection carrying interleaved HEADERS and DATA frames
+      for streams 1, 3 and 5; a red cross on one TCP segment shows all three streams waiting in
+      the HTTP/2 lane.
+    example: >-
+      Lab (10 min). `curl -v --http2 -o /dev/null https://nghttp2.org/` and find the ALPN line and
+      the stream information; compare `curl -s -o /dev/null -w '%{http_version}\n'` with
+      `--http1.1` and `--http2`. Then `brew install nghttp2` and run `nghttp -nv https://nghttp2.org/`
+      to see SETTINGS, HEADERS and DATA frames with their stream ids, and
+      `h2load -n 20 -c 1 -m 10 https://nghttp2.org/` to read the header "space savings" that HPACK
+      achieved.
+    presentation: standard
+    sources:
+      - title: High Performance Browser Networking, ch. 12 "HTTP/2"
+        url: https://hpbn.co/http2/
+        locator: ch. 12, "Streams, Messages, and Frames", "Header Compression"
+        kind: book
+        verified: false
+      - title: "RFC 9113: HTTP/2"
+        url: https://www.rfc-editor.org/rfc/rfc9113.html
+        locator: §5 "Streams and Multiplexing"
+        kind: docs
+        verified: false
+      - title: HTTP/2 vs. HTTP/1.1 (Cloudflare Learning Center)
+        url: https://www.cloudflare.com/learning/performance/http2-vs-http1.1/
+        kind: docs
+        verified: false
+
+  - id: networking-07
+    title: "HTTP/3 and QUIC: why UDP, 0-RTT, connection migration"
+    level: I
+    est_min: 30
+    prereqs: [networking-04, networking-05, networking-06]
+    summary: >-
+      QUIC moves the transport into user space on top of UDP, folds TLS 1.3 into its own handshake
+      and gives every stream independent loss recovery, removing TCP head-of-line blocking; HTTP/3
+      maps HTTP onto it. The lesson explains why UDP was the only deployable choice, how the
+      combined handshake reaches 1-RTT and 0-RTT, and how connection IDs let a connection survive
+      a network change. It ends with when HTTP/3 helps (lossy mobile links, long RTTs) and what it
+      costs (CPU, UDP blocked on some networks, harder observability).
+    key_points:
+      - "Why UDP: TCP lives in kernels and middleboxes and is effectively frozen; UDP lets the transport evolve in user space, with almost all headers encrypted."
+      - "One combined transport and crypto handshake: 1-RTT for new connections, 0-RTT on resumption with the same replay caveat as TLS (RFC 9000 §7; RFC 9001 §4.6)."
+      - "Streams with independent delivery: a lost packet only stalls the streams whose data it carried (RFC 9000 §2)."
+      - "Connection IDs and path validation make connection migration possible when the client's address changes (RFC 9000 §5.1, §9)."
+      - "Discovery and fallback: Alt-Svc headers and HTTPS DNS records advertise h3, and clients fall back to TCP when UDP 443 is blocked."
+    diagram: >-
+      Round-trip ladder comparing TCP + TLS 1.3 (one RTT for TCP plus one for TLS before the
+      request), QUIC on a new connection (one RTT) and QUIC resumption (zero RTT, request in the
+      first flight), with an inset of a phone moving from Wi-Fi to LTE while the QUIC connection ID
+      stays the same.
+    example: >-
+      Lab (10 min). `curl -sI https://www.cloudflare.com | grep -i alt-svc` to see the h3
+      advertisement and `dig www.cloudflare.com HTTPS +short` (or `TYPE65` on an older dig) to see
+      the HTTPS record with its alpn list. If `curl -V` lists HTTP3, compare
+      `curl -s -o /dev/null -w '%{http_version} %{time_connect} %{time_appconnect}\n' --http3 https://www.cloudflare.com`
+      with the same command using `--http2`; otherwise open Chrome DevTools -> Network, enable the
+      Protocol column and reload to see h3. Finally capture
+      `sudo tcpdump -i en0 -nn -c 20 'udp port 443'` while loading the page and note how little of
+      it is readable.
+    presentation: standard
+    sources:
+      - title: "RFC 9000: QUIC, a UDP-Based Multiplexed and Secure Transport"
+        url: https://www.rfc-editor.org/rfc/rfc9000.html
+        locator: §2 "Streams", §5.1 "Connection ID", §7 "Cryptographic and Transport Handshake", §9 "Connection Migration"
+        kind: docs
+        verified: false
+      - title: What is HTTP/3? (Cloudflare Learning Center)
+        url: https://www.cloudflare.com/learning/performance/what-is-http3/
+        kind: docs
+        verified: false
+      - title: The Road to QUIC (Cloudflare blog)
+        url: https://blog.cloudflare.com/the-road-to-quic/
+        kind: blog
+        verified: false
+
+  - id: networking-08
+    title: "Modern DNS: resolution path, DoH/DoT, DNSSEC, TTL games"
+    level: I
+    est_min: 25
+    prereqs: [networking-04, networking-05]
+    summary: >-
+      Deepens the existing note Networking-DNS-DHCP.md from how resolution works to how DNS
+      behaves in production: walking the delegation chain yourself, what encrypted transports
+      (DoT, DoH) protect and what they do not, what DNSSEC actually validates, and how TTLs and
+      caches decide how quickly a change or failover takes effect. DNS is the first round trip of
+      almost every request and a classic source of "works on my machine" incidents.
+    key_points:
+      - "Stub -> recursive resolver -> root -> TLD -> authoritative, with caching at every hop; 'propagation' is really TTL expiry."
+      - "TTL trade-offs: low TTLs for failover and migrations vs resolver load and extra latency; negative caching of NXDOMAIN via the SOA record."
+      - "DoT (port 853) and DoH (HTTPS) encrypt stub-to-resolver traffic but do not authenticate the data; that is DNSSEC's job."
+      - "DNSSEC chain of trust: DS in the parent, DNSKEY and RRSIG in the child; a validation failure surfaces as SERVFAIL."
+      - "JVM gotcha: the JVM caches lookups itself (`networkaddress.cache.ttl`), independently of the record TTL, which matters for long-running services during failovers."
+    diagram: >-
+      Flowchart of a lookup for api.example.com: JVM cache -> OS stub -> recursive resolver
+      (reached over UDP 53, DoT 853 or DoH 443) -> root -> .com -> example.com authoritative, with
+      TTL badges on each cached answer, and a DNSSEC side chain: root DS -> com DNSKEY -> com DS ->
+      example.com DNSKEY -> RRSIG over the A record.
+    example: >-
+      Lab (10 min). `dig +trace www.wikipedia.org` and annotate each referral; run
+      `dig www.wikipedia.org @1.1.1.1` twice and watch the TTL count down in the resolver cache.
+      DNSSEC: `dig +dnssec cloudflare.com @1.1.1.1` (look for the ad flag and RRSIG records), then
+      `dig dnssec-failed.org @1.1.1.1` (SERVFAIL) vs `dig +cd dnssec-failed.org @1.1.1.1` (checking
+      disabled, answer returned). DoH by hand:
+      `curl -s -H 'accept: application/dns-json' 'https://cloudflare-dns.com/dns-query?name=example.com&type=AAAA'`.
+    presentation: standard
+    sources:
+      - title: DNS over TLS vs. DNS over HTTPS (Cloudflare Learning Center)
+        url: https://www.cloudflare.com/learning/dns/dns-over-tls/
+        kind: docs
+        verified: false
+      - title: How does DNSSEC work? (Cloudflare Learning Center)
+        url: https://www.cloudflare.com/learning/dns/dnssec/how-dnssec-works/
+        kind: docs
+        verified: false
+      - title: Julia Evans' blog
+        url: https://jvns.ca/
+        locator: posts "How to use dig" and "DNS doesn't 'propagate'" (both 2021)
+        kind: blog
+        verified: false
+
+  - id: networking-09
+    title: "Load balancing L4 vs L7, health checks, connection draining"
+    level: I
+    est_min: 25
+    prereqs: [networking-01, networking-06]
+    summary: >-
+      Deepens Networking-Routing-Reverse-Proxy.md: an L4 balancer forwards connections and never
+      sees HTTP, while an L7 balancer terminates the connection and routes each request, and that
+      one difference decides how HTTP/2 and gRPC traffic is spread, where TLS ends and what health
+      checks can see. The lesson covers the balancing algorithms that matter in practice, active
+      vs passive health checks, and draining connections during deploys without dropping
+      requests.
+    key_points:
+      - "L4 (TCP/UDP, per connection: IPVS, Maglev-style balancers, cloud NLBs) vs L7 (HTTP-aware, per request: Envoy, HAProxy in http mode, cloud ALBs), and what each can and cannot do."
+      - "Long-lived HTTP/2 and gRPC connections defeat per-connection balancing; the fixes are L7 balancing or client-side balancing."
+      - "Algorithms: round robin, least outstanding requests, consistent hashing, power of two random choices; why 'least connections' misleads with multiplexed connections."
+      - "Health checks: active probes vs passive outlier detection, liveness vs readiness, and how aggressive ejection can cascade."
+      - "Connection draining: stop new work, finish in-flight requests, then close; in Kubernetes readiness + preStop + terminationGracePeriodSeconds, in Akka the CoordinatedShutdown phases."
+    diagram: >-
+      Two-panel architecture diagram: an L4 balancer passing TCP connections straight to backends,
+      with one gRPC connection pinned to one pod, vs an L7 proxy terminating TLS and spreading
+      individual requests across pods; a health checker probes the pods and one pod is marked
+      draining.
+    example: >-
+      Lab (10 min) with HAProxy on a Mac (`brew install haproxy`). Start two backends with
+      `python3 -m http.server 8001` and `python3 -m http.server 8002`, and run HAProxy with a short
+      config using `mode http`, `balance roundrobin`, `option httpchk GET /` and both servers with
+      `check`. Loop `curl -s -o /dev/null -w '%{http_code}\n' localhost:8080`, kill one backend and
+      watch it get ejected. Then switch to `mode tcp` and fetch three URLs in one keep-alive `curl`
+      call to see all three land on the same backend. Map what you saw to your own Kubernetes or
+      Akka HTTP shutdown settings.
+    presentation: standard
+    sources:
+      - title: Site Reliability Engineering, ch. 20 "Load Balancing in the Datacenter"
+        url: https://sre.google/sre-book/load-balancing-datacenter/
+        locator: ch. 20, sections on subsetting and load balancing policies
+        kind: book
+        verified: false
+      - title: What is load balancing? (Cloudflare Learning Center)
+        url: https://www.cloudflare.com/learning/performance/what-is-load-balancing/
+        kind: docs
+        verified: false
+      - title: Envoy documentation
+        url: https://www.envoyproxy.io/docs/envoy/latest/
+        locator: Architecture overview -> Upstream clusters -> "Load Balancing", "Health checking", "Outlier detection"; Operations -> "Draining"
+        kind: docs
+        verified: false
+
+  - id: networking-10
+    title: CDNs and anycast
+    level: I
+    est_min: 20
+    prereqs: [networking-02, networking-08]
+    summary: >-
+      A CDN shrinks the speed-of-light budget from rung 2 by terminating connections and serving
+      cached content close to the user, and anycast is how a single IP address reaches the
+      nearest of many locations. The lesson explains anycast via BGP, what a CDN does beyond
+      caching (TLS termination near the user, warm connections to origin, DDoS absorption), and
+      the cache headers that decide hit or miss.
+    key_points:
+      - "Anycast: the same prefix is announced over BGP from many locations, and routing picks the closest in BGP terms, which is not always the geographically closest."
+      - "Why anycast suits UDP (DNS) and short TCP flows, and what happens to a TCP connection when routes change mid-flow."
+      - "The CDN request path: edge PoP -> optional tiered cache -> origin, with TLS terminated at the edge and long-lived connections back to origin."
+      - "Caching rules: Cache-Control (max-age, s-maxage, stale-while-revalidate), Vary and cache keys, purging; APIs usually bypass the cache but still gain from edge termination."
+      - "DNS-based geo steering vs anycast: trade-offs in failover speed and precision."
+    diagram: >-
+      Map-style diagram: users in Lviv, Lisbon and New York all send to the same anycast IP and
+      each lands on a different PoP; one PoP serves a cache hit, another misses and fetches from a
+      single origin over a long-lived connection.
+    example: >-
+      Lab (5–10 min). `curl -s https://www.cloudflare.com/cdn-cgi/trace` and read the colo= line
+      (the PoP that served you); `dig @1.1.1.1 CH TXT id.server +short` to see which resolver
+      location answered; `brew install mtr` and `sudo mtr -rwc 10 1.1.1.1` to see how few hops
+      away it is. Then `curl -sI` a static asset on a CDN-backed site twice and compare
+      `cf-cache-status`, `age` and `cache-control` between the two responses.
+    presentation: standard
+    sources:
+      - title: What is a CDN? (Cloudflare Learning Center)
+        url: https://www.cloudflare.com/learning/cdn/what-is-a-cdn/
+        kind: docs
+        verified: false
+      - title: What is an anycast network? (Cloudflare Learning Center)
+        url: https://www.cloudflare.com/learning/cdn/glossary/anycast-network/
+        kind: docs
+        verified: false
+      - title: The Cloudflare Blog
+        url: https://blog.cloudflare.com/
+        locator: post "A Brief Anycast Primer" (Matthew Prince, 2011)
+        kind: blog
+        verified: false
+
+  - id: networking-11
+    title: "WebSockets, SSE and gRPC streaming: picking a transport"
+    level: I
+    est_min: 25
+    prereqs: [networking-06]
+    summary: >-
+      When the server needs to push data (live status, notifications, streamed LLM tokens) there
+      are three mainstream options with very different operational footprints. The lesson
+      compares Server-Sent Events (one-way over a plain HTTP response), WebSockets (bidirectional,
+      own framing after an HTTP upgrade) and gRPC streaming (typed, over HTTP/2, best between
+      services), and ends with a decision table. LLM APIs streaming tokens over SSE make this
+      immediately practical.
+    key_points:
+      - "SSE: a text/event-stream HTTP response, server to client only, with automatic reconnect via Last-Event-ID; works through most proxies and over HTTP/2."
+      - "WebSockets: an HTTP/1.1 Upgrade handshake, then a framed bidirectional channel (RFC 6455); every proxy and load balancer on the path must allow the upgrade and long idle times."
+      - "gRPC: unary, server-streaming, client-streaming and bidirectional RPCs over HTTP/2 with Protobuf; excellent between services, needs gRPC-Web or a proxy for browsers."
+      - "Shared operational concerns: idle timeouts at every hop, heartbeats, backpressure, reconnect storms after deploys, and L7 balancing of long-lived connections (rung 9)."
+      - "Decision table: browser one-way -> SSE; browser bidirectional and low latency -> WebSocket; internal typed streaming -> gRPC; plain polling is still fine for low-frequency updates."
+    diagram: >-
+      Decision flowchart: "Who are the endpoints?" (browser-server or service-service) ->
+      "Direction?" -> "Message rate and latency need?" -> leaves SSE, WebSocket, gRPC streaming
+      and polling, each leaf annotated with what it is on the wire (long HTTP response, upgraded
+      TCP connection, HTTP/2 streams, repeated requests).
+    example: >-
+      Lab (10 min). Write a 15-line Python SSE server on localhost (http.server, Content-Type
+      text/event-stream, writes `data: tick N` plus a blank line every second and flushes) and
+      consume it with `curl -N localhost:8000/events`; note that it is just a long HTTP response.
+      Then open Chrome DevTools -> Network -> WS on any site that uses WebSockets and inspect the
+      101 Switching Protocols response and the frames. Finish by filling the decision table for
+      three cases: an order-status page, a chat, and an event feed between two Scala services.
+    presentation: standard
+    sources:
+      - title: High Performance Browser Networking, ch. 16 "Server-Sent Events (SSE)"
+        url: https://hpbn.co/server-sent-events-sse/
+        locator: ch. 16, "EventSource API", "Event Stream Protocol"
+        kind: book
+        verified: false
+      - title: High Performance Browser Networking, ch. 17 "WebSocket"
+        url: https://hpbn.co/websocket/
+        locator: ch. 17, "WebSocket Protocol", "Performance Checklist"
+        kind: book
+        verified: false
+      - title: gRPC core concepts
+        url: https://grpc.io/docs/what-is-grpc/core-concepts/
+        locator: sections "Server streaming RPC", "Bidirectional streaming RPC", "RPC life cycle"
+        kind: docs
+        verified: false
+
+  # ------------------------------------------------------------------ A: production networking
+  - id: networking-12
+    title: "Service mesh: sidecars vs eBPF data planes (Cilium)"
+    level: A
+    est_min: 30
+    prereqs: [networking-05, networking-09]
+    summary: >-
+      A service mesh moves mTLS, retries, timeouts, load balancing and telemetry out of
+      application code into the network data plane. The lesson compares the classic sidecar model
+      (an Envoy per pod), sidecar-less designs (Istio ambient mode's per-node L4 proxy plus
+      optional L7 waypoints) and eBPF-based data planes (Cilium), following one request through
+      each and weighing latency, resource cost, blast radius and operational complexity. It ends
+      with when a mesh is worth it at all for a JVM shop compared with good client libraries and
+      an L7 load balancer.
+    key_points:
+      - "What a mesh provides: workload identity and mTLS, L7 traffic policy (retries, timeouts, circuit breaking), uniform telemetry, and how much of that overlaps with Akka and HTTP client features."
+      - "Sidecar model: an iptables redirect into a per-pod Envoy; extra hops and memory per pod, plus upgrade and startup-ordering pain."
+      - "Ambient model: a per-node ztunnel for L4 and mTLS, and waypoint proxies for L7 only where needed."
+      - "eBPF data plane: Cilium programs the kernel for service load balancing, network policy and visibility (Hubble), using Envoy only for L7 features."
+      - "Trade-offs: latency per hop, failure isolation (per pod vs per node), shared proxies across tenants, debuggability, kernel version requirements."
+      - "When not to adopt a mesh: few services, one language with solid client libraries, no mTLS mandate."
+    diagram: >-
+      Three side-by-side request paths from pod A to pod B on different nodes: (1) app ->
+      iptables -> sidecar Envoy -> network -> sidecar Envoy -> app; (2) app -> node ztunnel (mTLS,
+      L4) -> optional waypoint (L7) -> node ztunnel -> app; (3) app -> eBPF hook in the kernel ->
+      network -> eBPF -> app, with a per-node Envoy used only for L7 policy. Each path is annotated
+      with its number of user-space proxy hops.
+    example: >-
+      Paper lab (15 min) plus an optional cluster. For one internal call between two services you
+      know, list the features you rely on today (timeouts, retries, TLS, metrics) and where each
+      lives (code, library, proxy). Count the proxy hops for each of the three models and estimate
+      the memory overhead for 50 pods using figures from the cited docs (cite them). Optional with
+      Docker: create a kind cluster with the default CNI disabled (Cilium's kind quick-start),
+      `cilium install`, `cilium hubble enable`, deploy two pods and run `hubble observe --follow`
+      while one curls the other.
+    presentation: deep
+    sources:
+      - title: Cilium documentation, "Introduction to Cilium & Hubble"
+        url: https://docs.cilium.io/en/stable/overview/intro/
+        locator: Introduction to Cilium & Hubble; also the Network -> "Service Mesh" section
+        kind: docs
+        verified: false
+      - title: Istio documentation, ambient mode overview
+        url: https://istio.io/latest/docs/ambient/overview/
+        kind: docs
+        verified: false
+      - title: What is eBPF? (ebpf.io)
+        url: https://ebpf.io/what-is-ebpf/
+        kind: docs
+        verified: false
+
+  - id: networking-13
+    title: Zero trust and WireGuard
+    level: A
+    est_min: 30
+    prereqs: [networking-04, networking-05]
+    summary: >-
+      Deepens Networking-NAT-DMZ-VPN.md: the perimeter model (trusted inside, a VPN to get in)
+      gives way to zero trust, where every request is authenticated and authorised on identity
+      and device posture wherever it comes from. WireGuard is the modern building block under many
+      such systems: a small, opinionated UDP tunnel with static public keys and a 1-RTT handshake.
+      The lesson connects the policy model (NIST SP 800-207) to the mechanics (cryptokey routing,
+      NAT traversal as Tailscale does it) and to the questions to ask of any access design.
+    key_points:
+      - "Zero-trust tenets: no implicit trust from network location, per-request authentication and authorisation, and the split between policy decision and policy enforcement points (NIST SP 800-207 §2–3)."
+      - "Two implementation styles: identity-aware proxies vs mesh VPNs, and where service mTLS from rung 12 fits."
+      - "WireGuard's design: Curve25519 static keys, a Noise-based 1-RTT handshake, cryptokey routing where AllowedIPs is both route and ACL, silence when idle, built-in roaming."
+      - "NAT traversal for peer-to-peer tunnels: endpoint discovery, hole punching, and relay fallback (DERP in Tailscale)."
+      - "Operational trade-offs: key distribution and rotation, no user authentication inside WireGuard itself, audit logging, MTU overhead."
+    diagram: >-
+      Two panels: (left) perimeter VPN, laptop -> VPN concentrator -> flat internal network with
+      many services; (right) zero trust, laptop and services each with a WireGuard identity, a
+      control plane distributing keys and policy, direct encrypted peer-to-peer paths, and a relay
+      used only when hole punching fails.
+    example: >-
+      Lab (10–15 min). `brew install wireguard-tools`; generate a key pair with
+      `wg genkey | tee priv.key | wg pubkey > pub.key` and write a two-peer `wg0.conf` by hand,
+      explaining every line (Address, ListenPort, PrivateKey, [Peer] PublicKey, AllowedIPs,
+      Endpoint, PersistentKeepalive). If Tailscale is installed, run `tailscale netcheck` to see
+      your NAT behaviour and relay latencies and `tailscale ping <peer>` to watch a path go from
+      relayed to direct. Close with a one-paragraph access design for an internal admin tool using
+      these ideas.
+    presentation: deep
+    sources:
+      - title: WireGuard
+        url: https://www.wireguard.com/
+        locator: sections "Conceptual Overview", "Cryptokey Routing", "Built-in Roaming"; whitepaper §5 at /papers/wireguard.pdf
+        kind: docs
+        verified: false
+      - title: "NIST SP 800-207: Zero Trust Architecture"
+        url: https://csrc.nist.gov/pubs/sp/800/207/final
+        locator: §2 "Zero Trust Basics", §3 "Logical Components of Zero Trust Architecture"
+        kind: paper
+        verified: false
+      - title: How Tailscale works (Tailscale blog)
+        url: https://tailscale.com/blog/how-tailscale-works
+        kind: blog
+        verified: false
+
+  - id: networking-14
+    title: "IPv6 in production today: dual stack, NAT64, what still breaks"
+    level: A
+    est_min: 25
+    prereqs: [networking-08, networking-10]
+    summary: >-
+      Deepens Networking-IPV4-vs-IPV6.md from address anatomy to operations. The lesson covers
+      how dual-stack clients choose between IPv4 and IPv6 (Happy Eyeballs), how IPv6-only clients
+      reach IPv4-only services (DNS64/NAT64, 464XLAT), and the failure modes that still bite
+      backend services: IPv4 literals, v4-only allowlists and logs, filtered ICMPv6 and JVM
+      address preferences. Adoption figures come from live measurement pages, cited with the date
+      read.
+    key_points:
+      - "Measure, do not assume: adoption differs widely by country and network; read Google's and APNIC's measurement pages for Ukraine and for your users' countries and cite the date."
+      - "Happy Eyeballs v2: query AAAA and A, prefer IPv6, and race connection attempts with a short delay so a broken IPv6 path does not hurt users (RFC 8305)."
+      - "IPv6-only access networks: DNS64 synthesises AAAA records and NAT64 translates (RFC 6146, RFC 6147); 464XLAT covers apps that use IPv4 literals."
+      - "What still breaks: hard-coded IPv4 literals and regexes, v4-only firewall allowlists, logs and rate limits keyed per address instead of per /64, filtered ICMPv6 causing PMTUD black holes, `java.net.preferIPv4Stack` and `java.net.preferIPv6Addresses`."
+      - "Dual-stack Kubernetes services and cloud load balancers, and why the rising cost of public IPv4 pushes towards IPv6-first designs (cite a provider announcement)."
+    diagram: >-
+      Flow: an IPv6-only phone resolves api.example.com (A record only) -> DNS64 returns a
+      synthesised AAAA in 64:ff9b::/96 -> traffic reaches the NAT64 gateway -> translated to IPv4
+      -> server. Alongside, a dual-stack laptop races IPv6 and IPv4 connections with Happy Eyeballs
+      and IPv6 wins.
+    example: >-
+      Lab (10 min). `curl -6 -s https://ifconfig.co` and `curl -4 -s https://ifconfig.co` (or open
+      test-ipv6.com) to see whether you have IPv6 at all; `dig AAAA` a few sites you use daily and
+      note which have none; `dig AAAA ipv4only.arpa +short` (any answer means your resolver does
+      DNS64, RFC 7050); `curl -v -o /dev/null https://www.google.com 2>&1 | grep -iE 'trying|connected'`
+      to see the address attempts; `ndp -an` to list IPv6 neighbours. Then grep one of your own
+      services' configs and log pipelines for IPv4-only assumptions.
+    presentation: deep
+    sources:
+      - title: "RFC 8305: Happy Eyeballs Version 2: Better Connectivity Using Concurrency"
+        url: https://www.rfc-editor.org/rfc/rfc8305.html
+        locator: §3 "Hostname Resolution", §5 "Connection Attempts"
+        kind: docs
+        verified: false
+      - title: "RFC 6146: Stateful NAT64"
+        url: https://www.rfc-editor.org/rfc/rfc6146.html
+        locator: §1 "Introduction"
+        kind: docs
+        verified: false
+      - title: APNIC Blog
+        url: https://blog.apnic.net/
+        locator: IPv6 deployment and measurement posts (Geoff Huston and APNIC Labs); per-country data at https://stats.labs.apnic.net/ipv6
+        kind: blog
+        verified: false
+
+  - id: networking-15
+    title: "Observability of the network path: eBPF tracing, pcap, latency histograms"
+    level: A
+    est_min: 30
+    prereqs: [networking-03, networking-12]
+    summary: >-
+      Deepens Networking-Network-Tools.md from one-off commands to a measurement practice. The
+      lesson uses three complementary lenses: client-side timing split into phases and summarised
+      as histograms (never averages), packet captures read for retransmissions, zero windows and
+      RTT, and kernel-level tracing with eBPF (bcc and bpftrace tools, Cilium Hubble) that sees
+      every connection at low overhead. It ends with which lens to reach for first for a given
+      symptom.
+    key_points:
+      - "Percentiles and histograms: averages hide the tail; collect p50/p90/p99 per phase (DNS, connect, TLS, TTFB) and know how many samples a percentile needs."
+      - "pcap analysis: Wireshark expert info, `tcp.analysis.retransmission` and `tcp.analysis.zero_window` filters, RTT and throughput stream graphs; capture vs display filters; snaplen and privacy."
+      - "eBPF tracing on Linux: tcpconnect, tcpconnlat, tcpretrans and tcplife from bcc, bpftrace one-liners, their overhead and kernel requirements."
+      - "In-cluster flow visibility with Hubble: flows, DNS and HTTP metrics without changing the application."
+      - "Correlating layers: tie a slow OpenTelemetry span in the application to retransmits or DNS delay on the same host in the same time window."
+    diagram: >-
+      Layered stack (application -> TLS -> TCP -> IP -> NIC) with each tool placed at the layer it
+      observes: OpenTelemetry spans and `curl -w` at the top, tcpdump and Wireshark at the packet
+      level, bcc/bpftrace and Hubble hooking kernel functions; arrows show which symptom each one
+      answers (slow DNS, retransmits, queueing, slow server).
+    example: >-
+      Lab (15 min). Latency histogram on the Mac: run 100 iterations of
+      `curl -s -o /dev/null -w '%{time_namelookup} %{time_connect} %{time_appconnect} %{time_starttransfer}\n' https://example.com`
+      into a file and compute p50/p90/p99 per column with a 10-line Python script. pcap:
+      `sudo tcpdump -i en0 -w slow.pcap 'host <download-host>'` during a large download, open it
+      in Wireshark, apply `tcp.analysis.flags` and open Statistics -> TCP Stream Graphs -> Round
+      Trip Time. eBPF (needs Linux: a VM, a cloud box or a Kubernetes node):
+      `sudo bpftrace -e 'kprobe:tcp_retransmit_skb { @[comm] = count(); }'` and bcc's tcpretrans
+      while generating traffic.
+    presentation: deep
+    sources:
+      - title: Linux eBPF Tracing Tools (Brendan Gregg)
+        url: https://www.brendangregg.com/ebpf.html
+        locator: sections on the bcc networking tools and bpftrace
+        kind: blog
+        verified: false
+      - title: Cilium documentation, Hubble observability
+        url: https://docs.cilium.io/en/stable/
+        locator: Observability -> "Setting up Hubble Observability", `hubble observe`
+        kind: docs
+        verified: false
+      - title: The Cloudflare Blog
+        url: https://blog.cloudflare.com/
+        locator: post "The story of one latency spike" (Marek Majkowski, 2015)
+        kind: blog
+        verified: false
+
+  - id: networking-16
+    title: "Capstone: debug a slow request end to end (runbook)"
+    level: A
+    est_min: 30
+    prereqs: [networking-07, networking-08, networking-09, networking-15]
+    summary: >-
+      The capstone turns the track into a runbook the reader can use on call and file into the
+      knowledge base: given "this request is slow", decide within minutes which segment of the
+      path is responsible (name resolution, connection setup, TLS, the network path, the load
+      balancer or the server) and collect the evidence that proves it. Each step names the tool,
+      the command, what normal looks like and what to do next. The result is a one-page decision
+      tree plus copy-pasteable commands.
+    key_points:
+      - "Start with phase timing (`curl -w`): which phase owns the time (DNS, connect, TLS, TTFB or transfer), compared against the RTT floor from rung 2."
+      - "DNS slow or flapping: `dig +trace`, resolver choice, TTLs, the JVM DNS cache (rung 8)."
+      - "Connect or TLS slow: path latency and loss with `mtr`, SYN retransmits in tcpdump, chain or revocation problems with `openssl s_client` (rungs 1 and 5)."
+      - "TTFB slow: separate proxy time from upstream time with proxy logs (request time vs upstream response time), health and ejection events, and client connection-pool exhaustion (rungs 9 and 12)."
+      - "Transfer slow: congestion window, retransmits, zero windows, bufferbloat, and HTTP/2 vs HTTP/3 behaviour on lossy links (rungs 3, 7 and 15)."
+      - "Write it for a teammate: symptom -> check -> command -> expected output -> next step."
+    diagram: >-
+      Decision-tree flowchart: "Request slow" -> measure phases with curl -w -> branches for DNS,
+      connect, TLS, TTFB and transfer, each leading to the tool to use and the likely causes, and
+      ending in "escalate with evidence" boxes.
+    example: >-
+      Run the runbook against deliberately broken setups. Locally: a small HTTP server with an
+      artificial sleep in its handler behind HAProxy from rung 9, so TTFB grows while connect
+      stays flat. On the path: add 100 ms delay and 2% loss with macOS Network Link Conditioner
+      (Additional Tools for Xcode) or `dnctl`/`pfctl` dummynet, and watch which phases move in
+      `curl -w` and what `mtr` and tcpdump show. Deliverable: Networking-Slow-Request-Runbook.md
+      with the decision tree and commands, filed into 10-networking when passed.
+    presentation: deep
+    sources:
+      - title: curl man page
+        url: https://curl.se/docs/manpage.html
+        locator: option -w / --write-out (time_namelookup, time_connect, time_appconnect, time_starttransfer, time_total)
+        kind: docs
+        verified: false
+      - title: High Performance Browser Networking, ch. 10 "Primer on Web Performance"
+        url: https://hpbn.co/primer-on-web-performance/
+        locator: ch. 10, "Analyzing the Resource Waterfall"
+        kind: book
+        verified: false
+      - title: mtr (README)
+        url: https://github.com/traviscross/mtr
+        kind: docs
+        verified: false

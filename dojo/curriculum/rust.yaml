@@ -1,0 +1,465 @@
+track: rust
+name: "Rust basics"
+weight: 1
+files_to: 26-rust
+description: >-
+  Rust fundamentals as a low-priority trickle: toolchain and ownership, then borrowing, data
+  modelling, error handling, traits, iterators, collections and the minimum about lifetimes,
+  ending with a small tested CLI (B to I only). The order follows The Rust Programming
+  Language book's dependency chain, every rung is taught from a Scala developer's vantage point
+  (case classes, sealed traits, Option/Either, type classes, the JVM's GC), and Rustlings
+  exercises serve as the running labs.
+primary_sources:
+  - title: "The Rust Programming Language (Klabnik, Nichols, Krycek)"
+    url: https://doc.rust-lang.org/book/
+  - title: "Rust by Example"
+    url: https://doc.rust-lang.org/rust-by-example/
+  - title: "Rustlings: small exercises to get used to reading and writing Rust"
+    url: https://github.com/rust-lang/rustlings
+rungs:
+  - id: rust-01
+    title: "Why Rust, rustup and cargo"
+    level: B
+    est_min: 20
+    prereqs: []
+    summary: >-
+      Explains what Rust trades for what: memory safety without a garbage collector, checked at
+      compile time by ownership, which is a different deal from the JVM a Scala developer is used
+      to. Sets up the toolchain with rustup, walks the cargo workflow (new, check, build, run,
+      test) next to sbt and scala-cli, and covers the few syntax basics (let vs let mut,
+      shadowing, expressions) that map directly onto Scala's val, var and expression-oriented
+      style.
+    key_points:
+      - "Rust's niche: systems-level performance with no GC and safety checked at compile time; the costs are a steeper learning curve and longer compile times"
+      - "rustup manages toolchains and components (clippy, rustfmt); cargo builds, tests and fetches crates from crates.io via Cargo.toml (compare sbt and build.sbt)"
+      - "The cargo loop: cargo new, cargo check, cargo run, cargo build --release, cargo test"
+      - "let is val, let mut is var; shadowing; blocks and if are expressions, as in Scala (book ch. 3)"
+      - "Installing Rustlings as the running exercise companion for this track"
+    diagram: >-
+      Toolchain map: rustup managing rustc, cargo, clippy and rustfmt; cargo driving a project
+      (Cargo.toml, src/main.rs, target/). A parallel column shows the Scala world: Coursier
+      setup → sbt or scala-cli → build.sbt, src/main/scala, target/.
+    example: >-
+      Lab: install with rustup, then cargo new hello_iaido and cargo run. Change main to print a
+      shadowed value (let x = 5; let x = x * 2;), run cargo check, then cargo build --release
+      and compare target/debug with target/release. Finish with cargo install rustlings,
+      rustlings init, and the exercises in 00_intro and the first two in 01_variables.
+    presentation: minimal
+    sources:
+      - title: "The Rust Programming Language, ch. 1 Getting Started"
+        url: https://doc.rust-lang.org/book/ch01-00-getting-started.html
+        locator: "ch. 1 'Getting Started': 1.1 Installation, 1.3 Hello, Cargo!"
+        kind: book
+        verified: false
+      - title: "The Rust Programming Language, ch. 3 Common Programming Concepts"
+        url: https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html
+        locator: "ch. 3.1 'Variables and Mutability' (shadowing), ch. 3.3 'Functions' (statements and expressions)"
+        kind: book
+        verified: false
+      - title: "Rustlings"
+        url: https://github.com/rust-lang/rustlings
+        locator: "README installation steps; exercises/00_intro and exercises/01_variables"
+        kind: course
+        verified: false
+
+  - id: rust-02
+    title: "Ownership and moves"
+    level: B
+    est_min: 20
+    prereqs: [rust-01]
+    summary: >-
+      Introduces Rust's core rules: each value has exactly one owner, ownership can move, and the
+      value is dropped when its owner goes out of scope, shown with the book's String move
+      diagram. Seen from Scala, assigning a heap value is not a second JVM reference to the same
+      object but a transfer, so the old binding becomes unusable; Copy types and clone() are the
+      explicit exceptions.
+    key_points:
+      - "Stack vs heap, and why the JVM hides this while Rust makes it visible"
+      - "The three ownership rules; drop at the end of scope (like try-with-resources, but automatic for every value)"
+      - "Move semantics: let s2 = s1 invalidates s1, and passing a value to a function moves it too"
+      - "Copy types (integers, bool, char, tuples of Copy types) vs clone() for an explicit deep copy"
+      - "Returning ownership from functions, and why that gets tedious (the motivation for borrowing)"
+    diagram: >-
+      The book's move diagram: s1 on the stack (ptr, len, capacity) pointing at "hello" on the
+      heap; after let s2 = s1, s2 holds the same ptr, len and capacity and s1 is greyed out as
+      invalid, so only one owner frees the buffer. A side panel shows the JVM, where both
+      references stay valid and the GC frees the object later.
+    example: >-
+      Lab: cargo new ownership_lab. Write let s1 = String::from("hello"); let s2 = s1; then
+      println!("{s1}") and read the E0382 "borrow of moved value" error. Fix it once with
+      s1.clone() and once by switching to an integer, which is Copy. Then do Rustlings
+      move_semantics1 to move_semantics3.
+    presentation: minimal
+    sources:
+      - title: "The Rust Programming Language, ch. 4.1 What Is Ownership?"
+        url: https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html
+        locator: "ch. 4.1 'What Is Ownership?': 'Variables and Data Interacting with Move' (the String move figures 4-1 to 4-4) and 'Ownership and Functions'"
+        kind: book
+        verified: false
+      - title: "Rust by Example: Ownership and moves"
+        url: https://doc.rust-lang.org/rust-by-example/scope/move.html
+        locator: "Scoping rules › Ownership and moves"
+        kind: docs
+        verified: false
+      - title: "Rustlings"
+        url: https://github.com/rust-lang/rustlings
+        locator: "exercises/06_move_semantics (move_semantics1 to move_semantics3)"
+        kind: course
+        verified: false
+
+  - id: rust-03
+    title: "Borrowing, references and slices"
+    level: B
+    est_min: 20
+    prereqs: [rust-02]
+    summary: >-
+      Shows how references let code use a value without taking ownership, and the borrow rules
+      that make this safe: any number of shared &T or exactly one &mut T, never both at once, and
+      no reference may outlive its value. For a Scala developer this is a compile-time version of
+      the aliasing discipline that immutability gives on the JVM; slices (&str, &[T]) are borrowed
+      views into existing data.
+    key_points:
+      - "Shared references (&T): functions that read a value without taking ownership"
+      - "Mutable references (&mut T): one at a time and never alongside shared ones, which rules out data races at compile time"
+      - "Non-lexical lifetimes: a borrow ends at its last use, not at the end of the block"
+      - "Dangling references are rejected by the compiler"
+      - "Slices: &str and &[T] as views into String and Vec; string literals are &'static str"
+    diagram: >-
+      Borrow timeline: a bar for the String owner across the scope, overlapping bars for shared
+      borrows r1 and r2, then one exclusive &mut bar that may only start after r1 and r2 are last
+      used; a red conflict marker where a &mut would overlap a shared borrow.
+    example: >-
+      Lab: cargo new borrow_lab. Write the book's calculate_length(s: &String) -> usize and
+      change(s: &mut String). Then create two &mut borrows of the same String on purpose and
+      read error E0499. Finish with first_word(s: &str) -> &str using a slice, followed by
+      Rustlings move_semantics4 and move_semantics5.
+    presentation: standard
+    sources:
+      - title: "The Rust Programming Language, ch. 4.2 References and Borrowing"
+        url: https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html
+        locator: "ch. 4.2 'References and Borrowing': Mutable References, Dangling References, The Rules of References"
+        kind: book
+        verified: false
+      - title: "The Rust Programming Language, ch. 4.3 The Slice Type"
+        url: https://doc.rust-lang.org/book/ch04-03-slices.html
+        locator: "ch. 4.3 'The Slice Type': String Slices, Other Slices"
+        kind: book
+        verified: false
+      - title: "Rust by Example: Borrowing"
+        url: https://doc.rust-lang.org/rust-by-example/scope/borrow.html
+        locator: "Scoping rules › Borrowing"
+        kind: docs
+        verified: false
+
+  - id: rust-04
+    title: "Structs, enums and match"
+    level: B
+    est_min: 25
+    prereqs: [rust-03]
+    summary: >-
+      Models data with structs and enums and takes it apart with exhaustive match, which maps
+      directly onto Scala case classes, sealed traits or Scala 3 enums, and pattern matching. The
+      differences worth noticing: Rust enums carry data per variant natively, methods live in
+      separate impl blocks, and #[derive(Debug, Clone, PartialEq)] opts into what a case class
+      generates for free.
+    key_points:
+      - "Structs: field init shorthand, struct update syntax and tuple structs (compare case classes and copy)"
+      - "impl blocks: methods taking &self, &mut self or self; associated functions such as new (compare companion apply)"
+      - "Derive attributes for Debug, Clone and PartialEq: opting into what case classes generate"
+      - "Enums with data per variant (compare a sealed-trait ADT or a Scala 3 enum)"
+      - "match is exhaustive, with bindings, guards and _; if let for the one-case match"
+    diagram: >-
+      Side-by-side ADT: Scala enum Shape { case Circle(r: Double); case Rect(w: Double, h: Double) }
+      and Rust enum Shape { Circle { r: f64 }, Rect { w: f64, h: f64 } }, both feeding an area
+      match with one arm per variant, annotated that both compilers flag a missing arm.
+    example: >-
+      Lab: cargo new shapes. Define the Shape enum above, an impl Shape with fn area(&self) -> f64
+      using match, and a Rect-only helper using if let; print a Vec<Shape> with {:?} after
+      deriving Debug. Then do Rustlings structs1 to structs3 and enums1 to enums3.
+    presentation: standard
+    sources:
+      - title: "The Rust Programming Language, ch. 5 Using Structs"
+        url: https://doc.rust-lang.org/book/ch05-00-structs.html
+        locator: "ch. 5 'Using Structs to Structure Related Data': 5.1 Defining and Instantiating Structs, 5.3 Method Syntax"
+        kind: book
+        verified: false
+      - title: "The Rust Programming Language, ch. 6 Enums and Pattern Matching"
+        url: https://doc.rust-lang.org/book/ch06-00-enums.html
+        locator: "ch. 6: 6.1 Defining an Enum, 6.2 The match Control Flow Construct, 6.3 Concise Control Flow with if let"
+        kind: book
+        verified: false
+      - title: "Rustlings"
+        url: https://github.com/rust-lang/rustlings
+        locator: "exercises/07_structs (structs1 to structs3), exercises/08_enums (enums1 to enums3)"
+        kind: course
+        verified: false
+
+  - id: rust-05
+    title: "Option, Result and the ? operator"
+    level: B
+    est_min: 25
+    prereqs: [rust-04]
+    summary: >-
+      Covers Rust's error-handling model: Option<T> for absence, Result<T, E> for recoverable
+      failure, and panic! reserved for bugs. From Scala these are Option and a right-biased
+      Either, with map, and_then (flatMap), unwrap_or (getOrElse) and ok_or; the ? operator plays
+      the role of a for-comprehension over Either, returning early on the first error.
+    key_points:
+      - "Option<T> (Some, None) instead of null; match and the combinators map, and_then, unwrap_or, ok_or"
+      - "Result<T, E> (Ok, Err): recoverable errors, vs panic! for unrecoverable ones"
+      - "The ? operator: early return of Err (or None), with From conversions between error types"
+      - "unwrap and expect: acceptable in tests and prototypes, avoided in library code"
+      - "Scala mapping: Option ↔ Option, Result ↔ Either, and_then ↔ flatMap, ? ↔ for-comprehension short-circuit"
+    diagram: >-
+      Railway diagram of the book's read_username_from_file: File::open? → read_to_string? →
+      Ok(username), each ? a switch that diverts an Err onto the failure rail and returns it;
+      beside it, a Scala for-comprehension over Either with the same shape.
+    example: >-
+      Lab: cargo new parse_lab. Write fn parse_pair(s: &str) -> Result<(i32, i32), String> that
+      splits on a comma and parses both halves with ? (map_err turns ParseIntError into a
+      String), and fn first_even(v: &[i32]) -> Option<i32>; call both from main. Then do
+      Rustlings options1 to options3 and errors1 to errors3.
+    presentation: standard
+    sources:
+      - title: "The Rust Programming Language, ch. 6.1 Defining an Enum"
+        url: https://doc.rust-lang.org/book/ch06-01-defining-an-enum.html
+        locator: "ch. 6.1, section 'The Option Enum and Its Advantages Over Null Values'"
+        kind: book
+        verified: false
+      - title: "The Rust Programming Language, ch. 9.2 Recoverable Errors with Result"
+        url: https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html
+        locator: "ch. 9.2 'Recoverable Errors with Result': 'Propagating Errors' and 'A Shortcut for Propagating Errors: the ? Operator'"
+        kind: book
+        verified: false
+      - title: "Rustlings"
+        url: https://github.com/rust-lang/rustlings
+        locator: "exercises/12_options (options1 to options3), exercises/13_error_handling (errors1 to errors3)"
+        kind: course
+        verified: false
+
+  - id: rust-06
+    title: "Traits and generics"
+    level: I
+    est_min: 25
+    prereqs: [rust-05]
+    summary: >-
+      Introduces generics with trait bounds, and traits as Rust's mechanism for shared behaviour.
+      For a Scala developer, impl Trait for Type is much closer to a type-class instance (a given)
+      than to a trait mixed into a class, and a T: Display bound reads like a context bound. The
+      big runtime difference is monomorphization instead of JVM erasure, with dyn Trait as the
+      explicit opt-in to dynamic dispatch.
+    key_points:
+      - "Generic functions, structs and enums; monomorphization vs type erasure"
+      - "Defining and implementing traits, default methods, and the orphan rule (compare type-class coherence)"
+      - "Trait bounds: T: Trait, impl Trait in argument and return position, where clauses (compare context bounds)"
+      - "Standard traits worth knowing: Debug, Display, Clone, PartialEq, Default, From"
+      - "Static dispatch with generics vs dynamic dispatch with Box<dyn Trait>, and when a heterogeneous collection needs the latter"
+    diagram: >-
+      Mapping diagram: a Scala type class (trait Show[A]; given Show[Point]; def show[A: Show](a: A))
+      matched arrow by arrow to Rust (trait Summary; impl Summary for Point;
+      fn notify(item: &impl Summary)), with a footer showing the monomorphized copies for Point
+      and Article vs one erased JVM method.
+    example: >-
+      Lab: cargo new traits_lab. Define the book's trait Summary with a required
+      summarize_author and a default summarize that calls it, implement it for two structs, and
+      write the book's fn largest<T: PartialOrd>(list: &[T]) -> &T. Then do Rustlings generics1,
+      generics2 and traits1 to traits3.
+    presentation: standard
+    sources:
+      - title: "The Rust Programming Language, ch. 10.1 Generic Data Types"
+        url: https://doc.rust-lang.org/book/ch10-01-syntax.html
+        locator: "ch. 10.1 'Generic Data Types', incl. 'Performance of Code Using Generics'"
+        kind: book
+        verified: false
+      - title: "The Rust Programming Language, ch. 10.2 Traits"
+        url: https://doc.rust-lang.org/book/ch10-02-traits.html
+        locator: "ch. 10.2 'Traits: Defining Shared Behavior': default implementations, traits as parameters, trait bound syntax"
+        kind: book
+        verified: false
+      - title: "Rustlings"
+        url: https://github.com/rust-lang/rustlings
+        locator: "exercises/14_generics (generics1, generics2), exercises/15_traits (traits1 to traits3)"
+        kind: course
+        verified: false
+
+  - id: rust-07
+    title: "Iterators and closures"
+    level: I
+    est_min: 25
+    prereqs: [rust-06]
+    summary: >-
+      Covers Rust's functional side: closures that capture their environment, and lazy iterator
+      adaptors such as map, filter and fold ending in a consuming collect or sum. The style will
+      feel like Scala's collections over an Iterator or a view, but ownership is in the picture:
+      iter, iter_mut and into_iter decide whether items are borrowed or moved, and Fn, FnMut and
+      FnOnce say how a closure uses what it captured. As zero-cost abstractions, these chains
+      compile to code as fast as hand-written loops.
+    key_points:
+      - "Closures: syntax, type inference, capturing by reference vs by value (the move keyword)"
+      - "Fn, FnMut and FnOnce and what each allows, vs Scala's single Function1"
+      - "The Iterator trait and next; adaptors are lazy (compare Scala views and Iterator) and need a consumer"
+      - "iter(), iter_mut() and into_iter(): borrow, borrow mutably, or take ownership"
+      - "Consumers and adaptors to know: collect with a type annotation, sum, fold, filter_map, zip, enumerate"
+      - "Zero-cost abstraction: iterator chains compile to the same code as loops (book ch. 13.4)"
+    diagram: >-
+      Pipeline diagram: vec.iter() → map(|x| x * 2) → filter(|x| x % 3 == 0) →
+      collect::<Vec<_>>(), with nothing flowing until collect pulls; a legend shows that iter,
+      iter_mut and into_iter yield &T, &mut T and T.
+    example: >-
+      Lab: cargo new iter_lab. Reproduce the book's shoes_in_size, filtering a Vec<Shoe> with a
+      closure that captures shoe_size. Then write your own iterator, a Fibonacci struct with
+      impl Iterator (type Item = u64), and sum the first 20 even values with take_while and
+      filter. Finish with Rustlings iterators1 to iterators3.
+    presentation: standard
+    sources:
+      - title: "The Rust Programming Language, ch. 13.1 Closures"
+        url: https://doc.rust-lang.org/book/ch13-01-closures.html
+        locator: "ch. 13.1 'Closures: Anonymous Functions that Capture Their Environment', incl. the Fn traits"
+        kind: book
+        verified: false
+      - title: "The Rust Programming Language, ch. 13.2 Iterators"
+        url: https://doc.rust-lang.org/book/ch13-02-iterators.html
+        locator: "ch. 13.2 'Processing a Series of Items with Iterators': the Iterator trait, consuming and producing adaptors, closures that capture their environment"
+        kind: book
+        verified: false
+      - title: "Rustlings"
+        url: https://github.com/rust-lang/rustlings
+        locator: "exercises/18_iterators (iterators1 to iterators3)"
+        kind: course
+        verified: false
+
+  - id: rust-08
+    title: "Collections and strings"
+    level: I
+    est_min: 25
+    prereqs: [rust-07]
+    summary: >-
+      Tours the three everyday collections, Vec<T>, String and HashMap<K, V>, and the ownership
+      questions each one raises. Text is the trickiest part for a JVM developer: Rust strings are
+      UTF-8 bytes, so String vs &str, why s[0] does not compile, and chars() vs bytes() replace
+      the Java UTF-16 String mental model. HashMap's entry API is the idiomatic way to update in
+      place.
+    key_points:
+      - "Vec<T>: push, indexing vs get (panic vs Option), iterating with & and &mut, and the borrow conflict of pushing while holding a reference (compare ArrayBuffer)"
+      - "String vs &str: owned growable UTF-8 vs a borrowed slice; String::from, to_string, push_str, + and format!"
+      - "No integer indexing into strings; chars() vs bytes(), and the grapheme caveat"
+      - "HashMap<K, V>: insert moves owned keys and values; get returns Option<&V>"
+      - "entry().or_insert() for counting and grouping (compare getOrElseUpdate and updatedWith)"
+    diagram: >-
+      Memory-layout diagram: a String as (ptr, len, capacity) pointing to a UTF-8 heap buffer
+      holding "Привіт" (6 characters, 12 bytes); a &str slice (ptr, len) pointing into the same
+      buffer; and, for comparison, a Java String box holding UTF-16 code units.
+    example: >-
+      Lab: cargo new word_count. Take a hard-coded paragraph, split_whitespace, lowercase each
+      word and count into a HashMap<String, usize> with entry().or_insert(0); print the top three
+      by sorting a Vec of (word, count). Also print "Привіт".len() next to
+      "Привіт".chars().count(). Then do Rustlings strings1 to strings3 and hashmaps1 to
+      hashmaps2.
+    presentation: standard
+    sources:
+      - title: "The Rust Programming Language, ch. 8 Common Collections"
+        url: https://doc.rust-lang.org/book/ch08-00-common-collections.html
+        locator: "ch. 8: 8.1 Storing Lists of Values with Vectors, 8.2 Storing UTF-8 Encoded Text with Strings ('Indexing into Strings'), 8.3 Storing Keys with Associated Values in Hash Maps ('Updating a Value Based on the Old Value')"
+        kind: book
+        verified: false
+      - title: "Rust by Example: Strings"
+        url: https://doc.rust-lang.org/rust-by-example/std/str.html
+        locator: "Std library types › Strings"
+        kind: docs
+        verified: false
+      - title: "Rustlings"
+        url: https://github.com/rust-lang/rustlings
+        locator: "exercises/09_strings (strings1 to strings3), exercises/11_hashmaps (hashmaps1, hashmaps2)"
+        kind: course
+        verified: false
+
+  - id: rust-09
+    title: "Lifetimes, the minimum"
+    level: I
+    est_min: 20
+    prereqs: [rust-08]
+    summary: >-
+      Explains just enough about lifetimes to read the compiler's errors and write the common
+      signatures: a lifetime annotation names how long a reference is valid, so the borrow checker
+      can relate a function's inputs to its output. Scala has no equivalent because the GC makes
+      it unnecessary, so the lesson focuses on the elision rules that make most annotations
+      disappear, the classic longest<'a> example, structs that hold references, and when to
+      sidestep the question by owning the data (String instead of &str).
+    key_points:
+      - "What the borrow checker checks: no reference outlives the value it refers to"
+      - "Annotation syntax &'a T; lifetimes describe relationships and do not change how long values live"
+      - "Why fn longest<'a>(x: &'a str, y: &'a str) -> &'a str needs the annotation"
+      - "The three elision rules, and why most functions need no annotations"
+      - "Structs holding references (struct ImportantExcerpt<'a>), 'static, and the pragmatic escape hatch of owning or cloning"
+    diagram: >-
+      Scope-bracket diagram in the book's style: nested scopes annotated with lifetimes 'a and
+      'b, a reference r with the longer 'a pointing at x with the shorter 'b and flagged as an
+      error, then the corrected version where x outlives r.
+    example: >-
+      Lab: cargo new lifetimes_lab. Write longest without annotations and read error E0106, then
+      add <'a> to fix it. Recreate the book's failing case where string2 goes out of scope before
+      result is used and read E0597. Finally define struct ImportantExcerpt<'a> { part: &'a str }
+      and do Rustlings lifetimes1 to lifetimes3.
+    presentation: standard
+    sources:
+      - title: "The Rust Programming Language, ch. 10.3 Validating References with Lifetimes"
+        url: https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html
+        locator: "ch. 10.3: the borrow checker, lifetime annotations in function signatures, in struct definitions, and 'Lifetime Elision'"
+        kind: book
+        verified: false
+      - title: "Rust by Example: Lifetimes"
+        url: https://doc.rust-lang.org/rust-by-example/scope/lifetime.html
+        locator: "Scoping rules › Lifetimes"
+        kind: docs
+        verified: false
+      - title: "Rustlings"
+        url: https://github.com/rust-lang/rustlings
+        locator: "exercises/16_lifetimes (lifetimes1 to lifetimes3)"
+        kind: course
+        verified: false
+
+  - id: rust-10
+    title: "A small CLI project with tests"
+    level: I
+    est_min: 30
+    prereqs: [rust-09]
+    summary: >-
+      Pulls the track together in the style of the book's chapter 12: a small command-line tool
+      with argument parsing, file I/O, a Config struct, errors propagated with Result and
+      Box<dyn Error>, and the logic moved into lib.rs so it can be tested. Tests are written the
+      Rust way, #[test] unit tests in a #[cfg(test)] module next to the code plus integration
+      tests under tests/, which a Scala developer can map onto munit or ScalaTest suites run by
+      cargo test.
+    key_points:
+      - "Project layout: main.rs as a thin shell, lib.rs for the logic (the book's separation of concerns)"
+      - "Reading arguments with std::env::args and files with std::fs::read_to_string; Config::build returning Result"
+      - "main returning Result<(), Box<dyn Error>>; eprintln! and process::exit for user-facing errors"
+      - "Unit tests in a cfg(test) module with assert_eq! and should_panic; integration tests in tests/"
+      - "Test-driven development of the search function (book ch. 12.4), then refining it with iterators (ch. 13.3)"
+    diagram: >-
+      Component diagram: main.rs (parse args → Config::build → run) calling lib.rs (run, search,
+      search_case_insensitive); the cfg(test) module and the tests/ folder both pointing at
+      lib.rs; arrows labelled with their Result types and the point where errors exit with a
+      non-zero code.
+    example: >-
+      Lab: cargo new minigrep and follow ch. 12 through 12.4, writing the failing test for search
+      before implementing it. Extend it with case-insensitive search (ch. 12.5's IGNORE_CASE
+      variable or a -i flag) and add one integration test under tests/ that runs search on a
+      fixture text. Finish with Rustlings tests1 to tests3.
+    presentation: deep
+    sources:
+      - title: "The Rust Programming Language, ch. 12 An I/O Project"
+        url: https://doc.rust-lang.org/book/ch12-00-an-io-project.html
+        locator: "ch. 12 'An I/O Project: Building a Command Line Program': 12.3 Refactoring to Improve Modularity and Error Handling, 12.4 Developing the Library's Functionality with Test-Driven Development, 12.5 Working with Environment Variables"
+        kind: book
+        verified: false
+      - title: "The Rust Programming Language, ch. 11 Writing Automated Tests"
+        url: https://doc.rust-lang.org/book/ch11-00-testing.html
+        locator: "ch. 11: 11.1 How to Write Tests, 11.3 Test Organization (unit vs integration tests)"
+        kind: book
+        verified: false
+      - title: "Rustlings"
+        url: https://github.com/rust-lang/rustlings
+        locator: "exercises/17_tests (tests1 to tests3)"
+        kind: course
+        verified: false

@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "day": 0,
+  "credits": {
+    "ai-ml": 0,
+    "fp-scala": 0,
+    "ddia": 0,
+    "architecture": 0,
+    "networking": 0,
+    "rust": 0
+  },
+  "next_rung": {
+    "ai-ml": 0,
+    "fp-scala": 0,
+    "ddia": 0,
+    "architecture": 0,
+    "networking": 0,
+    "rust": 0
+  },
+  "lessons_sent": 0,
+  "lessons_passed": 0,
+  "open": [],
+  "last_run_at": null,
+  "last_fresh_domains": [],
+  "trigger_id": null,
+  "reminder_trigger_id": null,
+  "dashboard_url": "https://claude.ai/artifact/Eedt4UPNqrameHt3dahkHp",
+  "repo_url": "https://github.com/yurii-mysak/scala-training-docs"
+}

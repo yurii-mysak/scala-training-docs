@@ -1,0 +1,1132 @@
+track: fp-scala
+name: "Functional Programming in Scala (red book)"
+weight: 3
+files_to: 02-functional-programming
+description: >-
+  A chapter-by-chapter path through "Functional Programming in Scala" in the book's own order:
+  Part 1 introduction to FP (B), Part 2 functional design and combinator libraries (I), Part 3
+  common structures such as monoids, monads and applicative/traversable functors (I to A), and
+  Part 4 effects and I/O (A), with each rung's lab taken from the book's own exercises and done
+  in a Scala worksheet or scala-cli script. Section and exercise numbers follow the 2nd
+  edition, which keeps the 1st edition's 15-chapter, 4-part structure and nearly all of its
+  numbering (ch. 15 was rewritten around Pull/Stream), so writers confirm numbers against the
+  companion repo, and rungs extend the existing notes in 02-functional-programming and
+  01-scala-language instead of repeating them.
+primary_sources:
+  - title: "Functional Programming in Scala, Second Edition (Chiusano, Bjarnason, Pilquist; Manning)"
+    url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+  - title: "Functional Programming in Scala, 1st edition (Chiusano, Bjarnason; Manning)"
+    url: https://www.manning.com/books/functional-programming-in-scala
+  - title: "fpinscala companion repository: exercise stubs, hints and answers"
+    url: https://github.com/fpinscala/fpinscala
+rungs:
+  # ---------------------------------------------------------------- Part 1 · Introduction to FP (B)
+  - id: fp-scala-01
+    title: "What is FP: referential transparency and the substitution model"
+    level: B
+    est_min: 15
+    prereqs: []
+    summary: >-
+      Opens the red book with its Cafe example: a buyCoffee method that charges a credit card as
+      a side effect is refactored to return the charge as a value, which makes it testable and
+      lets charges be batched and coalesced. From that the chapter defines a pure function and
+      referential transparency, and introduces the substitution model the rest of the book uses
+      to reason about programs. Extends the existing note
+      02-functional-programming/Functional-Programming-Foundations.md ("Pure Functions &
+      Referential Transparency") with the book's argument instead of repeating definitions.
+    key_points:
+      - "A side effect is anything a function does besides returning its result; the Cafe example shows why it hurts testing and reuse (§1.1)"
+      - "Pushing effects to the edge: buyCoffee returns (Coffee, Charge) and a separate layer talks to the payment system"
+      - "Definition of a pure function, and of referential transparency: an expression can be replaced by its value without changing the program's meaning (§1.2–1.3)"
+      - "The substitution model as equational reasoning; the book's String vs StringBuilder.append example shows it breaking (§1.3)"
+      - "Why it pays off day to day: local reasoning, modularity and safe refactoring"
+    diagram: >-
+      Two-panel flowchart. Left: buyCoffee calls cc.charge, with an arrow out to an external
+      Payments box labelled "side effect". Right: buyCoffee returns (Coffee, Charge) as values,
+      a list of Charges flows into coalesce, and only the outer edge calls Payments, once per
+      card.
+    example: >-
+      Chapter 1 has no numbered exercises, so the lab replays its two worked examples in a
+      scala-cli script (ch01.sc). (1) Write Charge with a combine method, buyCoffees(cc, n)
+      returning (List[Coffee], Charge), and coalesce(charges: List[Charge]) using groupBy on the
+      card and reduce with combine. (2) Run the §1.3 substitution test: with x = "Hello, World",
+      replace x.reverse by its value and see that r1 and r2 stay equal; repeat with a
+      StringBuilder and append and watch r1 and r2 differ.
+    presentation: minimal
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 1 'What is functional programming?', §1.1 (the Cafe / buyCoffee example), §1.2 'Exactly what is a (pure) function?', §1.3 'Referential transparency, purity, and the substitution model'"
+        kind: book
+        verified: false
+      - title: "Scala 3 Book: Pure Functions"
+        url: https://docs.scala-lang.org/scala3/book/fp-pure-functions.html
+        locator: "Scala 3 Book › Functional Programming › Pure Functions"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-02
+    title: "Getting started: tail recursion, higher-order and polymorphic functions"
+    level: B
+    est_min: 20
+    prereqs: [fp-scala-01]
+    summary: >-
+      Chapter 2 writes loops as local tail-recursive functions, passes functions as values
+      (higher-order functions) and abstracts over types with polymorphic functions such as
+      findFirst and isSorted. Its closing idea, "following types to implementations", shows that
+      signatures like partial1, curry and compose admit essentially one implementation. Extends
+      02-functional-programming/Functional-Programming-Foundations.md ("Recursion & Tail-Rec
+      Optimisation") and 01-scala-language/AdvancedFunctions.md (HOFs, currying, @tailrec); the
+      new part is the book's type-driven reasoning.
+    key_points:
+      - "Loops as a local tail-recursive go function; @annotation.tailrec turns a missed optimisation into a compile error (§2.4.1)"
+      - "Higher-order functions: formatResult takes the function to apply as a parameter (§2.4.2)"
+      - "Monomorphic vs polymorphic functions: findFirst over Array[A] with a predicate A => Boolean (§2.5)"
+      - "Function literals and how Scala represents them as Function1 objects (§2.5.2)"
+      - "Following types to implementations: the signature of compose leaves only one sensible body (§2.6)"
+    diagram: >-
+      Call-stack comparison: a naive recursive factorial piling up one frame per call, next to
+      the tail-recursive go(n, acc) compiled to a single frame with a jump arrow back to the top.
+      A callout notes that @tailrec makes the compiler reject a non-tail call.
+    example: >-
+      Lab in a Scala worksheet (ch02.worksheet.sc in Metals) or a scala-cli script. Exercise 2.1:
+      fib(n) using a local @tailrec def go; check that fib(0) to fib(6) give 0, 1, 1, 2, 3, 5, 8.
+      Exercise 2.5: compose[A, B, C](f: B => C, g: A => B): A => C, written only by following the
+      types; then compare it with the standard library's f compose g and g andThen f.
+    presentation: minimal
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 2 'Getting started with functional programming in Scala', §2.4 'Higher-order functions' (§2.4.1 'Writing loops functionally'), §2.5 'Polymorphic functions', §2.6 'Following types to implementations'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "gettingstarted chapter folder: GettingStarted.scala under exercises, and its counterpart under answers"
+        kind: docs
+        verified: false
+      - title: "Tour of Scala: Higher-order Functions"
+        url: https://docs.scala-lang.org/tour/higher-order-functions.html
+        locator: "Tour of Scala › Higher-order Functions"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-03
+    title: "Functional data structures I: the List ADT, pattern matching and data sharing"
+    level: B
+    est_min: 20
+    prereqs: [fp-scala-02]
+    summary: >-
+      Builds the book's own singly linked List as an algebraic data type (Nil and Cons) and writes
+      functions over it by pattern matching. The key insight is data sharing: an immutable list is
+      never copied when you drop or prepend, which is what makes persistent structures cheap.
+      Extends 02-functional-programming/Functional-Data-Structures.md (§1 Persistent Lists, §5
+      ADTs) and 01-scala-language/PatternMatching.md; what is new is implementing the structure
+      yourself.
+    key_points:
+      - "Defining List as an ADT: one data constructor per case, plus a companion with sum, product and a variadic apply (§3.1)"
+      - "Pattern matching as the way to take an ADT apart; exhaustiveness checking on a sealed type or enum (§3.2)"
+      - "Data sharing: tail and drop are O(1) and reuse the original cells, so no defensive copying (§3.3)"
+      - "Why init cannot run in constant time on a singly linked list (Exercise 3.6)"
+      - "Variance: List[+A] lets the single Nil be a List[Nothing] shared by every list"
+    diagram: >-
+      Box-and-arrow persistent list: xs = Cons(1, Cons(2, Cons(3, Nil))); ys = tail(xs) points
+      into the second cell of xs; zs = setHead(xs, 9) is one new cell 9 pointing at the same
+      Cons(2, ...) tail, so three lists share structure.
+    example: >-
+      Lab in a scala-cli script on the book's own List: Exercise 3.2 tail and Exercise 3.3
+      setHead. Decide and justify what each does on Nil (throw or return Nil), then confirm
+      sharing with reference equality: tail(xs) eq the second cell of xs.
+    presentation: standard
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 3 'Functional data structures', §3.1 'Defining functional data structures', §3.2 'Pattern matching', §3.3 'Data sharing in functional data structures'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "datastructures chapter folder: List.scala (exercises and answers)"
+        kind: docs
+        verified: false
+      - title: "Scala 3 Book: Algebraic Data Types"
+        url: https://docs.scala-lang.org/scala3/book/types-adts-gadts.html
+        locator: "Scala 3 Book › Domain Modeling / Types › Algebraic Data Types"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-04
+    title: "Functional data structures II: foldRight, foldLeft and trees"
+    level: B
+    est_min: 25
+    prereqs: [fp-scala-03]
+    summary: >-
+      Generalises recursive list functions into foldRight and its stack-safe twin foldLeft, then
+      builds length, reverse, append, map, filter and flatMap on top of them. The chapter closes
+      with a binary Tree ADT where size, maximum, depth and map collapse into a single fold.
+      Builds on the List from the previous rung and extends
+      02-functional-programming/Functional-Data-Structures.md (§3 Trees) with the fold-based
+      derivations.
+    key_points:
+      - "Abstracting sum and product into foldRight; why foldRight is not stack-safe and cannot short-circuit (§3.4, Exercise 3.7)"
+      - "foldRight(xs, Nil)(Cons(_, _)) rebuilds the list: a fold replaces the constructors (Exercise 3.8)"
+      - "foldLeft as a tail-recursive loop, and foldRight expressed through foldLeft (Exercises 3.10, 3.13)"
+      - "Loss of efficiency when list functions are assembled from simpler ones: extra passes (§3.4.2)"
+      - "The Tree ADT (Leaf, Branch) and generalising its functions into fold (§3.5)"
+    diagram: >-
+      Side-by-side expression trees: foldRight(List(1, 2, 3), 0)(_ + _) nesting to the right as
+      1 + (2 + (3 + 0)) with stack frames growing, versus foldLeft accumulating
+      ((0 + 1) + 2) + 3 in one loop.
+    example: >-
+      Lab in a Scala worksheet. Exercise 3.10: a @tailrec foldLeft; build a 100 000-element list
+      with a small tail-recursive helper (the book's variadic apply is itself recursive) and see
+      foldLeft succeed where foldRight overflows. Then the Tree fold exercise that closes §3.5
+      (3.28 in the 2nd ed., 3.29 in the 1st) and rewrite size and depth through it.
+    presentation: standard
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 3, §3.4 'Recursion over lists and generalizing to higher-order functions' (incl. §3.4.2 on loss of efficiency), §3.5 'Trees'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "datastructures chapter folder: List.scala and Tree.scala (exercises and answers)"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-05
+    title: "Handling errors without exceptions: Option and Either"
+    level: B
+    est_min: 25
+    prereqs: [fp-scala-04]
+    summary: >-
+      Argues that exceptions break referential transparency and are not tracked by types, then
+      rebuilds Option and Either from scratch with map, flatMap, getOrElse, orElse and filter.
+      The real lesson is lifting and traversal: map2, sequence and traverse let ordinary functions
+      work over values that may have failed. Extends 01-scala-language/Option.md, which covers
+      library usage and Option/Either interop; here the reader implements the types and the
+      combinators that ch. 11–12 later generalise.
+    key_points:
+      - "Why exceptions break referential transparency and are not type-safe; the alternatives the book rejects (§4.1–4.2)"
+      - "Option as the return type of a total function; usage patterns and lifting with lift(f) (§4.3.1–4.3.2)"
+      - "map2, sequence and traverse: combining several Options, and why traverse avoids a second pass"
+      - "Either carries the error; for-comprehensions over Either (§4.4)"
+      - "Short-circuiting vs accumulating errors: the limit that motivates Validated and applicatives (end of ch. 4, then ch. 12)"
+    diagram: >-
+      Railway diagram for the chapter's parseInsuranceRateQuote: parse age, parse tickets,
+      compute the rate. A success track and a failure track; Option drops to a None track and
+      loses the reason, Either carries Left(error) along the failure track, and map2 joins two
+      tracks into one.
+    example: >-
+      Lab in a scala-cli script on the book's Option and Either. Exercise 4.5: traverse for
+      Option (write map2 first, then sequence in terms of traverse), tested with the chapter's
+      Try helper on List("1", "2", "x"). Exercise 4.7: sequence and traverse for Either, and
+      compare which error comes back.
+    presentation: standard
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 4 'Handling errors without exceptions', §4.1–4.2, §4.3 'The Option data type' (§4.3.2 'Option composition, lifting, and wrapping exception-oriented APIs'), §4.4 'The Either data type'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "errorhandling chapter folder: Option.scala and Either.scala"
+        kind: docs
+        verified: false
+      - title: "Scala 3 Book: Functional Error Handling"
+        url: https://docs.scala-lang.org/scala3/book/fp-functional-error-handling.html
+        locator: "Scala 3 Book › Functional Programming › Functional Error Handling"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-06
+    title: "Strictness and laziness: non-strict functions and LazyList"
+    level: B
+    est_min: 20
+    prereqs: [fp-scala-05]
+    summary: >-
+      Separates strict from non-strict evaluation (thunks and by-name parameters) and builds a
+      LazyList (Stream in the 1st ed.) whose cells hold unevaluated thunks, memoized through smart
+      constructors. The central idea is separating the description of a computation from its
+      evaluation, so chained map and filter steps interleave like one loop. Extends the "Strict
+      vs Non-Strict (Lazy) Evaluation" and "Lazy Evaluation in Scala" sections of
+      02-functional-programming/Functional-Programming-Foundations.md and the by-name section of
+      01-scala-language/AdvancedFunctions.md.
+    key_points:
+      - "Strict vs non-strict functions; && and if as built-in non-strict forms; () => A thunks and => A by-name parameters (§5.1)"
+      - "LazyList with Empty and Cons of thunks; smart constructors cons and empty memoize with lazy val (§5.2, §5.2.1)"
+      - "foldRight with a lazy second argument can stop early: exists, forAll, takeWhile"
+      - "Incremental evaluation: the book's trace of map(_ + 10).filter(_ % 2 == 0) element by element (§5.3)"
+      - "Streams as first-class loops: no intermediate collections are built"
+    diagram: >-
+      Sequence diagram of the §5.3 trace: LazyList(1, 2, 3, 4).map(_ + 10).filter(_ % 2 == 0)
+      .toList, each element pulled through map and then filter before the next element is
+      touched, beside a strict List that builds a full intermediate list after map.
+    example: >-
+      Lab in a scala-cli script on the book's LazyList: Exercise 5.2 take and drop, and
+      Exercise 5.5 takeWhile via foldRight. Put a println inside the element thunks to see
+      exactly which elements get forced.
+    presentation: standard
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 5 'Strictness and laziness', §5.1 'Strict and non-strict functions', §5.2 'An extended example: lazy lists', §5.3 'Separating program description from evaluation'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "laziness chapter folder: LazyList.scala (Stream.scala in the 1st-edition branch)"
+        kind: docs
+        verified: false
+      - title: "Scala collections: Concrete Immutable Collection Classes"
+        url: https://docs.scala-lang.org/overviews/collections-2.13/concrete-immutable-collection-classes.html
+        locator: "section 'LazyLists'"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-07
+    title: "Infinite lazy lists and corecursion: unfold"
+    level: B
+    est_min: 25
+    prereqs: [fp-scala-06]
+    summary: >-
+      Uses laziness to define infinite structures such as ones, from(n) and fibs, and
+      generalises them into unfold, the corecursive dual of foldRight: it produces data instead
+      of consuming it. Rewriting map, take and zipWith through unfold shows how far one general
+      combinator reaches. Continues on the LazyList from the previous rung.
+    key_points:
+      - "Infinite lazy lists are safe because only the demanded prefix is evaluated (ones.take(5), ones.exists)"
+      - "Corecursion (guarded recursion) produces data and stays productive, while recursion consumes it (§5.4)"
+      - "unfold(state)(f: S => Option[(A, S)]) as the general lazy-list builder"
+      - "Deriving fibs, from, continually (constant in the 1st ed.) and ones, then map, take and zipWith, through unfold"
+      - "startsWith, tails and scanRight as follow-ups; why holding on to the head keeps memory alive"
+    diagram: >-
+      State-machine view of unfold: a state S box; f turns it into Some((a, s')), which emits a
+      onto the output lane and loops back with s', or into None, which ends the list. Annotated
+      with fibs' states (0, 1) → (1, 1) → (1, 2) → (2, 3).
+    example: >-
+      Lab in a Scala worksheet: Exercise 5.11 unfold, then Exercise 5.12, writing fibs, from,
+      continually and ones through unfold. Check fibs.take(10).toList and
+      from(1).takeWhile(_ < 6).toList.
+    presentation: standard
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 5, §5.4 'Infinite lazy lists and corecursion' ('Infinite streams and corecursion' in the 1st ed.)"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "laziness chapter folder: LazyList.scala (unfold and the derived functions in answers)"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-08
+    title: "Purely functional state: a pure random number generator"
+    level: B
+    est_min: 20
+    prereqs: [fp-scala-07]
+    summary: >-
+      Starts from scala.util.Random's hidden mutation and makes the state explicit: nextInt
+      returns the next RNG along with the value. Threading that state by hand quickly gets noisy,
+      so the chapter introduces Rand[A] = RNG => (A, RNG) with unit, map, map2 and flatMap.
+      Extends 02-functional-programming/Purely-Functional-State.md ("Example: RNG") with the
+      derivation that note skips.
+    key_points:
+      - "Side-effecting Random is hard to test and to reproduce (§6.1)"
+      - "Making stateful APIs pure: return the new state with the value; SimpleRNG's linear congruential generator (§6.2–6.3)"
+      - "Rand[A] as a state-action type; unit, map and map2 hide the manual threading (§6.4, §6.4.1)"
+      - "flatMap for nesting state actions: nonNegativeLessThan and why retrying needs it (§6.4.2)"
+      - "Reproducibility (same seed, same results), which property-based testing in ch. 8 builds on"
+    diagram: >-
+      Chain of immutable RNG states: rng0 → nextInt → (i1, rng1) → nextInt → (i2, rng2). A note
+      says calling nextInt on rng0 twice yields the same i1. A second lane shows map2(ra, rb)
+      hiding the threading.
+    example: >-
+      Lab in a scala-cli script: Exercise 6.1 nonNegativeInt (handle Int.MinValue) and
+      Exercise 6.6 map2 for Rand. Then use map2 to build both and randIntDouble and run them
+      twice from the same seed.
+    presentation: standard
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 6 'Purely functional state', §6.1–6.3, §6.4 'A better API for state actions' (§6.4.1 'Combining state actions', §6.4.2 'Nesting state actions')"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "state chapter folder: State.scala (RNG, SimpleRNG, Rand)"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-09
+    title: "Purely functional state: the general State data type"
+    level: B
+    est_min: 25
+    prereqs: [fp-scala-08]
+    summary: >-
+      Generalises Rand into State[S, A], a wrapper around S => (A, S) (an opaque type in the 2nd
+      ed., a case class in the 1st), and moves unit, map, map2, flatMap and sequence onto it.
+      With get, set and modify, for-comprehensions over State read like imperative code and stay
+      pure. This is the State monad summarised in
+      02-functional-programming/Purely-Functional-State.md; the rung adds the book's candy-machine
+      simulation.
+    key_points:
+      - "State[S, +A] as the general state action, with Rand[A] = State[RNG, A] (§6.5)"
+      - "map2, flatMap and sequence on State; sequencing a list of state actions"
+      - "get, set and modify; for-comprehensions as imperative-looking pure code (§6.6)"
+      - "The candy machine as a small finite-state domain model (Exercise 6.11)"
+      - "Preview: State is a monad, and ch. 11 names the pattern"
+    diagram: >-
+      State diagram of the candy machine: Locked and Unlocked states carrying (candies, coins),
+      transitions on Coin and Turn following Exercise 6.11's rules (coin into a locked machine
+      with candy unlocks it; turn on an unlocked machine dispenses and locks; other inputs and
+      any input with no candy are ignored).
+    example: >-
+      Lab in a Scala worksheet: Exercise 6.10 (unit, map, map2, flatMap and sequence for State)
+      and Exercise 6.11 simulateMachine(inputs): State[Machine, (Int, Int)]. Run four
+      Coin-Turn pairs on Machine(locked = true, candies = 5, coins = 10) and expect (14, 1),
+      the book's own check.
+    presentation: standard
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 6, §6.5 'A general state action data type', §6.6 'Purely functional imperative programming', Exercise 6.11 (candy machine)"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "state chapter folder: State.scala and the candy-machine answer"
+        kind: docs
+        verified: false
+
+  # ---------------------------------------------------------------- Part 2 · Functional design and combinator libraries (I)
+  - id: fp-scala-10
+    title: "Purely functional parallelism: designing the Par data type"
+    level: I
+    est_min: 25
+    prereqs: [fp-scala-09]
+    summary: >-
+      Designs a library for parallel computation from first principles, starting from a parallel
+      sum and letting the use case drive the API: unit, map2, fork, lazyUnit and run. The
+      representation, Par[A] = ExecutorService => Future[A], is chosen only after the API is
+      sketched, which is the chapter's lesson about method. Extends §4 "Functional Parallelism à
+      la FP-in-Scala" of 02-functional-programming/Purely-Functional-Concurrency.md; with Akka and
+      Future experience behind him, the reader contrasts Par, a description, with
+      scala.concurrent.Future, which is already running.
+    key_points:
+      - "Start from a use case (divide-and-conquer sum) and invent the data type and functions it needs (§7.1.1–7.1.2)"
+      - "Explicit forking: why unit stays strict and fork marks the parallel boundary (§7.1.3)"
+      - "Picking a representation: ExecutorService => Future[A] (§7.2)"
+      - "Refining the API: map2 that does not block, asyncF, sequence, parMap, parFilter (§7.3)"
+      - "Par as a description vs Future as a running computation, and what that does for referential transparency"
+    diagram: >-
+      Fork-join tree for the parallel sum of IndexedSeq(1 to 8): recursive splitAt into halves,
+      leaves as unit, inner nodes as map2(fork(left), fork(right))(_ + _), with a legend saying
+      nothing runs until run(es) is called.
+    example: >-
+      Lab in a scala-cli script on the book's Par: Exercise 7.4 asyncF and Exercise 7.5
+      sequence. Build parMap from them and run it on Executors.newCachedThreadPool() (the
+      fixed-pool deadlock is the next rung's subject).
+    presentation: standard
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 7 'Purely functional parallelism', §7.1 'Choosing data types and functions', §7.2 'Picking a representation', §7.3 'Refining the API'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "parallelism chapter folder: Par.scala"
+        kind: docs
+        verified: false
+      - title: "Java SE API: ExecutorService"
+        url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ExecutorService.html
+        locator: "interface ExecutorService, methods submit and invokeAll"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-11
+    title: "The algebra of an API: laws, the fork deadlock and general combinators"
+    level: I
+    est_min: 30
+    prereqs: [fp-scala-10]
+    summary: >-
+      Treats the Par API as an algebra with laws, map(y)(id) == y and fork(x) == x, and reasons
+      with them like equations. Checking the forking law exposes a real bug: on a fixed-size
+      thread pool the blocking fork deadlocks, which the chapter fixes with a non-blocking
+      implementation. It then refines choice, choiceN and chooser into their most general forms,
+      flatMap and join.
+    key_points:
+      - "Laws as specifications: the law of mapping and the free theorem map(map(y)(g))(f) == map(y)(f compose g) (§7.4.1)"
+      - "The law of forking, and how the blocking implementation breaks it on a fixed thread pool (§7.4.2–7.4.3)"
+      - "A fully non-blocking Par built on callbacks (actors in the book) (§7.4.4)"
+      - "Generalising choice → choiceN → chooser → flatMap, and flatMap expressed through join (§7.5)"
+      - "Algebraic design as a method: design against laws, not against one implementation"
+    diagram: >-
+      Deadlock sequence diagram: a one-thread pool; fork(fork(x)) submits the outer task, which
+      takes the only thread and blocks on Future.get for the inner task, which waits in the queue
+      forever. A second lane shows the callback-based version completing.
+    example: >-
+      Lab in a scala-cli script: Exercise 7.9, showing that any fixed-size pool can deadlock with
+      the blocking fork (reproduce it with Executors.newFixedThreadPool(1) and
+      fork(fork(unit(1))), using get with a timeout so the script ends). Then Exercise 7.14 join,
+      and define flatMap through join.
+    presentation: standard
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 7, §7.4 'The algebra of an API' (§7.4.1 law of mapping, §7.4.2 law of forking, §7.4.3 'Breaking the law: a subtle bug', §7.4.4 non-blocking implementation), §7.5 'Refining combinators to their most general form'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "parallelism chapter folder: Par.scala and the non-blocking implementation (Nonblocking.scala)"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-12
+    title: "Property-based testing: designing Gen and Prop"
+    level: I
+    est_min: 25
+    prereqs: [fp-scala-11, fp-scala-09]
+    summary: >-
+      Designs a small property-based testing library in the spirit of ScalaCheck, asking what a
+      property and a generator should mean before choosing representations. Gen turns out to be a
+      State[RNG, A] from ch. 6, and generators that depend on generated values need flatMap, the
+      same shape seen with Par. The existing note 12-testing/Testing-property_based.md covers
+      using ScalaCheck; this rung is about how such a library is built, which suits a reader with
+      a long QA background.
+    key_points:
+      - "Properties over generated inputs vs example-based tests; ScalaCheck's forAll model (§8.1)"
+      - "Writing properties before code: the specification exercises for sum and maximum (Exercises 8.1–8.2)"
+      - "What a Prop means: passed, or falsified with a failure message and a success count (§8.2.2, §8.2.5)"
+      - "Gen[A] as State[RNG, A]: choose, unit, boolean, listOfN (§8.2.3)"
+      - "Generators that depend on generated values need flatMap (§8.2.4)"
+    diagram: >-
+      Data-flow diagram: RNG seed → Gen[A] (a State[RNG, A]) → n test cases → predicate
+      A => Boolean → Result (Passed, or Falsified(failure, successes)). A side note says Gen,
+      like Par, ends up with map2 and flatMap.
+    example: >-
+      Lab in a Scala worksheet. Exercise 8.1: write down properties for sum: List[Int] => Int
+      (reversal, a list of identical values, the empty list) as a tester would write a spec.
+      Exercise 8.5: unit, boolean and listOfN for Gen, built on State from ch. 6.
+    presentation: standard
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 8 'Property-based testing', §8.1 'A brief tour of property-based testing', §8.2 'Choosing data types and functions' (§8.2.1–8.2.5)"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "testing chapter folder: Gen.scala"
+        kind: docs
+        verified: false
+      - title: "ScalaCheck"
+        url: https://scalacheck.org/
+        locator: "home page and User Guide (Properties, Generators)"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-13
+    title: "Property-based testing: minimisation, sized generators and the laws of generators"
+    level: I
+    est_min: 25
+    prereqs: [fp-scala-12]
+    summary: >-
+      Adds test-case minimisation the simple way, with sized generation (SGen) that tries small
+      cases first instead of shrinking, and then uses the library on real examples, including a
+      test suite for Par from ch. 7. It closes by testing higher-order functions and noticing that
+      Gen's combinators obey the same laws as Par's and Option's, the bridge into Part 3.
+      Complements 12-testing/Testing-property_based.md, whose "Shrinking" section describes the
+      approach ScalaCheck takes instead.
+    key_points:
+      - "Shrinking vs sized generation: two routes to a minimal counterexample (§8.3)"
+      - "SGen and listOf; running a Prop with a maximum size (§8.3)"
+      - "Using the library: properties for max and for sorting, and checking Par computations (§8.4)"
+      - "Testing higher-order functions by generating functions (§8.5)"
+      - "The laws of generators: the same map and flatMap laws as Par, Option and List (§8.6)"
+    diagram: >-
+      Flowchart of a sized run: for size 0 to max, generate n cases from the SGen at that size,
+      stop at the first falsification and report the smallest failing size; beside it, a
+      shrinking loop that walks one failing case downward.
+    example: >-
+      Lab in a Scala worksheet: Exercise 8.13 (listOf1, a generator of non-empty lists, and the
+      max property that uses it) and Exercise 8.14 (a property that checks a sort, e.g.
+      List.sorted). Run them through the library's run with a small max size.
+    presentation: standard
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 8, §8.3 'Test case minimization', §8.4 'Using the library and improving its usability', §8.5 'Testing higher-order functions and future directions', §8.6 'The laws of generators'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "testing chapter folder: Gen.scala (SGen, Prop.run, checkPar)"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-14
+    title: "Parser combinators: designing an algebra first"
+    level: I
+    est_min: 25
+    prereqs: [fp-scala-13]
+    summary: >-
+      Designs a parser-combinator library by writing the interface and its laws before any
+      implementation exists, the book's most explicit demonstration of algebraic design.
+      Primitives such as string, or, product, slice, many and flatMap are discovered by trying to
+      express parsers and laws, and context-sensitive parsing shows why flatMap is needed.
+      Extends the "Parser Combinators" section of
+      02-functional-programming/Functional-Design-Patterns.md.
+    key_points:
+      - "Algebra first: a Parsers trait with an abstract Parser type and laws, no representation yet (§9.1)"
+      - "Primitives vs derived combinators: char from string, many from or, map2 and succeed (§9.2)"
+      - "slice and many1: counting matches without building lists (§9.2.1)"
+      - "Context sensitivity needs flatMap: a digit followed by that many 'a' characters (§9.3)"
+      - "Laws written as properties with Gen from ch. 8 (or, map, product)"
+    diagram: >-
+      Diagram of the algebra: the Parsers trait in the centre, primitives (string, regex, slice,
+      succeed, or, flatMap) on one side, derived combinators (map, map2, product, many, many1,
+      listOfN) on the other, with arrows showing which are derived from which.
+    example: >-
+      Lab in a Scala worksheet against the abstract Parsers trait: Exercise 9.1 (map2 and many1
+      via product) and Exercise 9.6 (the context-sensitive parser via flatMap). They only need to
+      type-check, which is the point of algebra-first design.
+    presentation: standard
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 9 'Parser combinators', §9.1 'Designing an algebra, first', §9.2 'A possible algebra' (§9.2.1 'Slicing and nonempty repetition'), §9.3 'Handling context sensitivity'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "parsing chapter folder: Parsers.scala"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-15
+    title: "Parser combinators: JSON, error reporting and implementing the algebra"
+    level: I
+    est_min: 30
+    prereqs: [fp-scala-14]
+    summary: >-
+      Writes a JSON parser purely against the abstract algebra, then designs error reporting
+      (labels, scopes, nested errors, attempt for backtracking) before finally choosing a
+      representation, Parser[A] = Location => Result[A]. Seeing a full parser work before any
+      implementation exists shows how many design decisions an algebra can carry on its own.
+    key_points:
+      - "A JSON parser written against the abstract interface (§9.4)"
+      - "Error-reporting design: ParseError as a stack of (Location, message), with label and scope (§9.5.1–9.5.2)"
+      - "Controlling branching and backtracking: attempt and committed failures (§9.5.3)"
+      - "One representation: Location => Result, with Success and Failure carrying isCommitted (§9.6.1)"
+      - "Implementing sequencing, labelling, failover and context-sensitive parsing on it (§9.6.2–9.6.5)"
+    diagram: >-
+      Parsing the book's "abra cadabra" example with or over two scoped alternatives: a
+      committed vs an uncommitted failure deciding whether or tries the right branch, and scope
+      pushing a frame onto the error stack.
+    example: >-
+      Lab in a scala-cli script: Exercise 9.13 (implement string, regex, succeed and slice for the
+      Location => Result representation) and Exercise 9.9 (the JSON parser); run the result on a
+      tiny JSON document and compare with the answers package.
+    presentation: standard
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 9, §9.4 'Writing a JSON parser', §9.5 'Error reporting' (§9.5.1–9.5.3), §9.6 'Implementing the algebra' (§9.6.1–9.6.5)"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "parsing chapter folder: JSON.scala, Parsers.scala, and the reference implementation under answers"
+        kind: docs
+        verified: false
+
+  # ---------------------------------------------------------------- Part 3 · Common structures in functional design (I → A)
+  - id: fp-scala-16
+    title: "Monoids: laws, foldMap and parallel folding"
+    level: I
+    est_min: 25
+    prereqs: [fp-scala-15, fp-scala-11, fp-scala-13]
+    summary: >-
+      Opens Part 3 by naming the first purely algebraic structure: a type with an associative
+      combine and an identity element. Monoids are exactly what folds need; foldMap maps then
+      combines, and associativity is what lets a fold be split into a balanced tree and run in
+      parallel with Par. Extends 01-scala-language/Type-Classes-and-CT.md (§2 Monoids) and
+      01-scala-language/typeclass_hierarchy.md (Semigroup, Monoid) with laws-as-tests and the
+      parallel fold; instances are given values (see 01-scala-language/ImplicitsTypeClasses.md).
+    key_points:
+      - "Monoid = a type, an associative combine and an empty element; string, integer, boolean, Option and endofunction monoids (§10.1)"
+      - "Monoid laws checked with the ch. 8 Prop: monoidLaws (Exercise 10.4)"
+      - "Folding with monoids: foldMap, and foldRight and foldLeft derived from foldMap via the endofunction monoid (§10.2)"
+      - "Associativity enables balanced folds: foldMapV splits an IndexedSeq in half (§10.3)"
+      - "Parallel folding with Par: parFoldMap (§10.3)"
+      - "Monoid instances as given values in Scala 3 (implicit objects in the 1st ed.)"
+    diagram: >-
+      Two folds of the same eight elements: a left-leaning chain (((a·b)·c)·d)… next to a
+      balanced tree (a·b)·(c·d)…, the balanced tree's subtrees marked as independent Par tasks,
+      with a caption that associativity makes both results equal.
+    example: >-
+      Lab in a scala-cli script: Exercise 10.5 foldMap and Exercise 10.7 foldMapV (the balanced
+      split of an IndexedSeq). Then check intAddition and stringMonoid with the monoid-law
+      property from ch. 8.
+    presentation: deep
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 10 'Monoids', §10.1 'What is a monoid?', §10.2 'Folding lists with monoids', §10.3 'Associativity and parallelism'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "monoids chapter folder: Monoid.scala"
+        kind: docs
+        verified: false
+      - title: "Scala 3 Book: Type Classes"
+        url: https://docs.scala-lang.org/scala3/book/ca-type-classes.html
+        locator: "Scala 3 Book › Contextual Abstractions › Type Classes"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-17
+    title: "Monoids: parallel parsing, Foldable and composing monoids"
+    level: I
+    est_min: 25
+    prereqs: [fp-scala-16]
+    summary: >-
+      The word-count example (WC with Stub and Part) shows how a non-obvious monoid makes a
+      sequential problem splittable. The chapter then abstracts over containers with the Foldable
+      type class, a higher-kinded F[_], and composes monoids (product, function and map-merge) so
+      that several aggregates come out of one traversal. Extends §9 Foldable of
+      01-scala-language/typeclass_hierarchy.md and §5 Foldable & Traverse of
+      01-scala-language/Type-Classes-and-CT.md.
+    key_points:
+      - "Parallel parsing: the WC monoid (Stub, Part) counts words across arbitrary splits (§10.4)"
+      - "Foldable[F[_]]: foldRight, foldLeft, foldMap and toList for List, IndexedSeq, LazyList, Tree and Option (§10.5)"
+      - "Higher-kinded type parameters as the first step to abstracting over containers"
+      - "Composing monoids: productMonoid, functionMonoid, mapMergeMonoid (§10.6.1)"
+      - "Fusing traversals: a mean (sum and count) in one pass with a product monoid (§10.6.2)"
+    diagram: >-
+      Word-count split: the book's "lorem ipsum dolor sit amet, " cut into chunks, each chunk
+      mapped to a WC value (Stub, or Part(leftStub, words, rightStub)), then combined pairwise
+      up a tree into one Part whose word count is the answer.
+    example: >-
+      Lab in a Scala worksheet: Exercise 10.10 wcMonoid (then count words with it) and
+      Exercise 10.18 bag, which uses mapMergeMonoid; bag(Vector("a", "rose", "is", "a", "rose"))
+      should give Map(a -> 2, rose -> 2, is -> 1).
+    presentation: deep
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 10, §10.4 'Example: Parallel parsing', §10.5 'Foldable data structures', §10.6 'Composing monoids' (§10.6.2 'Using composed monoids to fuse traversals')"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "monoids chapter folder: Monoid.scala and Foldable.scala"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-18
+    title: "Monads I: Functor, Monad and combinators written once"
+    level: I
+    est_min: 25
+    prereqs: [fp-scala-17, fp-scala-09, fp-scala-11, fp-scala-15]
+    summary: >-
+      Notices that Option, List, LazyList, Par, Gen, Parser and State all grew the same map2,
+      sequence and traverse, and factors them out: first Functor (map) with its law, then Monad
+      with unit and flatMap, so every combinator written once on Monad works for all of them.
+      Extends §4 Functor and §8 Monad of 01-scala-language/typeclass_hierarchy.md and §4 Monad of
+      01-scala-language/Type-Classes-and-CT.md; 01-scala-language/ForComprehensions.md shows the
+      syntax side of the same flatMap.
+    key_points:
+      - "Functor generalises map over F[_]; distribute and codistribute; the functor identity law (§11.1, §11.1.1)"
+      - "Monad as a minimal set of primitives, unit and flatMap, with map and map2 derived (§11.2)"
+      - "Instances for the earlier data types: Gen, Par, Parser, Option, List, LazyList (Exercise 11.1)"
+      - "Monadic combinators written once: sequence, traverse, replicateM, filterM (§11.3)"
+      - "One function, different behaviour per monad: replicateM for List vs Option (Exercise 11.5)"
+    diagram: >-
+      Class diagram: Functor[F[_]] (map) extended by Monad[F[_]] (unit and flatMap; deriving
+      map, map2, sequence, traverse, replicateM), with instance boxes for Option, List, Gen,
+      Par, Parser and State[S, _] hanging off Monad.
+    example: >-
+      Lab in a Scala worksheet: Exercise 11.1 (Monad instances for Option, List and Gen) and
+      Exercise 11.3 (sequence and traverse on the Monad trait). Then evaluate
+      replicateM(2, List(1, 2)) and replicateM(2, Some(1)) and explain the difference.
+    presentation: deep
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 11 'Monads', §11.1 'Functors: generalizing the map function', §11.2 'Monads: generalizing the flatMap and unit functions', §11.3 'Monadic combinators'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "monads chapter folder: Monad.scala (Functor and Monad)"
+        kind: docs
+        verified: false
+      - title: "Scala 3 Reference: Implementing Type Classes"
+        url: https://docs.scala-lang.org/scala3/reference/contextual/type-classes.html
+        locator: "sections on Functor and Monad"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-19
+    title: "Monads II: laws, Kleisli composition, the identity and State monads"
+    level: A
+    est_min: 30
+    prereqs: [fp-scala-18]
+    summary: >-
+      States the monad laws, associativity and left and right identity, and shows they become
+      obvious once phrased with Kleisli composition of A => F[B] functions. It then asks "just
+      what is a monad?" through the identity monad (flatMap is variable substitution) and the
+      State monad, which needs partial type application to fit Monad's F[_]. Extends §7 Kleisli
+      of 01-scala-language/Type-Classes-and-CT.md; the State instance closes the loop with ch. 6
+      and 02-functional-programming/Purely-Functional-State.md.
+    key_points:
+      - "The associative law in flatMap form, and why it lets for-comprehensions be refactored safely (§11.4.1)"
+      - "Kleisli composition: compose(f, g), and the laws restated as associativity plus identity (Exercises 11.7–11.10)"
+      - "Identity laws; join as an alternative primitive set unit, map, join (§11.4.3, Exercises 11.12–11.13)"
+      - "The identity monad: flatMap is just variable substitution (§11.5.1)"
+      - "The State monad and partial type application: ({type f[x] = State[S, x]})#f in the 1st ed., [x] =>> State[S, x] in Scala 3 (§11.5.2)"
+      - "A monad is a set of primitives that obey laws, not a container or a 'computation' metaphor"
+    diagram: >-
+      Category-style diagram: objects A, B, C, D with Kleisli arrows f: A → F[B],
+      g: B → F[C], h: C → F[D]; the two paths compose(compose(f, g), h) and
+      compose(f, compose(g, h)) meeting at F[D], and unit drawn as the identity arrow on each
+      object.
+    example: >-
+      Lab in a Scala worksheet: Exercise 11.7 compose (Kleisli composition) and Exercise 11.8
+      flatMap in terms of compose. Then write the associative law with compose and check it
+      for Option with a ch. 8 property.
+    presentation: deep
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 11, §11.4 'Monad laws' (§11.4.1 associative law, §11.4.3 identity laws), §11.5 'Just what is a monad?' (§11.5.1 identity monad, §11.5.2 'The State monad and partial type application')"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "monads chapter folder: Monad.scala (compose, join, Id, stateMonad)"
+        kind: docs
+        verified: false
+      - title: "Scala 3 Reference: Type Lambdas"
+        url: https://docs.scala-lang.org/scala3/reference/new-types/type-lambdas.html
+        locator: "Scala 3 Reference › New Types › Type Lambdas"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-20
+    title: "Applicative functors: map2 as the primitive"
+    level: A
+    est_min: 30
+    prereqs: [fp-scala-19]
+    summary: >-
+      Shows that most monadic combinators only need unit and map2, which defines Applicative, a
+      weaker but more common abstraction. Applicative computations have a structure fixed up
+      front, while monadic ones can choose the next step from earlier results; the chapter
+      compares the Option and Parser applicatives with their monads. Validated (Validation in the
+      1st ed.) accumulates every error, something no monad can do. Extends §5–6 Apply and
+      Applicative of 01-scala-language/typeclass_hierarchy.md and §3 of
+      01-scala-language/Type-Classes-and-CT.md.
+    key_points:
+      - "Applicative with unit and map2 (or unit and apply) as primitives; traverse and sequence only need map2 (§12.1–12.2)"
+      - "Monad vs applicative: context-sensitive vs context-free, shown with Option and Parser (§12.3)"
+      - "Not every applicative is a monad: zipping lazy lists, and Validated accumulating errors (§12.4.1)"
+      - "Applicative laws: left and right identity, associativity, naturality of product (§12.5)"
+      - "The practical payoff: form validation that reports every error at once"
+    diagram: >-
+      Two flowcharts validating the chapter's WebForm (name, birthdate, phone): a monadic
+      flatMap chain that stops at the first error, and an applicative map3 where the three
+      validations run independently and their errors are combined into one list.
+    example: >-
+      Lab in a Scala worksheet: Exercise 12.1 (sequence, replicateM and product from map2 and
+      unit) and Exercise 12.6 (an Applicative for Validated / Validation that accumulates
+      errors). Validate a WebForm with three bad fields and see all three errors come back.
+    presentation: deep
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 12 'Applicative and traversable functors', §12.1 'Generalizing monads', §12.2 'The Applicative trait', §12.3 'The difference between monads and applicative functors', §12.4 'The advantages of applicative functors', §12.5 'The applicative laws'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "applicative chapter folder: Applicative.scala"
+        kind: docs
+        verified: false
+      - title: "Cats documentation: Applicative"
+        url: https://typelevel.org/cats/typeclasses/applicative.html
+        locator: "Type Classes › Applicative"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-21
+    title: "Traversable functors: traverse, mapAccum and fusion"
+    level: A
+    est_min: 30
+    prereqs: [fp-scala-20, fp-scala-17]
+    summary: >-
+      Generalises traverse and sequence to any data structure with the Traverse type class, which
+      turns out to subsume both Functor and Foldable. With the State applicative a single traverse
+      can label elements, reverse a structure or fold it (mapAccum); traversals can be fused and
+      nested, and the chapter ends on why monads do not compose in general while applicatives do.
+      Extends §10 Traverse of 01-scala-language/typeclass_hierarchy.md and §5 of
+      01-scala-language/Type-Classes-and-CT.md.
+    key_points:
+      - "Traverse[F[_]]: traverse and sequence for List, Option and Tree; map via traverse with the identity applicative (§12.6, Exercises 12.13–12.14)"
+      - "From monoids to applicatives: every monoid gives a constant applicative, so foldMap is a traverse (§12.7.1)"
+      - "Traversals with State: zipWithIndex, toList, mapAccum, reverse, foldLeft (§12.7.2)"
+      - "Combining, fusing and nesting traversals: zip, fuse, compose (§12.7.3–12.7.5)"
+      - "Monad composition: applicatives always compose, monads need Traverse on the inner type (§12.7.6)"
+    diagram: >-
+      Hierarchy diagram: Functor → Applicative → Monad on one branch; Functor and Foldable →
+      Traverse on another, with arrows labelled "traverse with Id gives map" and "traverse with
+      Const[M, _] gives foldMap".
+    example: >-
+      Lab in a Scala worksheet: Exercise 12.13 (Traverse instances for List, Option and Tree)
+      and Exercise 12.16 (reverse for any traversable, via mapAccum). Check the chapter's law
+      hint: toList(reverse(x)) ++ toList(reverse(y)) == reverse(toList(y) ++ toList(x)).
+    presentation: deep
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 12, §12.6 'Traversable functors', §12.7 'Uses of Traverse' (§12.7.1 monoids to applicatives, §12.7.2 traversals with State, §12.7.3–12.7.5 combining, fusing, nesting, §12.7.6 monad composition)"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "applicative chapter folder: Traverse.scala"
+        kind: docs
+        verified: false
+      - title: "Cats documentation: Traverse"
+        url: https://typelevel.org/cats/typeclasses/traverse.html
+        locator: "Type Classes › Traverse"
+        kind: docs
+        verified: false
+
+  # ---------------------------------------------------------------- Part 4 · Effects and I/O (A)
+  - id: fp-scala-22
+    title: "External effects and I/O: the IO type and trampolining"
+    level: A
+    est_min: 30
+    prereqs: [fp-scala-21]
+    summary: >-
+      Factors effects out of a program into a pure core and an effectful shell, writes a first
+      IO type and shows that it is a monad. The naive IO overflows the stack, so the chapter
+      reifies control flow as data (Return, Suspend, FlatMap) and interprets it with a
+      tail-recursive loop, trampolining, then generalises the pattern into the Free monad.
+      Extends 02-functional-programming/SideEffects_IO.md, which covers the history and Cats
+      Effect's IO, with the book's derivation of stack safety.
+    key_points:
+      - "Factoring effects: inside every impure function is a pure function trying to get out (§13.1)"
+      - "A simple IO type and its Monad instance; handling input effects (§13.2)"
+      - "StackOverflowError on long flatMap chains, fixed by reifying control flow as data constructors (§13.3.1)"
+      - "Trampolining: a tail-recursive run loop that re-associates FlatMap(FlatMap(x, f), g) (§13.3.2)"
+      - "From TailRec to Free[F, A], the 'reasonably priced monads' (§13.4.1)"
+    diagram: >-
+      Flowchart of the run interpreter loop: match Return (done), Suspend (call the thunk),
+      FlatMap(Return or Suspend, f) (take a step), and FlatMap(FlatMap(y, g), f) (re-associate
+      to FlatMap(y, a => FlatMap(g(a), f)) and loop), with the call stack staying flat.
+    example: >-
+      Lab in a scala-cli script: Exercise 13.1 (Free is a monad for any F: implement map,
+      flatMap and the freeMonad instance) and Exercise 13.2 runTrampoline for
+      Free[Function0, A]. Test with a 100 000-step chain of flatMaps that blows the stack on the
+      naive IO.
+    presentation: deep
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 13 'External effects and I/O', §13.1 'Factoring effects', §13.2 'A simple IO type', §13.3 'Avoiding the StackOverflowError' (§13.3.1–13.3.2), §13.4.1 'Reasonably priced monads'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "iomonad chapter folder: IO.scala (IO, TailRec, Free)"
+        kind: docs
+        verified: false
+      - title: "Rúnar Bjarnason, Stackless Scala With Free Monads"
+        url: http://blog.higher-order.com/assets/trampolines.pdf
+        locator: "§3 Trampolines, §4 Free monads (paper the chapter builds on)"
+        kind: paper
+        verified: false
+
+  - id: fp-scala-23
+    title: "Free monads, interpreters and the IO type at the end of the universe"
+    level: A
+    est_min: 30
+    prereqs: [fp-scala-22]
+    summary: >-
+      Uses Free[F, A] with a Console algebra to describe programs that may only do console I/O,
+      then writes several interpreters: to Function0, to Par, and pure ones for tests. It moves on
+      to non-blocking asynchronous I/O by interpreting into Par, a general-purpose IO type and the
+      "main program at the end of the universe", and closes by showing why monadic IO is not
+      enough for streaming, the setup for ch. 15. Extends the "Free & Free Applicative Monads"
+      section of 02-functional-programming/Functional-Design-Patterns.md.
+    key_points:
+      - "A monad that supports only console I/O: a Console algebra lifted into Free (§13.4.2)"
+      - "Interpreters as natural transformations F ~> G: translate, and running Console in Function0 or Par (§13.4.2)"
+      - "Pure interpreters for testing with buffers or State (§13.4.3)"
+      - "Non-blocking and asynchronous I/O by interpreting into Par (§13.5)"
+      - "A general-purpose IO type and the main program at the end of the universe (§13.6)"
+      - "Why the IO type is insufficient for streaming I/O, the motivation for ch. 15 (§13.7)"
+    diagram: >-
+      Layer diagram: a Free[Console, A] program in the middle as a tree of Suspend and FlatMap
+      nodes; below it three interpreters fan out to Function0 (the real console), Par (async) and
+      a pure State-based test console, each labelled with its natural transformation.
+    example: >-
+      Lab in a scala-cli script: Exercise 13.3 (a generic run for Free[F, A] given Monad[F]) and
+      Exercise 13.4 (translate, then runConsole through runTrampoline so it is stack-safe). Run
+      one Console program against both the real interpreter and a pure test interpreter.
+    presentation: deep
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 13, §13.4.2 'A monad that supports only console I/O', §13.4.3 'Pure interpreters', §13.5 'Non-blocking and asynchronous I/O', §13.6 'A general-purpose IO type', §13.7 'Why the IO type is insufficient for streaming I/O'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "iomonad chapter folder: IO.scala (Free, Console, translate, runConsole)"
+        kind: docs
+        verified: false
+      - title: "Cats Effect"
+        url: https://typelevel.org/cats-effect/
+        locator: "documentation home; the production IO that descends from this chapter's design"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-24
+    title: "Local effects and mutable state: the ST monad"
+    level: A
+    est_min: 25
+    prereqs: [fp-scala-23]
+    summary: >-
+      Argues that mutation is fine when nobody can observe it, and builds the ST monad, whose
+      phantom type parameter S lets the type checker guarantee that mutable references and arrays
+      never escape the scope that created them. A purely functional in-place quicksort is the
+      payoff, and the chapter ends by reframing purity as contextual: what counts as a side
+      effect depends on who can observe it. Contrasts with the Ref and STM sections of
+      02-functional-programming/Purely-Functional-State.md, which deal with shared rather than
+      local mutable state.
+    key_points:
+      - "Purely functional mutable state: referential transparency only requires that mutation cannot be observed (§14.1)"
+      - "ST[S, A] as a little language for scoped mutation; STRef and its algebra (§14.2.1–14.2.2)"
+      - "Running ST actions with RunnableST so references cannot escape (§14.2.3)"
+      - "STArray and a purely functional in-place quicksort (§14.2.4–14.2.5)"
+      - "Purity is contextual: what counts as a side effect, e.g. StringBuilder inside a function, eq vs == (§14.3)"
+    diagram: >-
+      Scope diagram: a runST boundary box containing STRef and STArray allocation, reads and
+      writes; the pure result leaves the box, while an STRef[S, A] trying to escape is crossed
+      out with the note "S is universally quantified, so this does not type-check".
+    example: >-
+      Lab in a scala-cli script: Exercise 14.1 (fill for STArray from a Map) and Exercise 14.2
+      (partition and qs for the in-place quicksort). Run quicksort(List(5, 3, 8, 1)) and confirm
+      the result is a pure function of its input.
+    presentation: deep
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 14 'Local effects and mutable state', §14.1 'Purely functional mutable state', §14.2 (§14.2.1–14.2.5, incl. 'A purely functional in-place quicksort'), §14.3 'Purity is contextual'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "localeffects chapter folder: LocalEffects.scala (ST, STRef, STArray, Immutable.quicksort)"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-25
+    title: "Stream processing I: simple stream transformers"
+    level: A
+    est_min: 30
+    prereqs: [fp-scala-24, fp-scala-07]
+    summary: >-
+      Starts from an imperative line-counting loop that is efficient but not compositional and
+      replaces it with a stream-transformer type: Process[I, O] with Emit, Await and Halt in the
+      1st edition, Pull and Stream in the 2nd (Pilquist's FS2 design). Transformers such as take,
+      filter, count and mean are built and piped together, giving incremental I/O that composes
+      like LazyList. Extends 07-messaging-and-streaming/Messaging-fs2_streams_basics.md by
+      deriving what FS2 provides.
+    key_points:
+      - "Problems with imperative I/O: the line-counting example mixes concerns and cannot be reused (§15.1)"
+      - "A stream transformer as a state machine: emit output, await input, halt (§15.2)"
+      - "Building transformers: lift, filter, take, drop, takeWhile, count, mean, and a general loop (§15.2.1)"
+      - "Composition by piping one transformer's output into another; append and repeat (§15.2.2)"
+      - "Processing files incrementally without loading them whole (§15.2.3)"
+    diagram: >-
+      State-machine diagram of a transformer: Await(recv) consumes one input and moves to
+      Emit(head, tail) or Halt; below it a pipeline source |> filter |> take(3) |> count with
+      elements pulled one at a time from a file.
+    example: >-
+      Lab in a scala-cli script: Exercise 15.1 (take, drop, takeWhile and dropWhile as
+      transformers) and Exercise 15.3 (a running mean), then pipe them over a small file of
+      numbers. Numbers follow the 1st ed.; in the 2nd ed. the same tasks are the opening ch. 15
+      exercises on Pull, so confirm against the streamingio folder of the companion repo.
+    presentation: deep
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 15 'Stream processing and incremental I/O', §15.1 'Problems with imperative I/O: an example', §15.2 simple stream transformations (Process in the 1st ed., Pull and Stream in the 2nd)"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "streamingio chapter folder (exercise stubs and answers)"
+        kind: docs
+        verified: false
+      - title: "FS2 documentation"
+        url: https://fs2.io/
+        locator: "Guide › Building streams, and the Pull section"
+        kind: docs
+        verified: false
+
+  - id: fp-scala-26
+    title: "Stream processing II: effects, resource safety and applications"
+    level: A
+    est_min: 30
+    prereqs: [fp-scala-25, fp-scala-23]
+    summary: >-
+      Extends the transformer with an effect type so streams can perform I/O, then tackles
+      resource safety (files and connections closed on completion, early termination or error),
+      multiple inputs, sinks and effectful channels. The closing section sketches where these
+      ideas apply, which is the bridge from the book to FS2 and Akka Streams in daily work.
+      Extends 07-messaging-and-streaming/Messaging-fs2_streams_advanced.md and the Akka Streams
+      notes in the same section.
+    key_points:
+      - "An extensible stream type parameterised by an effect F; sources that evaluate effects (§15.3.1)"
+      - "Resource safety: finalisers run on normal completion, early termination and failure (§15.3.2)"
+      - "Single-input transformers, multiple inputs (zip, merge), sinks and effectful channels (§15.3.3–15.3.6)"
+      - "Dynamic resource allocation, e.g. a stream of file names becoming a stream of their lines (§15.3.7)"
+      - "Applications of compositional streaming, and the direct line to FS2 and Akka Streams (§15.4)"
+    diagram: >-
+      Lifecycle diagram for a resource-safe source: acquire a file handle → emit lines →
+      downstream take(5) stops early → the finaliser closes the handle; a second path shows an
+      error mid-stream still reaching the finaliser.
+    example: >-
+      Lab in a scala-cli script: the chapter's Fahrenheit-to-Celsius exercise (15.9 in the 1st
+      ed.): read a file of Fahrenheit values line by line, convert, and write the result to
+      another file, built so the input handle is closed even when the pipeline stops early. Then
+      write the same pipeline with FS2 (Files[IO].readUtf8Lines) and compare.
+    presentation: deep
+    sources:
+      - title: "Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)"
+        url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+        locator: "ch. 15, §15.3 'An extensible process type' (§15.3.1–15.3.7; 'extensible pulls and streams' in the 2nd ed.), §15.4 'Applications'"
+        kind: book
+        verified: false
+      - title: "fpinscala companion repository"
+        url: https://github.com/fpinscala/fpinscala
+        locator: "streamingio chapter folder (effectful streams, resource safety)"
+        kind: docs
+        verified: false
+      - title: "FS2 documentation"
+        url: https://fs2.io/
+        locator: "Guide › Resource acquisition; fs2.io.file Files"
+        kind: docs
+        verified: false

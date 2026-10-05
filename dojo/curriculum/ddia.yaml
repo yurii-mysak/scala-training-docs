@@ -1,0 +1,1137 @@
+track: ddia
+name: Designing Data-Intensive Applications
+weight: 3
+files_to: 06-databases-and-distributed-data
+description: >-
+  Chapter by chapter through Yuriy's own copy of DDIA (Kleppmann, 1st edition), strictly in book
+  order: Part I foundations (B to I), Part II distributed data (I to A), Part III derived data (A).
+  Dense chapters are split into 2-3 rungs; every rung cites the book by chapter and section title as
+  printed, ends with a hands-on check (a Postgres session, quorum arithmetic, a lag or failover
+  trace), and deepens the existing notes in 06-databases-and-distributed-data instead of repeating them.
+primary_sources:
+  - title: Designing Data-Intensive Applications (Martin Kleppmann, O'Reilly 2017, 1st ed.) — own physical copy
+    url: https://dataintensive.net/
+    kind: book
+    verified: false
+  - title: Martin Kleppmann's blog
+    url: https://martin.kleppmann.com/
+    kind: blog
+    verified: false
+  - title: Jepsen — Consistency Models map
+    url: https://jepsen.io/consistency
+    kind: docs
+    verified: false
+  - title: PostgreSQL documentation — Concurrency Control
+    url: https://www.postgresql.org/docs/current/mvcc.html
+    kind: docs
+    verified: false
+  - title: DDIA per-chapter reference list (ept/ddia-references)
+    url: https://github.com/ept/ddia-references
+    kind: docs
+    verified: false
+rungs:
+  # ---------------------------------------------------------------- Part I — Foundations of Data Systems
+  - id: ddia-01
+    title: Reliability, scalability, maintainability — the three concerns
+    level: B
+    est_min: 20
+    prereqs: []
+    summary: >-
+      Opens the book with the vocabulary every later chapter reuses: faults versus failures,
+      describing load with load parameters, and describing performance with percentiles rather
+      than averages. Starting here gives the ladder a shared language for trade-offs before any
+      storage engine or replication protocol appears; it complements the latency arithmetic in
+      15-system-design/napkin-math.md and the percentile-based SLOs in
+      19-observability-and-oncall/slos-and-error-budgets.md.
+    key_points:
+      - A fault is one component deviating from spec, a failure is the system as a whole stopping service — design for fault tolerance across hardware faults, software errors and human errors
+      - Load parameters (requests per second, read/write ratio, fan-out) describe load; Twitter's home timeline shows fan-out on write vs on read
+      - Response time is a distribution — report p50/p95/p99, and expect tail latency amplification when one request fans out to many backends
+      - Scaling up vs scaling out, elastic vs manual — an architecture is shaped by which operations are common, there is no generic scalable design
+      - Maintainability splits into operability, simplicity (removing accidental complexity) and evolvability
+    diagram: >-
+      Twitter's two home-timeline approaches side by side — (1) query on read, joining follows and
+      tweets; (2) fan-out on write into per-follower timeline caches — with the hybrid for accounts
+      with huge follower counts marked.
+    example: >-
+      Paste 20 sample response times into a five-line Python script and compute mean, p50, p95 and
+      p99; note how the mean hides the tail. Then compute tail latency amplification: if each backend
+      call is slow 1% of the time, what share of user requests that fan out to 10 backends is slow
+      (1 - 0.99^10, about 9.6%)? Finally redo the book's fan-out arithmetic from "Describing Load"
+      (tweets per second times average followers equals timeline-cache writes per second) for a
+      car-wash event of your choosing, e.g. one completed wash fanning out to receipts, loyalty and
+      reporting.
+    presentation: minimal
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 1, "Reliability"; "Scalability" → "Describing Load", "Describing Performance", "Approaches for Coping with Load"; "Maintainability"
+        kind: book
+        verified: false
+      - title: The Tail at Scale (Dean and Barroso, CACM 2013)
+        url: https://research.google/pubs/the-tail-at-scale/
+        locator: the discussion of why variability is amplified by fan-out, and the latency table for large fan-out services
+        kind: paper
+        verified: false
+
+  - id: ddia-02
+    title: Relational vs document data models
+    level: B
+    est_min: 20
+    prereqs: [ddia-01]
+    summary: >-
+      The first half of ch. 2: why NoSQL appeared, the object-relational mismatch, and how
+      one-to-many, many-to-one and many-to-many relationships push a model toward documents or
+      relations. Deepens RDBMS_vs_NoSQL.md, Databases-Data-Modeling.md and WideColumn_vs_Document.md
+      with the book's historical argument (the hierarchical and network models) and its
+      schema-on-read versus schema-on-write framing.
+    key_points:
+      - Documents fit tree-shaped one-to-many data and give locality (the résumé example); many-to-one and many-to-many references push back toward relations and joins
+      - Normalising with IDs removes duplication of human-meaningful data; denormalising trades write complexity for read locality
+      - The hierarchical (IMS) and network (CODASYL) models explain why hand-coded access paths lost to a query optimiser
+      - Schema-on-read vs schema-on-write is the real flexibility argument, not "schemaless"
+      - Relational and document databases are converging (JSON columns in Postgres, joins in document stores)
+    diagram: >-
+      The LinkedIn-style résumé profile drawn twice — as normalised tables (users, positions,
+      education, regions, organisations) and as one JSON document — with the many-to-one references
+      (region, organisation) highlighted as the places where the document duplicates data.
+    example: >-
+      Model a car-wash customer profile (vehicles, membership plan, wash history, home site) as
+      (a) Postgres tables and (b) one JSONB document. Run CREATE TABLE customers (id int primary key,
+      doc jsonb); insert one document; list vehicles with SELECT jsonb_array_elements(doc->'vehicles')
+      FROM customers. Then answer: which fields are many-to-one references (site, wash package) that
+      the document duplicates, and what has to change when a package is renamed?
+    presentation: minimal
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 2, "Relational Model Versus Document Model" → "The Birth of NoSQL", "The Object-Relational Mismatch", "Many-to-One and Many-to-Many Relationships", "Are Document Databases Repeating History?", "Relational Versus Document Databases Today"
+        kind: book
+        verified: false
+      - title: PostgreSQL documentation — JSON Types
+        url: https://www.postgresql.org/docs/current/datatype-json.html
+        locator: sections on jsonb, containment and the jsonb operators
+        kind: docs
+        verified: false
+
+  - id: ddia-03
+    title: Query languages and graph-like data models
+    level: B
+    est_min: 20
+    prereqs: [ddia-02]
+    summary: >-
+      The second half of ch. 2: declarative versus imperative querying (with MapReduce querying in
+      between), then property graphs, triple-stores and Datalog for data dominated by many-to-many
+      relationships. This is new ground for the knowledge base, which has no graph note yet, and the
+      declarative-query argument is what later explains query optimisers and dataflow engines (ch. 10).
+    key_points:
+      - Declarative queries say what, not how, which leaves room for the optimiser and for parallel execution (the CSS vs DOM-manipulation analogy)
+      - MapReduce querying sits between declarative and imperative; MongoDB added a declarative aggregation pipeline
+      - Property graphs (vertices, edges, properties) and Cypher; the same traversal in SQL needs a recursive common table expression
+      - Triple-stores and SPARQL; Datalog as the foundation, building rules from facts
+      - Graph models differ from the old network model — no schema-enforced nesting, any vertex can connect to any other
+    diagram: >-
+      The book's example graph — two people (Lucy and Alain), their birthplaces and home city, and
+      the chain of WITHIN edges from a town up to a country and continent — with BORN_IN and LIVES_IN
+      edges and the variable-length WITHIN* path highlighted.
+    example: >-
+      In Postgres create vertices(id, label, name) and edges(tail, head, label), load about eight rows
+      (Idaho WITHIN United States WITHIN North America; London WITHIN England WITHIN Europe; Lucy
+      BORN_IN Idaho and LIVES_IN London), then write a WITH RECURSIVE query that finds people born in
+      the United States who now live in Europe. Compare its length with the short Cypher query the
+      book gives for the same question.
+    presentation: minimal
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: 'ch. 2, "Query Languages for Data" → "Declarative Queries on the Web", "MapReduce Querying"; "Graph-Like Data Models" → "Property Graphs", "The Cypher Query Language", "Graph Queries in SQL", "Triple-Stores and SPARQL", "The Foundation: Datalog"'
+        kind: book
+        verified: false
+      - title: PostgreSQL documentation — WITH Queries (Common Table Expressions)
+        url: https://www.postgresql.org/docs/current/queries-with.html
+        locator: section "Recursive Queries"
+        kind: docs
+        verified: false
+
+  - id: ddia-04
+    title: Log-structured storage — hash indexes, SSTables and LSM-trees
+    level: B
+    est_min: 25
+    prereqs: [ddia-01]
+    summary: >-
+      Ch. 3 starts from the simplest possible database (two Bash functions appending to a file) and
+      builds up to log-structured merge trees: append-only segments with an in-memory hash index
+      (Bitcask), then sorted segments (SSTables) with a memtable, compaction and Bloom filters.
+      Deepens Cassandra_LSM.md and the LSM half of btree_lsm_comparison.md with the reason behind
+      each design step.
+    key_points:
+      - An append-only log plus an in-memory hash map of byte offsets (Bitcask) gives fast writes; keys must fit in RAM and range scans are poor
+      - Segments, compaction and merging; tombstones for deletes; crash recovery and partially written records
+      - SSTables keep keys sorted, enabling merge-sort compaction, a sparse in-memory index and compressed blocks
+      - LSM write path — WAL for durability, memtable, flush to an SSTable, background compaction (size-tiered vs leveled)
+      - Bloom filters avoid disk reads for keys that do not exist
+    diagram: >-
+      LSM write and read paths — a write goes to the WAL and the memtable, the memtable flushes to an
+      SSTable, compaction merges SSTables; a read checks the memtable, then each SSTable's Bloom filter,
+      then SSTables from newest to oldest.
+    example: >-
+      Run the book's two Bash functions db_set and db_get (append "key,value" to a file; grep for the
+      key and take the last match), write the same key three times and observe that reads scan the
+      whole file. Then write a 25-line Python version that keeps a dict of key to byte offset (the
+      Bitcask idea), add a compact() that rewrites only the latest value per key, and measure how much
+      the file shrinks.
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 3, "Data Structures That Power Your Database" → "Hash Indexes", "SSTables and LSM-Trees"
+        kind: book
+        verified: false
+      - title: Apache Cassandra documentation
+        url: https://cassandra.apache.org/doc/latest/
+        locator: Architecture → Storage Engine (commit log, memtables, SSTables) and Compaction
+        kind: docs
+        verified: false
+
+  - id: ddia-05
+    title: B-trees, and how they compare with LSM-trees
+    level: I
+    est_min: 25
+    prereqs: [ddia-04]
+    summary: >-
+      B-trees — fixed-size pages updated in place, a write-ahead log for crash safety, latches for
+      concurrency — and the book's balanced comparison with LSM-trees (write amplification,
+      compaction interference, predictability). Deepens btree_lsm_comparison.md and Indexing_Optim.md,
+      and closes with "Other Indexing Structures" (clustered and covering indexes, multi-column
+      indexes, in-memory databases).
+    key_points:
+      - B-tree pages of a few KB, branching factor, logarithmic depth, page splits on overflow
+      - Making B-trees reliable — WAL (redo log) and latches; copy-on-write as the alternative
+      - Write amplification exists in both families; LSM usually wins on write throughput and compression, B-trees on read predictability and a single location per key (convenient for locks)
+      - Compaction can interfere with foreground reads and writes and can fall behind under sustained write load — monitor it
+      - Clustered vs secondary vs covering indexes, concatenated (multi-column) indexes; in-memory databases are fast mainly because they avoid encoding overhead
+    diagram: >-
+      A B-tree lookup descending from the root page through key-range references to a leaf page, plus
+      an insert that splits a full leaf into two pages and updates the parent.
+    example: >-
+      Compute B-tree capacity from the figures the book gives in "B-Trees" (page size, branching
+      factor, number of levels) and check its storage claim. Then in Postgres create a table with one
+      million rows via generate_series, add an index, and run EXPLAIN (ANALYZE, BUFFERS) on a point
+      lookup and a range scan; compare buffers touched with the expected tree depth. Optional: CREATE
+      EXTENSION pageinspect; SELECT * FROM bt_metap('your_index') to read the tree level directly.
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 3, "B-Trees" (incl. "Making B-trees reliable", "B-tree optimizations"); "Comparing B-Trees and LSM-Trees"; "Other Indexing Structures"
+        kind: book
+        verified: false
+      - title: PostgreSQL documentation — Index Types
+        url: https://www.postgresql.org/docs/current/indexes-types.html
+        locator: section "B-Tree"
+        kind: docs
+        verified: false
+      - title: PostgreSQL documentation — Using EXPLAIN
+        url: https://www.postgresql.org/docs/current/using-explain.html
+        locator: sections "EXPLAIN Basics" and "EXPLAIN ANALYZE" (BUFFERS option)
+        kind: docs
+        verified: false
+
+  - id: ddia-06
+    title: OLTP vs OLAP, data warehouses and column storage
+    level: I
+    est_min: 25
+    prereqs: [ddia-05]
+    summary: >-
+      The second half of ch. 3: why analytics moved into separate warehouses, star and snowflake
+      schemas, and how column-oriented storage, compression (bitmaps and run-length encoding), sort
+      order and materialised aggregates make scanning billions of rows fast. Links
+      13-data-engineering/Data_concepts.md (star and snowflake schemas) and
+      13-data-engineering/delta_parquet_guide.md (Parquet is the columnar format the book mentions).
+    key_points:
+      - OLTP (small key-based reads and writes, user-facing) vs OLAP (large scans and aggregates, analyst-facing); ETL into a warehouse
+      - Star schema — a fact table with foreign keys into dimension tables; snowflake schemas normalise dimensions further
+      - Column storage keeps each column in its own file so a query reads only the columns it needs
+      - Column compression with bitmap and run-length encoding; vectorised processing that fits CPU caches
+      - Sort order, writes via an in-memory store merged into column files, and data cubes or materialised views that trade flexibility for speed
+    diagram: >-
+      The same fact_sales table laid out row by row and column by column, with one low-cardinality
+      column shown underneath as one bitmap per distinct value and then run-length encoded.
+    example: >-
+      Hand-encode a 16-value column such as product_sk = [69, 69, 69, 74, 31, 31, 31, 29, 30, 30, 31,
+      31, 68, 69, 69, 69] as one bitmap per distinct value, then run-length encode each bitmap, in the
+      style of the book's column-compression figure. Optionally pip install duckdb, generate a
+      one-million-row washes table, export it to Parquet and CSV, and time SELECT site, count(*) ...
+      GROUP BY site against each file.
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: 'ch. 3, "Transaction Processing or Analytics?" → "Data Warehousing", "Stars and Snowflakes: Schemas for Analytics"; "Column-Oriented Storage" → "Column Compression", "Sort Order in Column Storage", "Writing to Column-Oriented Storage", "Aggregation: Data Cubes and Materialized Views"'
+        kind: book
+        verified: false
+      - title: Apache Parquet documentation
+        url: https://parquet.apache.org/docs/
+        locator: File Format → Concepts (row groups, column chunks, pages) and encodings
+        kind: docs
+        verified: false
+
+  - id: ddia-07
+    title: Encoding formats and schema evolution
+    level: I
+    est_min: 25
+    prereqs: [ddia-02]
+    summary: >-
+      The first half of ch. 4: why language-native serialisation is a trap, what JSON and XML get
+      wrong (numbers, binary strings, optional schemas), and how Thrift, Protocol Buffers and Avro
+      give compact binary encodings that still allow forward and backward compatibility. Deepens
+      15-system-design/grpc_protobuf_schema_design.md (§3 wire format, §5 versioning) and the
+      schema-evolution section of Event-Sourcing-Guide.md.
+    key_points:
+      - Backward compatibility (new code reads old data) vs forward compatibility (old code reads new data), both needed for rolling upgrades
+      - Language-native formats such as Java serialization — security, versioning and cross-language problems
+      - JSON's weaknesses — number precision beyond 2^53, no binary strings, optional schemas; binary JSON variants save little
+      - Protobuf and Thrift field tags — never reuse a tag, new fields must be optional or defaulted, removed tags are reserved
+      - Avro resolves the writer's schema against the reader's schema; no tags, so schemas can be generated from a database; the open question of how the reader finds the writer's schema (schema registry)
+    diagram: >-
+      One record encoded as JSON, MessagePack, Protocol Buffers and Avro, drawn as byte strips with
+      field tags and length prefixes annotated and the total byte count of each.
+    example: >-
+      Encode the book's sample record {"userName": "Martin", "favoriteNumber": 1337, "interests":
+      ["daydreaming", "hacking"]} as compact JSON in Python and as a Protocol Buffers message
+      (protoc with Python, or ScalaPB), and print both byte lengths. Then add a field with a new tag
+      and decode the new bytes with the old generated class (forward compatibility); remove a field
+      and decode old bytes with the new class (backward compatibility). Write down which change would
+      break each direction.
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 4, "Formats for Encoding Data" → "Language-Specific Formats", "JSON, XML, and Binary Variants", "Thrift and Protocol Buffers", "Avro", "The Merits of Schemas"
+        kind: book
+        verified: false
+      - title: Schema evolution in Avro, Protocol Buffers and Thrift (Kleppmann, 2012)
+        url: https://martin.kleppmann.com/2012/12/05/schema-evolution-in-avro-protocol-buffers-thrift.html
+        locator: whole post (the byte-level diagrams of each encoding)
+        kind: blog
+        verified: false
+      - title: Protocol Buffers — Language Guide (proto 3)
+        url: https://protobuf.dev/programming-guides/proto3/
+        locator: section "Updating A Message Type" (and "Reserved Fields")
+        kind: docs
+        verified: false
+
+  - id: ddia-08
+    title: Modes of dataflow — databases, services and messages
+    level: I
+    est_min: 20
+    prereqs: [ddia-07]
+    summary: >-
+      The second half of ch. 4 asks who encodes and who decodes: a database (data outlives code), a
+      service call (REST or RPC, and why location transparency is a fallacy), or an asynchronous
+      message (brokers, and distributed actor frameworks such as Akka). Directly relevant to Yuriy's
+      Akka background — the book discusses actor-framework serialisation and rolling upgrades — and
+      links 15-system-design/grpc_protobuf_schema_design.md and
+      07-messaging-and-streaming/Messaging-Fundamentals.md.
+    key_points:
+      - Dataflow through databases — data outlives code, so older code must not drop unknown fields when it rewrites a record
+      - A network request is not a local function call — timeouts, retries and idempotence, variable latency, encoding of every argument
+      - Service evolution — servers are usually upgraded first, so requests need backward and responses forward compatibility; API versioning
+      - Message brokers decouple sender from receiver (buffering, redelivery, fan-out) with one-way asynchronous messages
+      - Distributed actor frameworks (Akka, Orleans, Erlang OTP) move the encoding problem inside the cluster; rolling upgrades need compatible message serialisation
+    diagram: >-
+      Three lanes — a process writes to a database and a later process reads it; a client calls a
+      service and gets a response; a producer sends through a broker to consumers — each annotated
+      with which side must be forward- and which backward-compatible.
+    example: >-
+      Reproduce the book's lost-field problem from "Dataflow Through Databases": v2 of a service
+      writes a customer record with a new loyaltyTier field; a v1 service decodes it into
+      case class Customer(id, name) (unknown fields ignored), changes the name and writes it back —
+      loyaltyTier is gone. Fix it by preserving unknown fields (keep the raw JSON and patch only the
+      changed field). Ten lines of Scala with circe, or Python with dicts.
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: 'ch. 4, "Modes of Dataflow" → "Dataflow Through Databases", "Dataflow Through Services: REST and RPC", "Message-Passing Dataflow" (incl. "Distributed actor frameworks")'
+        kind: book
+        verified: false
+      - title: Akka documentation
+        url: https://doc.akka.io/
+        locator: Akka core → Serialization (Jackson and Protobuf serializers) and Rolling Updates
+        kind: docs
+        verified: false
+
+  # ---------------------------------------------------------------- Part II — Distributed Data
+  - id: ddia-09
+    title: Leaders and followers — single-leader replication
+    level: I
+    est_min: 25
+    prereqs: [ddia-08]
+    summary: >-
+      Ch. 5 opens Part II with why we replicate and how the most common scheme works: synchronous
+      versus asynchronous followers, adding a follower from a snapshot, catch-up recovery, failover and
+      its traps (lost writes, split brain, choosing the timeout), and the four ways to implement a
+      replication log. Yuriy has run Cassandra and Kafka; this rung sets the single-leader baseline
+      they deviate from, and links the WAL material in Data_Storage_Persistence_Strategies.md.
+    key_points:
+      - Synchronous vs asynchronous vs semi-synchronous followers — the durability vs availability trade-off
+      - A new follower is a consistent snapshot plus replay from the snapshot's log position (Postgres LSN, MySQL binlog coordinates)
+      - Failover — detect, elect, reconfigure; discarded writes, split brain and timeout tuning are where it goes wrong
+      - Replication logs — statement-based, WAL shipping, logical (row-based), trigger-based; logical logs decouple from storage-engine versions and feed change data capture
+    diagram: >-
+      Sequence diagram of writes to a leader with an asynchronous follower lagging behind, the leader
+      crashing, the follower being promoted, the unreplicated writes lost, and the old leader coming
+      back believing it is still leader (split brain).
+    example: >-
+      Trace the failover incident the book describes in "Leader failure: Failover" (an out-of-date
+      follower promoted to leader reused auto-increment primary keys that another system also
+      stored). On paper: the leader is at log position 1000 and the async follower at 970 when the
+      leader dies — list which writes vanish, what clients saw, and what fencing the old leader
+      (STONITH) would and would not fix. Optional: on any replicated Postgres run SELECT * FROM
+      pg_stat_replication and read the write_lag, flush_lag and replay_lag columns.
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 5, "Leaders and Followers" → "Synchronous Versus Asynchronous Replication", "Setting Up New Followers", "Handling Node Outages", "Implementation of Replication Logs"
+        kind: book
+        verified: false
+      - title: PostgreSQL documentation — Log-Shipping Standby Servers
+        url: https://www.postgresql.org/docs/current/warm-standby.html
+        locator: sections "Streaming Replication" and "Failover"
+        kind: docs
+        verified: false
+      - title: Patterns of Distributed Systems (Unmesh Joshi, martinfowler.com)
+        url: https://martinfowler.com/articles/patterns-of-distributed-systems/
+        locator: patterns "Leader and Followers", "Write-Ahead Log", "High-Water Mark"
+        kind: blog
+        verified: false
+
+  - id: ddia-10
+    title: Problems with replication lag
+    level: I
+    est_min: 20
+    prereqs: [ddia-09]
+    summary: >-
+      Asynchronous followers make reads eventually consistent, and "eventually" can mean seconds. The
+      book names three guarantees users notice when they are missing — read-your-writes, monotonic
+      reads and consistent prefix reads — and practical ways to provide them. Gives concrete anomalies
+      to the BASE and eventual-consistency discussion in CAP_Consistency.md §3.
+    key_points:
+      - Read-after-write (read-your-writes) consistency — read your own edits from the leader, track the last-write timestamp, cross-device complications
+      - Monotonic reads — a user never sees time go backwards; route each user to the same replica
+      - Consistent prefix reads — causally related writes are seen in order; a problem specific to partitioned data
+      - Pretending replication is synchronous when it is not is a common bug source, and one reason transactions exist (ch. 7)
+    diagram: >-
+      Timeline with a leader and two followers at different lags: a user writes a comment, then
+      refreshes twice and hits follower 1 and then follower 2, each read annotated with the guarantee
+      it violates.
+    example: >-
+      Trace three scenarios for a car-wash membership app with one leader and two followers lagging
+      200 ms and 3 s: (1) a customer upgrades their plan and reloads the page; (2) a customer refreshes
+      the wash-history list twice; (3) a support chat where the answer appears before the question.
+      Name the violated guarantee in each and the cheapest fix (read from the leader for N seconds
+      after a write; sticky routing by hash of customer_id; write causally related messages to the
+      same partition).
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 5, "Problems with Replication Lag" → "Reading Your Own Writes", "Monotonic Reads", "Consistent Prefix Reads", "Solutions for Replication Lag"
+        kind: book
+        verified: false
+      - title: Jepsen — Consistency Models
+        url: https://jepsen.io/consistency
+        locator: session models on the map — "Read Your Writes", "Monotonic Reads" (and how they sit below Causal)
+        kind: docs
+        verified: false
+
+  - id: ddia-11
+    title: Multi-leader and leaderless replication, quorums
+    level: I
+    est_min: 30
+    prereqs: [ddia-10]
+    summary: >-
+      The rest of ch. 5: multi-leader setups (multiple datacentres, offline clients, collaborative
+      editing) and their write conflicts, then Dynamo-style leaderless replication — read repair,
+      anti-entropy, quorums (w + r > n) and their limits, sloppy quorums with hinted handoff, and
+      detecting concurrent writes with version vectors. Deepens the quorum math in CAP_Consistency.md
+      §4 and the anti-entropy section of Cassandra_LSM.md, i.e. the system Yuriy has run in production.
+    key_points:
+      - Multi-leader conflicts — avoid them (route each record to one leader) or converge (last write wins, merging, custom resolution on write or on read)
+      - Leaderless writes and reads go to several replicas; read repair and anti-entropy fix stale copies
+      - The quorum condition w + r > n, and why it still is not linearizable (sloppy quorums, concurrent writes, partially failed writes, LWW clock skew)
+      - Sloppy quorums and hinted handoff raise write availability at the cost of read guarantees
+      - Happens-before vs concurrent; last-write-wins silently discards data; version vectors capture causality
+    diagram: >-
+      An n = 3 leaderless cluster: a write accepted by two of three replicas while the third is down,
+      then a quorum read that gets one stale and one fresh value and triggers read repair on the
+      stale replica.
+    example: >-
+      Fill a small table for n = 3 and n = 5: which (w, r) pairs satisfy w + r > n, how many node
+      failures each tolerates for reads and for writes, and which Cassandra consistency levels (ONE,
+      QUORUM, ALL, LOCAL_QUORUM) they correspond to. Then construct a concrete history with n = 3,
+      w = r = 2 that still returns a stale value (for example a write that reached only one replica
+      and was reported failed but not rolled back, or a sloppy quorum).
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 5, "Multi-Leader Replication" → "Handling Write Conflicts", "Multi-Leader Replication Topologies"; "Leaderless Replication" → "Writing to the Database When a Node Is Down", "Limitations of Quorum Consistency", "Sloppy Quorums and Hinted Handoff", "Detecting Concurrent Writes"
+        kind: book
+        verified: false
+      - title: Dynamo — Amazon's Highly Available Key-value Store (DeCandia et al., SOSP 2007)
+        url: https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf
+        locator: sections on data versioning (vector clocks), hinted handoff and replica synchronisation (Merkle trees)
+        kind: paper
+        verified: false
+
+  - id: ddia-12
+    title: Partitioning key-value data and secondary indexes
+    level: I
+    est_min: 25
+    prereqs: [ddia-11]
+    summary: >-
+      The first half of ch. 6: partitioning by key range versus by hash of key, skew and hot spots,
+      then the two ways to partition secondary indexes — by document (local, scatter/gather reads) or
+      by term (global, usually updated asynchronously). Deepens Partitioning_Rebalancing.md,
+      partition_strategies.md and cassandra_partition_clustering.md; DynamoDB's local and global
+      secondary indexes in dynamodb_refresher.md are the two index styles in practice.
+    key_points:
+      - The goal is spreading data and query load evenly; skew creates hot spots
+      - Key-range partitioning keeps range scans cheap but risks hot ranges (timestamps); hash partitioning spreads load but loses range queries; Cassandra's compound primary key is the compromise
+      - Relieving a hot key by adding a random suffix, paid for by reads that must fan in
+      - Document-partitioned (local) secondary indexes — writes touch one partition, reads scatter/gather and suffer tail latency
+      - Term-partitioned (global) secondary indexes — efficient reads, writes touch several partitions, usually asynchronous
+    diagram: >-
+      Two partitions of a car-listings table: on the left each partition keeps its own local index
+      by colour (a query for red cars goes to every partition); on the right a global index
+      partitioned by term (colour values a-r on one partition, s-z on the other).
+    example: >-
+      Design the partition key for a car-wash transactions table (about 300 sites, a few big sites
+      doing ten times the volume): compare site_id, (site_id, day) and hash(transaction_id). For each,
+      write which of three main queries (a site's daily report, a customer's history, one transaction
+      by id) hits a single partition and where hot spots form. Then decide whether the customer-history
+      lookup needs a local or a global secondary index and what consistency it gets.
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 6, "Partitioning and Replication"; "Partitioning of Key-Value Data" → "Partitioning by Key Range", "Partitioning by Hash of Key", "Skewed Workloads and Relieving Hot Spots"; "Partitioning and Secondary Indexes"
+        kind: book
+        verified: false
+      - title: Amazon DynamoDB Developer Guide — Global secondary indexes
+        url: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html
+        locator: sections on GSI attribute projections and eventual consistency of GSI reads
+        kind: docs
+        verified: false
+
+  - id: ddia-13
+    title: Rebalancing partitions and request routing
+    level: I
+    est_min: 20
+    prereqs: [ddia-12]
+    summary: >-
+      The second half of ch. 6: why hash mod N is a rebalancing disaster, the three workable
+      strategies (a fixed number of partitions, dynamic splitting, partitions proportional to nodes),
+      automatic versus manual rebalancing, and how a request finds the right node. Deepens
+      Partitioning_Rebalancing.md §2–§7 (consistent-hashing math, Kafka consumer rebalancing,
+      Cassandra token reassignment).
+    key_points:
+      - Hash mod N moves most keys whenever N changes — avoid it
+      - Fixed number of partitions (chosen up front), dynamic partitioning (split and merge by size), partitions proportional to nodes (Cassandra-style tokens)
+      - Fully automatic rebalancing combined with automatic failure detection can cascade; keep a human in the loop
+      - Request routing — any node via gossip, a routing tier, or partition-aware clients; ZooKeeper as the authoritative partition map
+      - Parallel query execution in MPP databases goes beyond single-key routing
+    diagram: >-
+      Before and after adding a fifth node — under hash mod N most keys move between all nodes; with a
+      fixed number of partitions the new node steals whole partitions from each existing node.
+    example: >-
+      Write a ten-line Python script that hashes 100,000 keys and counts how many change node when the
+      cluster grows from 4 to 5 nodes with (a) hash mod N and (b) 256 fixed partitions where the new
+      node steals partitions evenly from the others. Compare the two percentages with the theory, then
+      relate the result to Kafka consumer-group rebalancing in Partitioning_Rebalancing.md §5.
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: 'ch. 6, "Rebalancing Partitions" → "Strategies for Rebalancing", "Operations: Automatic or Manual Rebalancing"; "Request Routing" (incl. "Parallel Query Execution")'
+        kind: book
+        verified: false
+      - title: Patterns of Distributed Systems (Unmesh Joshi, martinfowler.com)
+        url: https://martinfowler.com/articles/patterns-of-distributed-systems/
+        locator: patterns "Fixed Partitions" and "Key-Range Partitions"
+        kind: blog
+        verified: false
+
+  - id: ddia-14
+    title: Transactions — what ACID really means, and read committed
+    level: I
+    est_min: 25
+    prereqs: [ddia-05]
+    summary: >-
+      Ch. 7 strips the marketing from ACID: atomicity is abortability, consistency belongs to the
+      application, isolation is the hard part, durability is a spectrum. It then covers single- versus
+      multi-object operations, retrying aborted transactions, and the weakest useful isolation level,
+      read committed. Deepens SQL_Transactions.md and runs real Postgres sessions.
+    key_points:
+      - Atomicity means all-or-nothing on a fault (abortability), not concurrency; consistency is the application's invariants; isolation means concurrent transactions behave as if serial; durability ranges from disk to replication to backups
+      - Single-object atomic operations (compare-and-set, increment) vs multi-object transactions (foreign keys, denormalised counters, secondary indexes)
+      - Retrying aborted transactions — duplicates when the commit acknowledgement was lost, retry storms under overload, only transient errors are worth retrying
+      - Read committed prevents dirty reads and dirty writes; typically row locks for writes and remembering the old committed value for reads
+      - Read committed still allows read skew (non-repeatable reads), which the next rung fixes
+    diagram: >-
+      Two-session timeline for the book's read-skew example — two accounts of 500 each, a transfer of
+      100 committing between the reader's two SELECTs, so the reader sees a total of 900.
+    example: >-
+      docker run --rm -e POSTGRES_PASSWORD=pw -p 5432:5432 postgres:16, then open two psql sessions.
+      Create accounts(id int primary key, balance int) with two rows of 500. Session A: BEGIN; SELECT
+      balance FROM accounts WHERE id = 1. Session B: BEGIN; UPDATE accounts SET balance = balance + 100
+      WHERE id = 1; UPDATE accounts SET balance = balance - 100 WHERE id = 2 — before B commits, show
+      that A cannot see the change (no dirty read). COMMIT B; A now reads id = 2 and its sum is 900
+      (read skew). Repeat with session A as BEGIN ISOLATION LEVEL REPEATABLE READ and see 1000.
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 7, "The Slippery Concept of a Transaction" → "The Meaning of ACID", "Single-Object and Multi-Object Operations"; "Weak Isolation Levels" → "Read Committed"
+        kind: book
+        verified: false
+      - title: PostgreSQL documentation — Transaction Isolation
+        url: https://www.postgresql.org/docs/current/transaction-iso.html
+        locator: section "Read Committed Isolation Level" and the isolation-levels table
+        kind: docs
+        verified: false
+      - title: Hermitage — testing transaction isolation levels (Kleppmann)
+        url: https://github.com/ept/hermitage
+        locator: README table of anomalies per database, and postgres.md (G0, G1a, G1b, G1c, G-single test cases)
+        kind: docs
+        verified: false
+
+  - id: ddia-15
+    title: Snapshot isolation, lost updates and write skew
+    level: I
+    est_min: 30
+    prereqs: [ddia-14]
+    summary: >-
+      Snapshot isolation (MVCC, confusingly called repeatable read in Postgres and MySQL) fixes read
+      skew and makes long read-only queries and backups safe. The rung then works through the two
+      anomalies that remain hard: lost updates (atomic writes, SELECT FOR UPDATE, automatic detection,
+      compare-and-set) and write skew caused by phantoms (the on-call doctors example). Deepens
+      SQL_Transactions.md §1–§2.
+    key_points:
+      - MVCC — each transaction reads a consistent snapshot; visibility rules based on transaction IDs; readers never block writers
+      - The name repeatable read means different things in Postgres, MySQL and the SQL standard
+      - Preventing lost updates — atomic UPDATE ... SET x = x + 1, explicit SELECT ... FOR UPDATE, automatic detection (Postgres repeatable read aborts), compare-and-set
+      - Write skew — two transactions read the same set, then update different objects, together violating an invariant; phantoms cause it
+      - Materialising conflicts as a last resort
+    diagram: >-
+      The on-call doctors timeline — Alice and Bob each check that at least two doctors are on call,
+      each sees two, each takes themselves off call, both commit, and nobody is on call.
+    example: >-
+      In two psql sessions on Postgres 16 create doctors(name text primary key, on_call bool,
+      shift_id int) with alice and bob on call for shift 1234. Both sessions: BEGIN ISOLATION LEVEL
+      REPEATABLE READ; SELECT count(*) FROM doctors WHERE on_call AND shift_id = 1234; then A takes
+      alice off call and B takes bob off; COMMIT both — both succeed and the invariant is broken.
+      Then show a lost update: both sessions at READ COMMITTED read a counter and write back the value
+      read plus one — one increment is lost; repeat at REPEATABLE READ and watch Postgres abort the
+      second writer with "could not serialize access due to concurrent update".
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 7, "Snapshot Isolation and Repeatable Read"; "Preventing Lost Updates"; "Write Skew and Phantoms"
+        kind: book
+        verified: false
+      - title: PostgreSQL documentation — Transaction Isolation
+        url: https://www.postgresql.org/docs/current/transaction-iso.html
+        locator: section "Repeatable Read Isolation Level"
+        kind: docs
+        verified: false
+      - title: Jepsen — Snapshot Isolation
+        url: https://jepsen.io/consistency/models/snapshot-isolation
+        locator: model definition and the anomalies it allows (write skew)
+        kind: docs
+        verified: false
+
+  - id: ddia-16
+    title: Serializability — serial execution, 2PL and SSI
+    level: A
+    est_min: 30
+    prereqs: [ddia-15]
+    summary: >-
+      The three ways databases actually provide serializable isolation: literally running
+      transactions one at a time on a single thread (feasible with stored procedures and in-memory
+      data), pessimistic two-phase locking with predicate and index-range locks, and optimistic
+      serializable snapshot isolation (Postgres SERIALIZABLE). Deepens SQL_Transactions.md §7 and
+      prepares the linearizability-versus-serializability distinction in
+      linearizability_vs_serializability.md.
+    key_points:
+      - Actual serial execution is viable when transactions are short, data fits in memory, and per-partition throughput suffices; stored procedures remove network round trips
+      - Two-phase locking — shared and exclusive locks held until commit; deadlocks; unstable latencies under contention
+      - Predicate locks and index-range (next-key) locks prevent phantoms
+      - SSI is optimistic — it detects reads of stale MVCC versions and writes that affect prior reads, and aborts at commit
+      - SSI performance depends on contention and transaction length; applications must retry serialization failures (SQLSTATE 40001)
+    diagram: >-
+      A comparison matrix or decision tree of serial execution, 2PL and SSI against contention,
+      transaction length and latency predictability, showing which approach Postgres, MySQL InnoDB
+      and single-threaded stores such as Redis use.
+    example: >-
+      Rerun the doctors write-skew lab from the previous rung with BEGIN ISOLATION LEVEL SERIALIZABLE
+      in both sessions — one of them now fails with SQLSTATE 40001 ("could not serialize access due to
+      read/write dependencies among transactions"). Then write a small retry wrapper in Scala or
+      Python (up to three attempts on 40001, with jittered backoff) and explain in two sentences why
+      the whole transaction must be re-run, not just the failed statement.
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 7, "Serializability" → "Actual Serial Execution", "Two-Phase Locking (2PL)", "Serializable Snapshot Isolation (SSI)"
+        kind: book
+        verified: false
+      - title: PostgreSQL documentation — Transaction Isolation
+        url: https://www.postgresql.org/docs/current/transaction-iso.html
+        locator: section "Serializable Isolation Level"
+        kind: docs
+        verified: false
+      - title: Jepsen — Serializability
+        url: https://jepsen.io/consistency/models/serializable
+        locator: model definition, and how it differs from strict serializability
+        kind: docs
+        verified: false
+
+  - id: ddia-17
+    title: Faults, unreliable networks and unreliable clocks
+    level: A
+    est_min: 30
+    prereqs: [ddia-09]
+    summary: >-
+      Ch. 8 turns deliberately pessimistic: partial failures are nondeterministic, networks drop and
+      delay packets with no upper bound, timeouts are the only detector, and clocks lie — time-of-day
+      clocks jump, NTP is coarse, and a process can pause at any point. For a JVM engineer the
+      process-pause section is the core: a stop-the-world GC can outlast a lease. Links
+      05-jvm-internals/JVM-Garbage_Collection.md and 15-system-design/third-party-failure-modes.md
+      (timeouts).
+    key_points:
+      - Partial failure is the defining property of distributed systems; reliable systems are built from unreliable parts
+      - Unbounded network delay means a slow node is indistinguishable from a dead one; timeouts trade false positives against detection delay; queueing is the main source of variable delay
+      - Monotonic vs time-of-day clocks — measure durations with the monotonic clock (System.nanoTime on the JVM), never with wall-clock time
+      - Clock skew breaks last-write-wins ordering; clock readings have a confidence interval (Spanner's TrueTime exposes it)
+      - Process pauses (GC, VM suspension, synchronous I/O, swapping) mean a node cannot assume time stood still between two lines of code
+    diagram: >-
+      The book's last-write-wins clock-skew example as a timeline — two nodes whose clocks differ by a
+      few milliseconds, where a causally later write receives an earlier timestamp and is silently
+      discarded.
+    example: >-
+      Find the bugs in the book's lease-renewal loop from "Process Pauses" (a request loop that renews
+      the lease when fewer than 10 s remain, then processes the request if the lease is still valid):
+      list two ways it breaks — the expiry time was set by another machine's clock, and a long GC pause
+      between the validity check and processing. Then in a Scala REPL compare what
+      System.currentTimeMillis and System.nanoTime promise, and look up the longest GC pause in a
+      recent GC log of a JVM service you own.
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 8, "Faults and Partial Failures"; "Unreliable Networks" → "Detecting Faults", "Timeouts and Unbounded Delays"; "Unreliable Clocks" → "Monotonic Versus Time-of-Day Clocks", "Clock Synchronization and Accuracy", "Relying on Synchronized Clocks", "Process Pauses"
+        kind: book
+        verified: false
+      - title: Java SE API — java.lang.System (nanoTime, currentTimeMillis)
+        url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/System.html
+        locator: method descriptions of nanoTime() and currentTimeMillis()
+        kind: docs
+        verified: false
+
+  - id: ddia-18
+    title: Knowledge, truth and lies — majorities, fencing tokens, system models
+    level: A
+    est_min: 25
+    prereqs: [ddia-17]
+    summary: >-
+      If a node cannot trust its own sense of time or liveness, truth has to be decided by a quorum.
+      The second half of ch. 8 shows why a node that believes it holds a lock may not, how fencing
+      tokens fix that, what Byzantine faults are and why most data systems ignore them, and how
+      system models plus safety and liveness properties let us reason about correctness. Links
+      03-akka-ecosystem/Akka_Cluster.md (split brain resolution).
+    key_points:
+      - The truth is defined by the majority — a node declared dead must accept it even if it is alive
+      - The leader and the lock — a paused lock holder keeps writing; fencing tokens (monotonically increasing) must be checked by the storage service
+      - Byzantine faults matter in aerospace and in peer-to-peer settings, rarely inside one organisation's datacentre; weak forms of lying are handled by checksums and input validation
+      - System models — synchronous, partially synchronous, asynchronous timing; crash-stop, crash-recovery, Byzantine nodes; partially synchronous crash-recovery is the realistic one
+      - Safety (nothing bad happens) vs liveness (something good eventually happens)
+    diagram: >-
+      Sequence diagram of the fencing-token flow — client 1 obtains a lease with token 33 and pauses;
+      the lease expires; client 2 obtains token 34 and writes; client 1 wakes up and writes with token
+      33, and storage rejects it.
+    example: >-
+      Implement fencing in storage with one SQL statement: UPDATE files SET content = $1, fence = $2
+      WHERE id = $3 AND fence < $2. Run it with token 34 and then 33 and confirm the stale write
+      affects 0 rows. Then read Kleppmann's distributed-locking post and write two sentences on why a
+      Redis lock without fencing tokens is unsafe for correctness but fine for efficiency. Compare
+      with how Akka Cluster's split brain resolver decides which side of a partition survives.
+    presentation: standard
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 8, "Knowledge, Truth, and Lies" → "The Truth Is Defined by the Majority" (incl. "The leader and the lock", "Fencing tokens"), "Byzantine Faults", "System Model and Reality"
+        kind: book
+        verified: false
+      - title: How to do distributed locking (Kleppmann, 2016)
+        url: https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html
+        locator: sections on protecting a resource with a lock and on making the lock safe with fencing
+        kind: blog
+        verified: false
+      - title: Akka documentation
+        url: https://doc.akka.io/
+        locator: Akka Cluster → Split Brain Resolver (strategies such as keep-majority)
+        kind: docs
+        verified: false
+
+  - id: ddia-19
+    title: Linearizability
+    level: A
+    est_min: 30
+    prereqs: [ddia-11, ddia-18]
+    summary: >-
+      Ch. 9 begins with the strongest single-object consistency model: linearizability makes a
+      replicated system look as if there were one copy with atomic operations. The rung covers what
+      makes a history linearizable, when you need it (leader election, uniqueness constraints,
+      cross-channel timing), which replication schemes can provide it, and its cost — the actual
+      content of CAP. Deepens CAP_Consistency.md and linearizability_vs_serializability.md, and uses
+      Kleppmann's critique of the CP/AP labels.
+    key_points:
+      - Linearizability is a recency guarantee — once any read returns a new value, all later reads return it; each operation appears to take effect atomically between its start and end
+      - Linearizability (single-object recency) vs serializability (multi-object transaction isolation); strict serializability is both
+      - Needed for locks and leader election, uniqueness constraints, and cross-channel timing dependencies (the image-resizer example)
+      - Single-leader replication can be linearizable and consensus is; multi-leader is not; leaderless Dynamo-style systems with last-write-wins are not, even with quorums
+      - CAP is about linearizability under network partitions, and the everyday cost is latency even without partitions
+    diagram: >-
+      A register history: clients A, B and C, a write of x = 1 overlapping several reads, with
+      vertical markers for the linearisation points and the one read that makes the history
+      non-linearizable.
+    example: >-
+      Given a history — client A writes x = 1 from t = 0 to t = 10; client B reads from t = 2 to 4 and
+      gets 1; client C reads from t = 5 to 7 and gets 0 — decide whether it is linearizable and why
+      not. Then revisit the book's sports-score example (one person sees the final score and tells
+      another, whose reload hits a stale replica): which guarantee was violated, and would
+      read-your-writes have prevented it? Finally write a concrete interleaving that makes Cassandra
+      QUORUM reads and writes with last-write-wins non-linearizable.
+    presentation: deep
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 9, "Consistency Guarantees"; "Linearizability" → "What Makes a System Linearizable?", "Relying on Linearizability", "Implementing Linearizable Systems", "The Cost of Linearizability"
+        kind: book
+        verified: false
+      - title: Jepsen — Linearizability
+        url: https://jepsen.io/consistency/models/linearizable
+        locator: model definition and its position at the top of the map
+        kind: docs
+        verified: false
+      - title: Please stop calling databases CP or AP (Kleppmann, 2015)
+        url: https://martin.kleppmann.com/2015/05/11/please-stop-calling-databases-cp-or-ap.html
+        locator: sections on what CAP's consistency and availability actually mean, and the case studies
+        kind: blog
+        verified: false
+
+  - id: ddia-20
+    title: Ordering guarantees — causality, Lamport timestamps, total order broadcast
+    level: A
+    est_min: 30
+    prereqs: [ddia-19]
+    summary: >-
+      Ordering is the thread linking replication, transactions and consensus. The rung separates
+      causal order (a partial order, and the strongest model that does not slow down under network
+      problems) from total order, shows how Lamport timestamps give a total order consistent with
+      causality but cannot decide "is this username taken?" in real time, and introduces total order
+      broadcast — the log abstraction behind a Kafka partition and behind consensus — and its
+      equivalence to linearizable compare-and-set.
+    key_points:
+      - Causality is a partial order; linearizability implies causality but costs more; causal consistency is the strongest model that stays available under partitions
+      - Sequence numbers — noncausal generators (per-node counters, physical timestamps, preallocated blocks) vs Lamport timestamps (counter plus node id, take the max on receive)
+      - Timestamp ordering is not sufficient for uniqueness constraints — the total order is only known after collecting every operation
+      - Total order broadcast — reliable delivery plus totally ordered delivery; state machine replication; it is a log
+      - Linearizable storage can be built from total order broadcast (append a claim, read it back) and vice versa (increment-and-get)
+    diagram: >-
+      Three nodes exchanging two messages with a Lamport timestamp (counter, nodeId) on every event,
+      showing max(local, received) + 1 on receive and the resulting total order.
+    example: >-
+      By hand, assign Lamport timestamps to eight events on three nodes (with two messages), sort them
+      into the total order and check it respects happens-before. Then design username uniqueness for a
+      car-wash loyalty app on top of a single-partition Kafka topic used as total order broadcast:
+      each signup appends claim(name, requestId) and a consumer accepts the first claim per name.
+      Write down what the client does while it waits and where a linearizable read would still need
+      a sync point.
+    presentation: deep
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 9, "Ordering Guarantees" → "Ordering and Causality", "Sequence Number Ordering", "Total Order Broadcast"
+        kind: book
+        verified: false
+      - title: Time, Clocks, and the Ordering of Events in a Distributed System (Lamport, 1978)
+        url: https://lamport.azurewebsites.net/pubs/time-clocks.pdf
+        locator: sections "The Partial Ordering", "Logical Clocks", "Ordering the Events Totally"
+        kind: paper
+        verified: false
+      - title: The Log — what every software engineer should know about real-time data's unifying abstraction (Jay Kreps, 2013)
+        url: https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying
+        locator: Part One "What Is a Log?" — logs in distributed systems and state machine replication
+        kind: blog
+        verified: false
+
+  - id: ddia-21
+    title: Distributed transactions and consensus — 2PC, consensus, ZooKeeper
+    level: A
+    est_min: 30
+    prereqs: [ddia-16, ddia-20]
+    summary: >-
+      Atomic commit across nodes with two-phase commit, and why it blocks when the coordinator dies;
+      XA transactions and in-doubt locks; then fault-tolerant consensus (Paxos, Raft, Zab, VSR) as the
+      general solution — epochs, quorums, and why consensus is equivalent to total order broadcast.
+      Ends with ZooKeeper and etcd as outsourced consensus for leader election, service discovery and
+      membership. Deepens Distributed_Transactions.md §1–§2 and the Saga versus 2PC comparison in
+      15-system-design/event_sourcing_cqrs_sagas_guide.md.
+    key_points:
+      - 2PC — prepare, vote, the commit point in the coordinator's log; a participant that voted yes must wait in doubt if the coordinator crashes; 3PC assumes bounded delays
+      - XA and heterogeneous distributed transactions — in-doubt transactions keep holding locks; orphaned ones need heuristic decisions
+      - Consensus properties — uniform agreement, integrity, validity, termination; a majority must be up
+      - Consensus algorithms decide a sequence of values (total order broadcast) using epoch/term numbers and two rounds of quorum voting
+      - ZooKeeper and etcd provide linearizable atomic operations, total ordering, failure detection (ephemeral nodes) and change notifications — use them rather than reimplementing consensus
+    diagram: >-
+      2PC sequence diagram — a coordinator and two participants; prepare, yes, yes; the coordinator
+      writes its commit decision and crashes before sending commit; both participants stay in doubt,
+      holding locks.
+    example: >-
+      Postgres lab: docker run --rm -e POSTGRES_PASSWORD=pw -p 5432:5432 postgres:16 -c
+      max_prepared_transactions=10. Session A: BEGIN; UPDATE accounts SET balance = balance - 100
+      WHERE id = 1; PREPARE TRANSACTION 'tx-42'; then disconnect. Session B: SELECT * FROM
+      pg_prepared_xacts, then try to update the same row — it blocks behind an in-doubt transaction
+      that survives the disconnect (and a restart). Resolve it with COMMIT PREPARED 'tx-42'. Then map
+      Raft's term numbers onto the book's epoch numbers in two sentences.
+    presentation: deep
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 9, "Distributed Transactions and Consensus" → "Atomic Commit and Two-Phase Commit (2PC)", "Distributed Transactions in Practice", "Fault-Tolerant Consensus", "Membership and Coordination Services"
+        kind: book
+        verified: false
+      - title: PostgreSQL documentation — PREPARE TRANSACTION
+        url: https://www.postgresql.org/docs/current/sql-prepare-transaction.html
+        locator: Description and Notes (max_prepared_transactions, locks held by prepared transactions)
+        kind: docs
+        verified: false
+      - title: The Raft Consensus Algorithm
+        url: https://raft.github.io/
+        locator: the interactive visualisation and the paper "In Search of an Understandable Consensus Algorithm" (terms, leader election, log replication)
+        kind: docs
+        verified: false
+
+  # ---------------------------------------------------------------- Part III — Derived Data
+  - id: ddia-22
+    title: Batch processing — the Unix philosophy and MapReduce
+    level: A
+    est_min: 25
+    prereqs: [ddia-06]
+    files_to: 13-data-engineering
+    summary: >-
+      Part III treats derived data as the output of batch and stream jobs. Ch. 10 builds MapReduce up
+      from a Unix pipeline (sort | uniq -c), then explains distributed execution on a distributed
+      filesystem, the shuffle, and reduce-side versus map-side joins. Files to 13-data-engineering,
+      next to the lakehouse and Parquet notes.
+    key_points:
+      - The Unix philosophy — a uniform interface, separating logic from wiring, immutable inputs, cheap experimentation
+      - Sorting vs in-memory aggregation; MapReduce as a distributed sort with mapper and reducer callbacks
+      - The shuffle — partition by key, sort, copy to reducers; workflows of chained jobs
+      - Reduce-side joins — sort-merge join, secondary sort, handling skewed (hot) keys
+      - Map-side joins — broadcast hash, partitioned hash, map-side merge — when one input is small or both are already partitioned alike
+    diagram: >-
+      The book's user-activity join as a dataflow — activity events and the user database both keyed
+      by user_id in mappers, shuffled to reducers, joined by sort-merge, with the hot-key skew path
+      marked.
+    example: >-
+      Run the book's pipeline on any web-server access log (or a ten-line generated one): cat
+      access.log | awk '{print $7}' | sort | uniq -c | sort -r -n | head -n 5. Then write the same job
+      as map (url to 1), shuffle (group by key) and reduce (sum) in 15 lines of Scala collections or
+      Python, and mark where a real cluster would move data over the network.
+    presentation: deep
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 10, "Batch Processing with Unix Tools"; "MapReduce and Distributed Filesystems" → "MapReduce Job Execution", "Reduce-Side Joins and Grouping", "Map-Side Joins"
+        kind: book
+        verified: false
+      - title: MapReduce — Simplified Data Processing on Large Clusters (Dean and Ghemawat, OSDI 2004)
+        url: https://research.google/pubs/mapreduce-simplified-data-processing-on-large-clusters/
+        locator: sections "Programming Model" and "Implementation" (execution overview)
+        kind: paper
+        verified: false
+
+  - id: ddia-23
+    title: Batch outputs and dataflow engines beyond MapReduce
+    level: A
+    est_min: 25
+    prereqs: [ddia-22]
+    files_to: 13-data-engineering
+    summary: >-
+      What batch jobs should produce (search indexes, key-value stores built offline, immutable
+      outputs that make a bad deploy reversible), how Hadoop compares with MPP databases, and why
+      dataflow engines (Spark, Flink, Tez) replaced materialised intermediate state with pipelined
+      operators, plus graph processing in the Pregel model and the move to declarative high-level
+      APIs. Links 13-data-engineering/lakehouse_unified_platform_and_migration.md.
+    key_points:
+      - Batch outputs — build a new immutable dataset and switch to it atomically; human fault tolerance and minimising irreversibility
+      - Hadoop vs MPP databases — diversity of storage and processing models; designing for frequent faults (preemption)
+      - Materialised intermediate state vs dataflow engines — fewer disk writes, pipelined operators, recomputation from lineage for fault tolerance
+      - Graph processing with the Pregel (bulk synchronous parallel) model
+      - Declarative high-level APIs let the engine choose join algorithms and optimise across operators
+    diagram: >-
+      A three-stage job drawn as chained MapReduce jobs with a distributed-filesystem write between
+      every stage, next to the same job as a Spark-style DAG with a single shuffle boundary.
+    example: >-
+      Design a nightly car-wash revenue roll-up that writes to a new table revenue_v<date> and then
+      switches a view atomically (CREATE OR REPLACE VIEW revenue AS SELECT * FROM revenue_v<date>), so
+      a buggy run is undone by pointing the view back at yesterday's table. Then, in a four-operator
+      Spark-style chain (filter, map, groupByKey, join), mark which operators are narrow and which
+      force a shuffle.
+    presentation: deep
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 10, "The Output of Batch Workflows"; "Comparing Hadoop to Distributed Databases"; "Beyond MapReduce" → "Materialization of Intermediate State", "Graphs and Iterative Processing", "High-Level APIs and Languages"
+        kind: book
+        verified: false
+      - title: Resilient Distributed Datasets (Zaharia et al., NSDI 2012)
+        url: https://www.usenix.org/conference/nsdi12/technical-sessions/presentation/zaharia
+        locator: sections on RDD lineage, narrow vs wide dependencies, and fault recovery
+        kind: paper
+        verified: false
+
+  - id: ddia-24
+    title: Event streams, change data capture and event sourcing
+    level: A
+    est_min: 30
+    prereqs: [ddia-09, ddia-23]
+    files_to: 07-messaging-and-streaming
+    summary: >-
+      The first half of ch. 11: message brokers versus partitioned logs, then the insight that a
+      database's replication log is itself a stream — change data capture, log compaction and event
+      sourcing — and why immutable events let many views be derived from one log. Yuriy knows Kafka
+      well, so the rung concentrates on the database-stream duality; it deepens
+      06-databases-and-distributed-data/Event-Sourcing-Guide.md and the outbox and CDC section of
+      Distributed_Transactions.md (§4).
+    key_points:
+      - Traditional brokers (per-message acknowledgement, redelivery, load balancing that reorders) vs logs (offsets, order per partition, replay, a slow message blocks its partition)
+      - Dual writes race and partially fail — keep one source of truth and derive the rest through CDC
+      - Change data capture — an initial snapshot plus the log; log compaction keeps the latest value per key so a new consumer can rebuild state
+      - Event sourcing — commands vs events; events are immutable facts; current state is a fold over the log
+      - Immutability enables several read views from one log and easier recovery, but deletion (privacy requests) needs excision
+    diagram: >-
+      One Postgres table feeding its WAL into a CDC connector and a compacted Kafka topic, which fans
+      out to a search index, a cache and an analytics store.
+    example: >-
+      Postgres CDC in eight minutes: docker run --rm -e POSTGRES_PASSWORD=pw -p 5432:5432 postgres:16
+      -c wal_level=logical; SELECT pg_create_logical_replication_slot('s1', 'test_decoding'); insert,
+      update and delete a few rows in a washes table; then SELECT * FROM
+      pg_logical_slot_get_changes('s1', NULL, NULL) and read the change stream. Finally explain in
+      three sentences how a CDC connector such as Debezium turns this into a Kafka topic, and why a
+      compacted topic plus the initial snapshot is enough to rebuild a cache from scratch.
+    presentation: deep
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 11, "Transmitting Event Streams" → "Messaging Systems", "Partitioned Logs"; "Databases and Streams" → "Keeping Systems in Sync", "Change Data Capture", "Event Sourcing", "State, Streams, and Immutability"
+        kind: book
+        verified: false
+      - title: PostgreSQL documentation — Logical Decoding
+        url: https://www.postgresql.org/docs/current/logicaldecoding.html
+        locator: section "Logical Decoding Examples" (SQL interface with test_decoding)
+        kind: docs
+        verified: false
+      - title: Using logs to build a solid data infrastructure, or why dual writes are a bad idea (Kleppmann, 2015)
+        url: https://martin.kleppmann.com/2015/05/27/logs-for-data-infrastructure.html
+        locator: the dual-writes race-condition example and the log-based alternative
+        kind: blog
+        verified: false
+
+  - id: ddia-25
+    title: Processing streams — time, windows, joins, fault tolerance
+    level: A
+    est_min: 30
+    prereqs: [ddia-24]
+    files_to: 07-messaging-and-streaming
+    summary: >-
+      What stream processors are used for (complex event processing, analytics, materialised views),
+      why event time and processing time diverge and when a window is complete, the four window types,
+      the three kinds of stream join and their time dependence, and achieving exactly-once effects via
+      microbatching, checkpointing, atomic commit and idempotence. Links
+      03-akka-ecosystem/Stream_Processing.md, 07-messaging-and-streaming/Messaging-kafka_advanced.md and
+      15-system-design/idempotency-and-deduplication.md.
+    key_points:
+      - Event time vs processing time; stragglers and deciding when a window is done; whose clock to trust (device vs server timestamps)
+      - Window types — tumbling, hopping, sliding, session
+      - Stream-stream (window) join, stream-table join (enrichment), table-table join (materialised view maintenance); joins depend on time ordering
+      - Fault tolerance — microbatching, checkpointing, atomic commit of output with offsets, idempotent writes, rebuilding state after failure
+    diagram: >-
+      An event-time axis against a processing-time axis with ten events plotted; one late event lands
+      after its one-minute tumbling window has already been emitted.
+    example: >-
+      Take ten events as (event_time, arrival_time) pairs, two of them arriving 90 s late. Compute
+      one-minute tumbling-window counts by processing time and by event time with 30 s of allowed
+      lateness, and say what happens to each late event (dropped, emitted as a correction, sent to a
+      side output). Then note that Akka Streams groupedWithin windows by processing time, and sketch
+      how you would key windows by event time instead.
+    presentation: deep
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 11, "Processing Streams" → "Uses of Stream Processing", "Reasoning About Time", "Stream Joins", "Fault Tolerance"
+        kind: book
+        verified: false
+      - title: The world beyond batch — Streaming 101 (Tyler Akidau, O'Reilly Radar, 2015)
+        url: https://www.oreilly.com/radar/the-world-beyond-batch-streaming-101/
+        locator: sections on event time vs processing time and on windowing
+        kind: blog
+        verified: false
+
+  - id: ddia-26
+    title: The future of data systems — derived data, unbundling, correctness
+    level: A
+    est_min: 30
+    prereqs: [ddia-21, ddia-25]
+    summary: >-
+      The book's closing argument: integrate specialised systems by deriving data through ordered logs
+      instead of distributed transactions, see the dataflow as the database turned inside out, and get
+      correctness end to end — operation identifiers for duplicate suppression, uniqueness through log
+      partitions, timeliness versus integrity, auditing. It also asks the ethical questions about
+      predictive analytics and privacy. Deepens 15-system-design/idempotency-and-deduplication.md §2.2
+      (the end-to-end argument).
+    key_points:
+      - Derived data vs distributed transactions — logs give ordering and deterministic, idempotent derivation; total ordering has limits across partitions and datacentres
+      - Unbundling databases — indexes, caches and materialised views as stream-maintained derived state; application code as a derivation function
+      - The end-to-end argument — exactly-once needs an operation identifier carried from the client all the way to the database
+      - Timeliness (up to date) vs integrity (no corruption or loss) — integrity is the one you cannot relax; coordination-avoiding systems
+      - Doing the right thing — bias and feedback loops in predictive analytics, privacy, tracking and consent
+    diagram: >-
+      The car-wash POS as a dataflow — the transaction log in the centre, deriving loyalty balances,
+      a search index, revenue analytics and customer notifications, each labelled with how stale it
+      may be.
+    example: >-
+      Implement the book's request-ID pattern from "The End-to-End Argument for Databases" in
+      Postgres: a requests table with a UNIQUE request_id; inside one transaction insert the request
+      row and apply the balance updates. Run the same request twice and show the second insert fails
+      and nothing is applied twice. Then draw the derived-data diagram for one real car-wash flow and
+      mark which views may lag (timeliness) and which must never be wrong (integrity).
+    presentation: deep
+    sources:
+      - title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
+        url: https://dataintensive.net/
+        locator: ch. 12, "Data Integration"; "Unbundling Databases"; "Aiming for Correctness" → "The End-to-End Argument for Databases", "Enforcing Constraints", "Timeliness and Integrity", "Trust, but Verify"; "Doing the Right Thing"
+        kind: book
+        verified: false
+      - title: Turning the database inside-out with Apache Samza (Kleppmann, 2015)
+        url: https://martin.kleppmann.com/2015/03/04/turning-the-database-inside-out.html
+        locator: talk transcript sections on replication, secondary indexes, caching and materialised views
+        kind: blog
+        verified: false

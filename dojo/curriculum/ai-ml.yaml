@@ -1,0 +1,1805 @@
+track: ai-ml
+name: AI / ML foundations
+weight: 5
+files_to: 24-ai-ml-foundations
+description: >-
+  One ladder from "what does a model actually optimise" to shipping calibrated decision models
+  and agents, for an experienced backend/distributed-systems engineer with no formal ML
+  background. Phase 1 (rungs 1–11, Beginner) follows the dou.ua ML/CV roadmap by The Fourth Law
+  team: Kaggle Learn for the hands-on mechanics, 3Blue1Brown and Khan Academy for linear algebra,
+  StatQuest for statistics, so every later idea has its maths in place before it is needed.
+  Phase 2 (rungs 12–19) builds neural networks from a single neuron upward, doing backpropagation
+  by hand before PyTorch's autograd does it, with CS231n lectures 1–7 as the reference for
+  training and convolutional networks. Phase 3 (rungs 20–29) runs embeddings → attention →
+  Transformer → tokens → training stages → inference → prompting, then bridges into the
+  interview-level material already in 20-llm-agent-systems (evaluation, RAG, agents) instead of
+  repeating it. Phase 4 (rungs 30–38) is the engineering frontier — MCP and agent harnesses,
+  calibration as the prerequisite for decision models (Jev, Clef), RL fine-tuning, evals in CI,
+  cost and latency — and ends with an end-to-end capstone.
+primary_sources:
+  - title: "DOU — what to study to become an ML/CV engineer in 2026 (The Fourth Law team)"
+    url: https://dou.ua/forums/topic/62000/
+    verified: false
+  - title: "Kaggle Learn — Intro to Machine Learning"
+    url: https://www.kaggle.com/learn/intro-to-machine-learning
+    verified: false
+  - title: "Kaggle Learn — Intermediate Machine Learning"
+    url: https://www.kaggle.com/learn/intermediate-machine-learning
+    verified: false
+  - title: "Kaggle Learn — Pandas"
+    url: https://www.kaggle.com/learn/pandas
+    verified: false
+  - title: "Kaggle Learn — Intro to Deep Learning"
+    url: https://www.kaggle.com/learn/intro-to-deep-learning
+    verified: false
+  - title: "Kaggle Learn — Computer Vision"
+    url: https://www.kaggle.com/learn/computer-vision
+    verified: false
+  - title: "3Blue1Brown — Essence of Linear Algebra"
+    url: https://www.3blue1brown.com/topics/linear-algebra
+    verified: false
+  - title: "3Blue1Brown — Neural Networks"
+    url: https://www.3blue1brown.com/topics/neural-networks
+    verified: false
+  - title: "Khan Academy — Linear algebra"
+    url: https://www.khanacademy.org/math/linear-algebra
+    verified: false
+  - title: "StatQuest with Josh Starmer — video index"
+    url: https://statquest.org/video-index/
+    verified: false
+  - title: "Stanford CS231n — Deep Learning for Computer Vision (course site)"
+    url: https://cs231n.stanford.edu/
+    verified: false
+  - title: "CS231n course notes"
+    url: https://cs231n.github.io/
+    verified: false
+  - title: "PyTorch Tutorials — Learn the Basics"
+    url: https://pytorch.org/tutorials/beginner/basics/intro.html
+    verified: false
+  - title: "Albumentations documentation"
+    url: https://albumentations.ai/docs/
+    verified: false
+  - title: "Vaswani et al., Attention Is All You Need (2017)"
+    url: https://arxiv.org/abs/1706.03762
+    verified: false
+  - title: "Jay Alammar — The Illustrated Transformer"
+    url: https://jalammar.github.io/illustrated-transformer/
+    verified: false
+  - title: "Andrej Karpathy — Neural Networks: Zero to Hero"
+    url: https://karpathy.ai/zero-to-hero.html
+    verified: false
+  - title: "Anthropic Engineering blog"
+    url: https://www.anthropic.com/engineering
+    verified: false
+  - title: "Anthropic — Building effective agents"
+    url: https://www.anthropic.com/engineering/building-effective-agents
+    verified: false
+  - title: "Claude developer documentation"
+    url: https://docs.claude.com/
+    verified: false
+  - title: "Claude Code / Claude developer hub"
+    url: https://claude.dev/
+    verified: false
+  - title: "Model Context Protocol"
+    url: https://modelcontextprotocol.io/
+    verified: false
+  - title: "mager.co — Jev decision model (2026-09-19)"
+    url: https://mager.co/blog/2026-09-19-jev-decision-model/
+    verified: false
+  - title: "OpenRouter docs — community guide: Jev"
+    url: https://openrouter.ai/docs/guides/community/jev
+    verified: false
+  - title: "Cloudflare changelog — Clef on Workers AI (2026-10-01)"
+    url: https://developers.cloudflare.com/changelog/post/2026-10-01-clef-workers-ai/
+    verified: false
+  - title: "Flavio Copes — Clef"
+    url: https://flaviocopes.com/clef/
+    verified: false
+  - title: "The Register — Cloudflare tries to outplay Jev with open-weight Clef models (2026-10-01)"
+    url: https://www.theregister.com/ai-and-ml/2026/10/01/cloudflare-tries-to-outplay-jev-with-open-weight-clef-models/5300649
+    verified: false
+
+rungs:
+
+  # ───────────────────────── Phase 1 — Foundations (B) ─────────────────────────
+
+  - id: ai-ml-01
+    title: "What machine learning actually optimises"
+    level: B
+    est_min: 20
+    prereqs: []
+    summary: >-
+      Supervised machine learning is function fitting: pick a model family with adjustable
+      parameters, define a loss that scores how wrong its predictions are, and search for the
+      parameters that make the loss small. The real goal is not low loss on the data you already
+      have but good predictions on data you have not seen — generalisation. This four-part frame
+      (data, model, loss, optimiser) is the skeleton every later rung hangs on, from linear
+      regression to LLM pretraining.
+    key_points:
+      - "Supervised learning in one line: learn f(x) ≈ y from examples; features, target, prediction."
+      - "A model is a family of functions indexed by parameters; training means choosing the parameters."
+      - "Loss functions: mean absolute error and mean squared error for numbers; classifiers use log loss (rung 09)."
+      - "Training loss versus loss on unseen data: the gap is what overfitting means, and why data is held back."
+      - "The frame data → model → loss → optimiser, and where each later rung of this track plugs into it."
+    diagram: >-
+      A training loop: training data (x, y) → model f(x; θ) → predictions ŷ → loss L(ŷ, y) →
+      optimiser updates θ → back to the model. A side branch shows unseen data flowing into the
+      same trained model to measure generalisation, with no arrow back to the optimiser.
+    example: >-
+      Five houses (size in m², price in k$). In a Kaggle notebook with numpy, compare two candidate
+      lines price = a·size + b by computing MAE and MSE for each and pick the winner. Then add one
+      outlier house (a mansion) and observe that MSE and MAE now disagree about which line is
+      better — a first taste of "the loss you choose decides what good means". About 10 lines.
+    presentation: minimal
+    sources:
+      - title: "DOU — what to study to become an ML/CV engineer in 2026 (The Fourth Law team)"
+        url: https://dou.ua/forums/topic/62000/
+        locator: "Whole article: the roadmap and the reasoning for its order (classical ML and maths before deep learning and CV)"
+        kind: blog
+        verified: false
+      - title: "Kaggle Learn — Intro to Machine Learning"
+        url: https://www.kaggle.com/learn/intro-to-machine-learning
+        locator: "Lesson 1, \"How Models Work\""
+        kind: course
+        verified: false
+      - title: "Google Machine Learning Crash Course"
+        url: https://developers.google.com/machine-learning/crash-course
+        locator: "Module \"Linear regression\" → page \"Loss\" (L1/L2 loss, MAE/MSE)"
+        kind: course
+        verified: false
+
+  - id: ai-ml-02
+    title: "Your first model: pandas in, predictions out"
+    level: B
+    est_min: 25
+    prereqs: [ai-ml-01]
+    summary: >-
+      Before any maths, get the mechanics into your hands: load a CSV into a pandas DataFrame,
+      look at it, choose features X and target y, fit a scikit-learn model and predict. Kaggle's
+      Intro to ML does exactly this with the Melbourne housing data, and the Pandas micro-course
+      covers the DataFrame operations you will reach for daily. For a Scala engineer, a DataFrame
+      is closest to a Spark DataFrame: columnar, vectorised, with groupby/agg.
+    key_points:
+      - "DataFrame and Series; read_csv, head, describe; selecting with columns, loc and iloc."
+      - "Choosing the prediction target y and the feature list X; dropping rows with missing values as the first crude fix."
+      - "The scikit-learn contract: define → fit → predict (evaluate comes in rung 03)."
+      - "DecisionTreeRegressor as a first model: no scaling needed, easy to picture."
+      - "pandas ↔ Spark DataFrame parallels: vectorised column operations, groupby and aggregation."
+    diagram: >-
+      Left-to-right pipeline: CSV file → DataFrame (head/describe) → select y and X →
+      model.fit(X, y) → model.predict(X_new) → predictions column; the four scikit-learn steps
+      define/fit/predict/evaluate labelled under the arrows, with "evaluate" greyed out as next lesson.
+    example: >-
+      Kaggle notebook cells: pd.read_csv on the Melbourne housing CSV used by the course; .describe();
+      pick five numeric features (Rooms, Bathroom, Landsize, Lattitude, Longtitude — the course's own
+      column spellings); DecisionTreeRegressor(random_state=1).fit(X, y); predict the first five rows
+      and compare with y.head(). Finish with one groupby: mean Price by Rooms.
+    presentation: minimal
+    sources:
+      - title: "Kaggle Learn — Intro to Machine Learning"
+        url: https://www.kaggle.com/learn/intro-to-machine-learning
+        locator: "Lesson 2, \"Basic Data Exploration\"; Lesson 3, \"Your First Machine Learning Model\""
+        kind: course
+        verified: false
+      - title: "Kaggle Learn — Pandas"
+        url: https://www.kaggle.com/learn/pandas
+        locator: "Lesson 1 \"Creating, Reading and Writing\"; Lesson 2 \"Indexing, Selecting & Assigning\"; Lesson 4 \"Grouping and Sorting\""
+        kind: course
+        verified: false
+
+  - id: ai-ml-03
+    title: "Validation, overfitting and data leakage"
+    level: B
+    est_min: 25
+    prereqs: [ai-ml-02]
+    summary: >-
+      In-sample error lies: a deep enough tree memorises the training set and scores perfectly
+      while predicting new data badly. This rung introduces held-out validation, the
+      underfitting–overfitting curve controlled by model capacity, cross-validation for small
+      datasets, and data leakage — the bug where information about the answer sneaks into the
+      features. These habits separate a model that works from one that only looks like it does.
+    key_points:
+      - "Train / validation / test splits; the test set is touched once; train_test_split."
+      - "Capacity versus error: underfitting (high bias) and overfitting (high variance); the U-shaped validation curve."
+      - "k-fold cross-validation: a steadier estimate at k times the cost."
+      - "Data leakage: target leakage and train–test contamination (e.g. preprocessing fitted on all rows)."
+      - "QA analogy: the validation set is a test suite the model must never see during development."
+    diagram: >-
+      Error versus model capacity (max_leaf_nodes on a log axis): training error falls
+      monotonically, validation error is U-shaped; the sweet spot is marked, the left region
+      labelled "underfitting", the right "overfitting".
+    example: >-
+      The Kaggle Intro to ML exercise: train_test_split the housing data, loop max_leaf_nodes over
+      [5, 50, 500, 5000], print validation MAE for each and choose the best. Then compute the
+      in-sample MAE of the 5000-leaf tree to see how misleading it is. Optional: cross_val_score
+      with cv=5 on the best setting.
+    presentation: minimal
+    sources:
+      - title: "Kaggle Learn — Intro to Machine Learning"
+        url: https://www.kaggle.com/learn/intro-to-machine-learning
+        locator: "Lesson 4 \"Model Validation\"; Lesson 5 \"Underfitting and Overfitting\""
+        kind: course
+        verified: false
+      - title: "Kaggle Learn — Intermediate Machine Learning"
+        url: https://www.kaggle.com/learn/intermediate-machine-learning
+        locator: "Lesson 5 \"Cross-Validation\"; Lesson 7 \"Data Leakage\""
+        kind: course
+        verified: false
+      - title: "StatQuest — Machine Learning Fundamentals: Bias and Variance"
+        url: https://statquest.org/video-index/
+        locator: "Video index → \"Machine Learning Fundamentals: Bias and Variance\" (whole video, ~6 min)"
+        kind: video
+        verified: false
+
+  - id: ai-ml-04
+    title: "Vectors and matrices as data"
+    level: B
+    est_min: 20
+    prereqs: [ai-ml-01]
+    summary: >-
+      Every model in this track treats data as vectors and matrices: a row of features is a
+      vector, a dataset is a matrix, and a linear model is a matrix–vector product. 3Blue1Brown's
+      view of vectors as arrows and matrices as transformations of space gives the geometric
+      intuition; numpy gives the code. This is the vocabulary needed for gradients, neural network
+      layers and embeddings.
+    key_points:
+      - "Two views of a vector: a list of numbers (a feature vector) and an arrow in space."
+      - "Linear combinations and span: everything reachable by scaling and adding vectors."
+      - "A matrix as a linear transformation; its columns are where the basis vectors land."
+      - "Matrix–vector and matrix–matrix products; shapes (n×d)·(d) → (n) as a batch of predictions."
+      - "numpy shapes and broadcasting; shape errors as the everyday reality."
+    diagram: >-
+      Left: a 4×3 data matrix X (4 houses × [size, rooms, age]) and a weight vector w of length 3;
+      an arrow labelled "X @ w" produces a length-4 vector of predictions. Right: the 2×2 matrix
+      [[2, 1], [0, 1]] drawn as a transformation moving the unit square spanned by î and ĵ to a
+      parallelogram.
+    example: >-
+      numpy: X = 4 houses × [size, rooms, age]; w = [3.0, 10.0, −0.5]; compute X @ w and verify
+      one entry by hand. Then apply [[2, 1], [0, 1]] to î = (1, 0), ĵ = (0, 1) and (1, 1), and
+      check that the image of (1, 1) is the sum of the images of î and ĵ (linearity).
+    presentation: minimal
+    sources:
+      - title: "3Blue1Brown — Essence of Linear Algebra"
+        url: https://www.3blue1brown.com/topics/linear-algebra
+        locator: "Ch. 1 \"Vectors, what even are they?\"; ch. 2 \"Linear combinations, span, and basis vectors\"; ch. 3 \"Linear transformations and matrices\""
+        kind: video
+        verified: false
+      - title: "Khan Academy — Linear algebra"
+        url: https://www.khanacademy.org/math/linear-algebra
+        locator: "Unit \"Vectors and spaces\" → lesson \"Vectors\"; unit \"Matrix transformations\" → lesson \"Functions and linear transformations\""
+        kind: course
+        verified: false
+
+  - id: ai-ml-05
+    title: "Dot products and similarity"
+    level: B
+    est_min: 20
+    prereqs: [ai-ml-04]
+    summary: >-
+      The dot product is the most-used operation in ML: a linear model's prediction is one, every
+      neuron computes one, and Transformer attention is built from them. Geometrically it measures
+      how much two vectors point the same way; normalised, it becomes cosine similarity, the
+      standard way to compare embeddings. This intuition pays off in rungs 12, 20 and 21.
+    key_points:
+      - "Algebraic definition (sum of products) and geometric meaning (|a|·|b|·cos θ, projection)."
+      - "The sign tells same direction, orthogonal, or opposite."
+      - "Vector norm (length) and normalisation to unit length."
+      - "Cosine similarity versus the raw dot product: sensitivity to magnitude."
+      - "Where it reappears: w·x + b, neurons, embedding search, attention scores q·k."
+    diagram: >-
+      Two arrows a and b from the origin with angle θ between them; the projection of b onto a
+      drawn as a dashed perpendicular; a small table beside it: θ = 0° → cos 1, 90° → 0,
+      180° → −1.
+    example: >-
+      numpy: three toy word-count vectors for documents about cats, dogs and tax; compute pairwise
+      dot products and cosine similarities. Then multiply the cat document by 10 (the same text
+      repeated ten times) and show that its dot products change while its cosine similarities do not.
+    presentation: minimal
+    sources:
+      - title: "3Blue1Brown — Essence of Linear Algebra"
+        url: https://www.3blue1brown.com/topics/linear-algebra
+        locator: "Ch. 9 \"Dot products and duality\" (the projection interpretation in the first half)"
+        kind: video
+        verified: false
+      - title: "Khan Academy — Linear algebra"
+        url: https://www.khanacademy.org/math/linear-algebra
+        locator: "Unit \"Vectors and spaces\" → lesson \"Vector dot and cross products\""
+        kind: course
+        verified: false
+      - title: "StatQuest — Cosine Similarity, Clearly Explained"
+        url: https://statquest.org/video-index/
+        locator: "Video index → \"Cosine Similarity, Clearly Explained!!!\""
+        kind: video
+        verified: false
+
+  - id: ai-ml-06
+    title: "Gradient descent in one variable"
+    level: B
+    est_min: 20
+    prereqs: [ai-ml-01]
+    summary: >-
+      Training means minimising a loss, and almost all of modern ML does it with gradient descent:
+      compute the slope of the loss, step downhill, repeat. With a single parameter everything is
+      visible — the derivative, the learning rate, convergence, overshooting and divergence.
+      Rung 07 generalises the same loop to many parameters.
+    key_points:
+      - "The derivative as the slope of the loss at the current parameter value."
+      - "Update rule θ ← θ − η · dL/dθ; the learning rate η is the step size."
+      - "η too small: slow; η too large: oscillation or divergence."
+      - "Stopping rules: small gradient, small step, or a fixed step budget."
+      - "Convex (one bowl) versus non-convex (many valleys) losses, as a preview of neural networks."
+    diagram: >-
+      A parabola L(θ) with a ball at successive θ values stepping down to the minimum; a second
+      panel shows the same parabola with too-large steps zig-zagging across the bowl and away from it.
+    example: >-
+      Pure Python: minimise L(w) = (w − 3)² from w = 0 with η = 0.1, 0.9 and 1.1 for 20 steps,
+      printing w each step — smooth convergence, oscillating convergence, divergence. Then fit only
+      an intercept b to five numbers by gradient descent on MSE and confirm it converges to their mean.
+    presentation: minimal
+    sources:
+      - title: "StatQuest — Gradient Descent, Step-by-Step"
+        url: https://statquest.org/video-index/
+        locator: "Video index → \"Gradient Descent, Step-by-Step\" (the intercept-only example in the first half)"
+        kind: video
+        verified: false
+      - title: "3Blue1Brown — Neural Networks"
+        url: https://www.3blue1brown.com/topics/neural-networks
+        locator: "Ch. 2 \"Gradient descent, how neural networks learn\" — the cost function and ball-rolling-downhill segment (roughly the first third)"
+        kind: video
+        verified: false
+      - title: "Google Machine Learning Crash Course"
+        url: https://developers.google.com/machine-learning/crash-course
+        locator: "Module \"Linear regression\" → pages \"Gradient descent\" and \"Hyperparameters\" (learning rate)"
+        kind: course
+        verified: false
+
+  - id: ai-ml-07
+    title: "Gradient descent in many variables: fitting linear regression"
+    level: B
+    est_min: 25
+    prereqs: [ai-ml-04, ai-ml-06]
+    summary: >-
+      With many parameters the derivative becomes the gradient — a vector of partial derivatives
+      pointing uphill — and gradient descent steps against it. For linear regression with mean
+      squared error the gradient has a compact matrix form, so the whole training loop is a few
+      lines of numpy. Mini-batch stochastic gradient descent, which estimates the gradient from a
+      sample, is how every network in phase 2 is trained.
+    key_points:
+      - "Partial derivatives and the gradient vector ∇L; the negative gradient is the steepest-descent direction."
+      - "Linear regression ŷ = Xw + b, MSE loss, gradient (2/n)·Xᵀ(ŷ − y) for w and the mean residual for b."
+      - "Feature scaling: unscaled features make gradient descent zig-zag down a narrow valley."
+      - "Batch versus stochastic versus mini-batch gradient descent; epochs."
+      - "Closed-form least squares exists for linear regression, but gradient descent is what scales to everything else."
+    diagram: >-
+      A contour plot of a two-parameter loss surface (elliptical contours) with the descent path
+      drawn as arrows perpendicular to the contours; a second path, for unscaled features,
+      zig-zags along a long narrow valley.
+    example: >-
+      numpy lab: generate 200 points from y = 2·x1 − 3·x2 + 1 + noise; implement batch gradient
+      descent with the matrix gradient for 500 steps; print the recovered w and b. Repeat with x2
+      multiplied by 100 to provoke the learning-rate problem, fix it with standardisation, and
+      compare with np.linalg.lstsq.
+    presentation: standard
+    sources:
+      - title: "3Blue1Brown — Neural Networks"
+        url: https://www.3blue1brown.com/topics/neural-networks
+        locator: "Ch. 2 \"Gradient descent, how neural networks learn\" — the segment on the gradient of the cost as a vector of nudges"
+        kind: video
+        verified: false
+      - title: "StatQuest — Stochastic Gradient Descent, Clearly Explained"
+        url: https://statquest.org/video-index/
+        locator: "Video index → \"Stochastic Gradient Descent, Clearly Explained!!!\""
+        kind: video
+        verified: false
+      - title: "CS231n notes — Optimization: Stochastic Gradient Descent"
+        url: https://cs231n.github.io/optimization-1/
+        locator: "Sections \"Computing the gradient\" and \"Gradient Descent\" (incl. mini-batch gradient descent)"
+        kind: course
+        verified: false
+
+  - id: ai-ml-08
+    title: "Probability you need for ML: distributions, Bayes, likelihood"
+    level: B
+    est_min: 25
+    prereqs: [ai-ml-01]
+    summary: >-
+      Classifiers output probabilities, most losses are negative log-likelihoods, and metrics
+      depend on base rates, so a minimum of probability is non-negotiable. This rung covers
+      distributions (Bernoulli, categorical, normal), conditional probability and Bayes' theorem,
+      and the difference between probability and likelihood that underlies maximum likelihood
+      estimation. It sets up logistic regression (rung 09), cross-entropy, and calibration (rung 32).
+    key_points:
+      - "Random variables; Bernoulli, categorical and normal distributions; mean and variance."
+      - "Conditional probability and Bayes' theorem; base-rate neglect."
+      - "Probability (data given fixed parameters) versus likelihood (parameters given fixed data)."
+      - "Maximum likelihood estimation, and why we minimise negative log-likelihood (products become sums, numerically stable)."
+      - "Independence assumptions; naive Bayes as the tiny model built from them (optional aside)."
+    diagram: >-
+      Two panels. (1) A Bayes tree: transactions split by prior (fraud 0.2% / legit 99.8%), then by
+      the detector's result, with the flagged-fraud and flagged-legit leaves highlighted to show
+      P(fraud | flagged). (2) A normal curve slid along fixed data points at three candidate means,
+      with the likelihood highest where the curve fits the data.
+    example: >-
+      Python: a fraud detector catches 95% of fraud and wrongly flags 1% of legitimate
+      transactions; fraud's base rate is 0.2%. Compute P(fraud | flagged) with Bayes' theorem
+      (0.95·0.002 / (0.95·0.002 + 0.01·0.998) ≈ 0.16). Then with numpy compute the log-likelihood
+      of 10 coin flips with 7 heads for p = 0.1 … 0.9 and confirm the maximum is at p = 0.7.
+    presentation: standard
+    sources:
+      - title: "StatQuest — Probability is not Likelihood"
+        url: https://statquest.org/video-index/
+        locator: "Video index → \"Probability is not Likelihood. Find out why!!!\"; then the Bayes' Theorem video in the Statistics section"
+        kind: video
+        verified: false
+      - title: "Goodfellow, Bengio, Courville — Deep Learning"
+        url: https://www.deeplearningbook.org/
+        locator: "Ch. 3 \"Probability and Information Theory\", §3.1–3.9 and §3.11 \"Bayes' Rule\"; ch. 5 §5.5 \"Maximum Likelihood Estimation\""
+        kind: book
+        verified: false
+
+  - id: ai-ml-09
+    title: "Logistic regression: from scores to probabilities"
+    level: B
+    est_min: 25
+    prereqs: [ai-ml-07, ai-ml-08]
+    summary: >-
+      Logistic regression is linear regression's classification sibling: compute a linear score
+      w·x + b, squash it with the sigmoid into a probability, and train by minimising log loss
+      (binary cross-entropy) — the negative log-likelihood from rung 08. The decision threshold is
+      a separate, business-level choice. The multi-class generalisation, softmax plus
+      cross-entropy, is exactly the output layer of every neural classifier and every LLM.
+    key_points:
+      - "Sigmoid σ(z) = 1/(1 + e^(−z)); the linear score as log-odds."
+      - "Log loss / binary cross-entropy, and why squared error fits probabilities poorly."
+      - "The gradient of log loss has the same (ŷ − y)·x shape as linear regression's."
+      - "The threshold is separate from the model; the decision boundary is a hyperplane."
+      - "Softmax and categorical cross-entropy for K classes — the LLM output layer in miniature."
+    diagram: >-
+      Left: a number line of linear scores z mapped through the S-shaped sigmoid to probabilities
+      between 0 and 1, with the 0.5 threshold dashed. Right: the log-loss curves −log(p) for y = 1
+      and −log(1 − p) for y = 0, showing the steep penalty for confident wrong answers.
+    example: >-
+      scikit-learn: LogisticRegression on load_breast_cancer (features standardised); predict_proba
+      for three test rows; compute their log loss by hand with numpy and compare with
+      sklearn.metrics.log_loss on the same rows. Then lower the threshold from 0.5 to 0.2 and count
+      how many predictions flip.
+    presentation: standard
+    sources:
+      - title: "StatQuest — Logistic Regression"
+        url: https://statquest.org/video-index/
+        locator: "Video index → \"StatQuest: Logistic Regression\", then \"Logistic Regression Details Pt 2: Maximum Likelihood\""
+        kind: video
+        verified: false
+      - title: "Google Machine Learning Crash Course"
+        url: https://developers.google.com/machine-learning/crash-course
+        locator: "Module \"Logistic regression\" → pages on the sigmoid function, log loss and regularization"
+        kind: course
+        verified: false
+      - title: "CS231n notes — Linear classification"
+        url: https://cs231n.github.io/linear-classify/
+        locator: "Section \"Softmax classifier\" (cross-entropy loss, probabilistic interpretation)"
+        kind: course
+        verified: false
+
+  - id: ai-ml-10
+    title: "Decision trees and ensembles: what Kaggle actually wins with"
+    level: B
+    est_min: 30
+    prereqs: [ai-ml-03]
+    summary: >-
+      On tabular data — the data most businesses actually have — gradient-boosted trees remain
+      the strongest default, and they are what the Kaggle courses steer you to. This rung explains
+      how a tree picks splits, why single trees overfit, how random forests average many
+      decorrelated trees, and how gradient boosting adds small trees that fit the current
+      ensemble's errors. It ends with the practical pipeline: impute, encode categoricals, then
+      XGBoost with early stopping on a validation set.
+    key_points:
+      - "Splitting by impurity reduction (Gini or entropy for classification, variance for regression); depth controls capacity."
+      - "Bagging and random forests: bootstrap samples plus random feature subsets lower variance."
+      - "Gradient boosting: sequential small trees fitted to residuals (negative gradients); learning rate versus number of trees."
+      - "XGBoost / LightGBM in practice: early stopping on a validation set (check the API of your installed version)."
+      - "Preprocessing inside a Pipeline (imputation, one-hot or ordinal encoding) so nothing leaks."
+    diagram: >-
+      Three columns. (1) One deep decision tree with its splits. (2) A random forest: several trees
+      trained on bootstrap samples, outputs averaged. (3) Gradient boosting: tree 1 → residuals →
+      tree 2 → residuals → tree 3, with predictions summed and scaled by the learning rate.
+    example: >-
+      Kaggle Intermediate ML: build a Pipeline with SimpleImputer and OneHotEncoder inside a
+      ColumnTransformer; compare RandomForestRegressor(n_estimators=100) with XGBRegressor
+      (n_estimators=1000, learning_rate=0.05, early stopping on a validation split) and the
+      rung-03 single tree; report validation MAE for all three in one table.
+    presentation: standard
+    sources:
+      - title: "Kaggle Learn — Intro to Machine Learning"
+        url: https://www.kaggle.com/learn/intro-to-machine-learning
+        locator: "Lesson 6 \"Random Forests\""
+        kind: course
+        verified: false
+      - title: "Kaggle Learn — Intermediate Machine Learning"
+        url: https://www.kaggle.com/learn/intermediate-machine-learning
+        locator: "Lesson 2 \"Missing Values\"; Lesson 3 \"Categorical Variables\"; Lesson 4 \"Pipelines\"; Lesson 6 \"XGBoost\""
+        kind: course
+        verified: false
+      - title: "StatQuest — Decision Trees and Gradient Boost"
+        url: https://statquest.org/video-index/
+        locator: "Video index → \"Decision and Classification Trees, Clearly Explained!!!\" and \"Gradient Boost Part 1 (of 4): Regression Main Ideas\""
+        kind: video
+        verified: false
+
+  - id: ai-ml-11
+    title: "Evaluation metrics: choosing what good means"
+    level: B
+    est_min: 25
+    prereqs: [ai-ml-03, ai-ml-09]
+    summary: >-
+      A model is only as good as the metric it is held to, and the wrong metric hides failures:
+      99% accuracy on a 1%-positive problem can be a model that never says yes. This rung covers
+      MAE and RMSE, the confusion matrix, precision, recall, F1, ROC and precision–recall curves,
+      and log loss, and ties metric and threshold choice to the cost of each kind of mistake. As a
+      former QA lead you already think in false positives and false negatives; this puts numbers on them.
+    key_points:
+      - "Regression: MAE versus RMSE (sensitivity to outliers) and the predict-the-mean baseline."
+      - "Confusion matrix; accuracy and why it fails under class imbalance."
+      - "Precision, recall and F1; moving the threshold trades one for the other."
+      - "ROC curve and AUC (threshold-free ranking quality); precision–recall curve for rare positives."
+      - "Log loss as a proper score for probabilities — preview of Brier score and calibration (rung 32)."
+    diagram: >-
+      A 2×2 confusion matrix (TP, FP, FN, TN) with arrows showing precision = TP/(TP + FP) and
+      recall = TP/(TP + FN); beside it an ROC curve with the diagonal random baseline and one
+      point labelled "threshold 0.5".
+    example: >-
+      scikit-learn on the rung-09 breast-cancer model: confusion_matrix, classification_report,
+      roc_auc_score and average_precision_score; sweep thresholds 0.1 … 0.9 and print precision and
+      recall at each; then choose the threshold that minimises 10·FN + FP ("a missed malignant case
+      costs ten false alarms").
+    presentation: standard
+    sources:
+      - title: "StatQuest — The Confusion Matrix; ROC and AUC"
+        url: https://statquest.org/video-index/
+        locator: "Video index → \"Machine Learning Fundamentals: The Confusion Matrix\" and \"ROC and AUC, Clearly Explained!\""
+        kind: video
+        verified: false
+      - title: "Google Machine Learning Crash Course"
+        url: https://developers.google.com/machine-learning/crash-course
+        locator: "Module \"Classification\" → \"Thresholds and the confusion matrix\"; \"Accuracy, recall, precision, and related metrics\"; \"ROC and AUC\""
+        kind: course
+        verified: false
+      - title: "scikit-learn User Guide — Metrics and scoring"
+        url: https://scikit-learn.org/stable/modules/model_evaluation.html
+        locator: "Section \"Classification metrics\" (confusion matrix, precision/recall/F-measure, ROC, log loss) and \"Regression metrics\""
+        kind: docs
+        verified: false
+
+  # ──────────────────── Phase 2 — Neural networks and PyTorch (B → I) ────────────────────
+
+  - id: ai-ml-12
+    title: "From perceptron to multilayer network"
+    level: B
+    est_min: 20
+    prereqs: [ai-ml-05, ai-ml-07]
+    summary: >-
+      A neuron is a dot product plus a bias passed through a non-linear activation — logistic
+      regression is a single neuron. Stacking neurons into layers, each a matrix multiply followed
+      by a non-linearity, gives a multilayer perceptron that can represent functions no linear
+      model can; XOR is the classic example. 3Blue1Brown's digit-recognition network is the mental
+      picture for the rest of phase 2.
+    key_points:
+      - "The perceptron and its limit: only linearly separable problems (XOR fails)."
+      - "A layer is W·x + b followed by an activation; an MLP is a composition of layers."
+      - "Without the non-linearity, stacked linear layers collapse into one linear map."
+      - "Counting parameters: weights plus biases per layer, e.g. the 784-16-16-10 network."
+      - "Hidden layers as learned features, with the honest caveat that they are rarely as clean as the edges-and-strokes story."
+    diagram: >-
+      A 2-2-1 network for XOR: inputs x1, x2 → two hidden neurons (one OR-like, one AND-like) →
+      one output neuron; beside it the four XOR points in the plane with the two hidden neurons'
+      lines carving out the positive region.
+    example: >-
+      numpy forward pass of a 2-2-1 network with hand-set weights and a step (or steep sigmoid)
+      activation that solves XOR; evaluate all four inputs. Then count the parameters of
+      3Blue1Brown's 784-16-16-10 network: (784·16 + 16) + (16·16 + 16) + (16·10 + 10) = 13,002.
+    presentation: standard
+    sources:
+      - title: "3Blue1Brown — Neural Networks"
+        url: https://www.3blue1brown.com/topics/neural-networks
+        locator: "Ch. 1 \"But what is a neural network?\" — layers, weights and biases, the 13,002-parameter count and the matrix notation near the end"
+        kind: video
+        verified: false
+      - title: "Kaggle Learn — Intro to Deep Learning"
+        url: https://www.kaggle.com/learn/intro-to-deep-learning
+        locator: "Lesson 1 \"A Single Neuron\"; Lesson 2 \"Deep Neural Networks\""
+        kind: course
+        verified: false
+      - title: "StatQuest — Neural Networks Pt. 1: Inside the Black Box"
+        url: https://statquest.org/video-index/
+        locator: "Video index → \"The Essential Main Ideas of Neural Networks\" / \"Neural Networks Pt. 1: Inside the Black Box\""
+        kind: video
+        verified: false
+
+  - id: ai-ml-13
+    title: "Backpropagation step by step"
+    level: B
+    est_min: 30
+    prereqs: [ai-ml-12]
+    summary: >-
+      Backpropagation is the chain rule applied systematically on a computation graph: a forward
+      pass computes values, a backward pass sends gradients from the loss to every parameter by
+      multiplying local derivatives. Andrej Karpathy's micrograd builds a working autograd engine
+      in about a hundred lines of Python, which demystifies what PyTorch does in the next rung.
+      Once seen, "the network learns" stops being magic.
+    key_points:
+      - "Computation graph: nodes are operations; values flow forward, gradients flow backward."
+      - "Chain rule as local gradient × upstream gradient; the local rules for add, multiply and tanh."
+      - "Gradients accumulate (+=) when a value feeds several downstream nodes."
+      - "Reverse-mode autodiff costs roughly one extra forward pass regardless of the number of parameters."
+      - "Numerical gradient checking with finite differences as a test oracle."
+    diagram: >-
+      A small graph for L = (w·x + b − y)²: leaves w, x, b, y → multiply → add → subtract →
+      square → L; forward values written above each edge and backward gradients below it in a
+      second colour.
+    example: >-
+      Pure Python, no libraries: forward pass of L = (w·x + b − y)² with w = 2, x = 3, b = 1,
+      y = 10 gives prediction 7, residual −3, L = 9. Backward by hand: dL/dpred = −6, dL/dw = −18,
+      dL/db = −6. Verify both with central finite differences (L(w + h) − L(w − h)) / 2h. Optional:
+      follow the first hour of the micrograd video.
+    presentation: standard
+    sources:
+      - title: "Andrej Karpathy — The spelled-out intro to neural networks and backpropagation: building micrograd"
+        url: https://www.youtube.com/watch?v=VMj-3S1tku0
+        locator: "First hour: derivative intuition, the Value class, manual backpropagation through a neuron (chapters are listed in the video description)"
+        kind: video
+        verified: false
+      - title: "3Blue1Brown — Neural Networks"
+        url: https://www.3blue1brown.com/topics/neural-networks
+        locator: "Ch. 3 \"Backpropagation, intuitively\" (formerly \"What is backpropagation really doing?\"); ch. 4 \"Backpropagation calculus\""
+        kind: video
+        verified: false
+      - title: "CS231n notes — Backpropagation, Intuitions"
+        url: https://cs231n.github.io/optimization-2/
+        locator: "Sections \"Simple expressions and interpretation of the gradient\", \"Compound expressions with chain rule\", \"Patterns in backward flow\" (CS231n Lecture 4, 2017 numbering)"
+        kind: course
+        verified: false
+
+  - id: ai-ml-14
+    title: "PyTorch basics: tensors, autograd and a training loop"
+    level: B
+    est_min: 30
+    prereqs: [ai-ml-13]
+    summary: >-
+      PyTorch is the default deep-learning framework, and its core is small: tensors (numpy arrays
+      that can live on a GPU), autograd (rung 13's micrograd at industrial strength), nn.Module for
+      models, and a training loop you write yourself. The official "Learn the Basics" tutorial
+      covers all of it on FashionMNIST. Writing the loop by hand — zero_grad, forward, loss,
+      backward, step — is the habit that makes every later model readable.
+    key_points:
+      - "Tensors: shape, dtype, device; numpy interop; broadcasting as in numpy."
+      - "Autograd: requires_grad, loss.backward(), .grad, and torch.no_grad() for evaluation."
+      - "Dataset and DataLoader: batching and shuffling."
+      - "nn.Module, nn.Sequential, nn.Linear, nn.ReLU; model.parameters()."
+      - "The five-line training step (zero_grad, forward, loss, backward, step) plus a separate evaluation loop."
+    diagram: >-
+      One epoch as a loop: DataLoader yields a batch (X, y) → model(X) → loss_fn(pred, y) →
+      loss.backward() fills .grad → optimizer.step() updates parameters → optimizer.zero_grad() →
+      next batch; a side box shows the evaluation loop under torch.no_grad().
+    example: >-
+      Lab: reproduce rung 07's linear regression in PyTorch (synthetic data, nn.Linear(2, 1),
+      MSELoss, SGD lr 0.1, 200 steps) and confirm it recovers w ≈ [2, −3], b ≈ 1. Check that
+      autograd reproduces rung 13's hand gradients (dL/dw = −18, dL/db = −6 for w = 2, x = 3,
+      b = 1, y = 10). Then run the FashionMNIST quickstart for two epochs.
+    presentation: standard
+    sources:
+      - title: "PyTorch Tutorials — Learn the Basics"
+        url: https://pytorch.org/tutorials/beginner/basics/intro.html
+        locator: "Pages \"Tensors\", \"Datasets & DataLoaders\", \"Build the Neural Network\", \"Automatic Differentiation with torch.autograd\", \"Optimizing Model Parameters\""
+        kind: docs
+        verified: false
+      - title: "StatQuest — Introduction to Coding Neural Networks with PyTorch"
+        url: https://statquest.org/video-index/
+        locator: "Video index → \"Introduction to Coding Neural Networks with PyTorch\" (and \"Tensors for Neural Networks, Clearly Explained!!!\")"
+        kind: video
+        verified: false
+
+  - id: ai-ml-15
+    title: "Activation functions and initialisation"
+    level: I
+    est_min: 25
+    prereqs: [ai-ml-14]
+    summary: >-
+      Deep networks fail to train for two classic reasons: gradients vanish or explode as they
+      pass through many layers, and a poor choice of activation or initial weight scale makes it
+      worse. This rung compares sigmoid, tanh, ReLU and its variants (GELU is what Transformers
+      use), and explains why initialisation must keep activation variance roughly constant across
+      layers — Xavier/Glorot for tanh, He/Kaiming for ReLU. Batch and layer normalisation are
+      introduced as the engineering fix that made deep nets far less fragile.
+    key_points:
+      - "Sigmoid/tanh saturation and vanishing gradients; ReLU's non-saturating side and dead units; Leaky ReLU, GELU."
+      - "Why all-zero initialisation fails (symmetry) and why the scale matters."
+      - "Xavier/Glorot versus He/Kaiming initialisation, each justified by a one-line variance argument."
+      - "Batch normalisation, and layer normalisation as the Transformer variant."
+      - "Diagnosing training with per-layer activation and gradient histograms."
+    diagram: >-
+      Top: sigmoid, tanh, ReLU and GELU curves with their derivatives underneath. Bottom: a strip
+      of activation histograms across 10 layers — collapsing to zero with too-small init,
+      saturating with too-large init, staying stable with He init.
+    example: >-
+      PyTorch lab: a 10-layer MLP of width 256 with tanh; push a batch of random inputs through and
+      print each layer's activation standard deviation for init std 0.01, 1.0 and Xavier. Repeat
+      with ReLU and nn.init.kaiming_normal_ and compare.
+    presentation: standard
+    sources:
+      - title: "CS231n notes — Neural Networks Part 1: Setting up the Architecture"
+        url: https://cs231n.github.io/neural-networks-1/
+        locator: "Section \"Commonly used activation functions\" (CS231n Lecture 6 \"Training Neural Networks I\", 2017 numbering)"
+        kind: course
+        verified: false
+      - title: "CS231n notes — Neural Networks Part 2: Setting up the Data and the Loss"
+        url: https://cs231n.github.io/neural-networks-2/
+        locator: "Sections \"Weight Initialization\" and \"Batch Normalization\""
+        kind: course
+        verified: false
+      - title: "He et al. — Delving Deep into Rectifiers (2015)"
+        url: https://arxiv.org/abs/1502.01852
+        locator: "§2.2 on initialisation of filter weights for rectifiers (the He/Kaiming variance argument)"
+        kind: paper
+        verified: false
+
+  - id: ai-ml-16
+    title: "Optimisers: SGD, momentum, Adam"
+    level: I
+    est_min: 25
+    prereqs: [ai-ml-07, ai-ml-14]
+    summary: >-
+      Plain gradient descent struggles in the long, narrow valleys real loss surfaces have.
+      Momentum accumulates a velocity that smooths out zig-zags; adaptive methods (RMSProp, Adam)
+      scale each parameter's step by a running estimate of its gradient magnitude. Adam — and
+      AdamW with decoupled weight decay — is the default for Transformers, while SGD with momentum
+      still competes for CNNs. Learning-rate schedules such as warmup and cosine decay matter as
+      much as the optimiser.
+    key_points:
+      - "SGD with momentum: the velocity update and the heavy-ball intuition; Nesterov as a variant."
+      - "Adagrad/RMSProp: per-parameter step sizes from running averages of squared gradients."
+      - "Adam = momentum + RMSProp + bias correction; default hyperparameters as given in the paper."
+      - "AdamW: weight decay decoupled from the adaptive update."
+      - "Learning-rate schedules: step decay, cosine, warmup; why the learning rate is the first hyperparameter to tune."
+    diagram: >-
+      A narrow elliptical loss valley with three trajectories from the same start point: SGD
+      zig-zagging across the valley, momentum overshooting then settling, Adam heading more
+      directly to the minimum.
+    example: >-
+      PyTorch lab: minimise the Rosenbrock function f(x, y) = (1 − x)² + 100(y − x²)² from
+      (−1.5, 2) with torch.optim.SGD (lr 1e-3), SGD with momentum 0.9, and Adam (lr 1e-2) for 2,000
+      steps each, printing the distance to (1, 1) every 500 steps. Then train the rung-14
+      FashionMNIST model for two epochs with SGD versus AdamW and compare.
+    presentation: standard
+    sources:
+      - title: "CS231n notes — Neural Networks Part 3: Learning and Evaluation"
+        url: https://cs231n.github.io/neural-networks-3/
+        locator: "Sections \"Parameter updates\" (SGD and bells and whistles, annealing the learning rate, per-parameter adaptive methods) — CS231n Lecture 7 \"Training Neural Networks II\", 2017 numbering"
+        kind: course
+        verified: false
+      - title: "Kingma & Ba — Adam: A Method for Stochastic Optimization (2014)"
+        url: https://arxiv.org/abs/1412.6980
+        locator: "Algorithm 1 and §2 (the update rule, bias correction, default hyperparameters)"
+        kind: paper
+        verified: false
+      - title: "PyTorch documentation — torch.optim"
+        url: https://pytorch.org/docs/stable/optim.html
+        locator: "Algorithms table (SGD, Adam, AdamW) and \"How to adjust learning rate\" (schedulers)"
+        kind: docs
+        verified: false
+
+  - id: ai-ml-17
+    title: "Regularisation: weight decay, dropout, early stopping"
+    level: I
+    est_min: 25
+    prereqs: [ai-ml-03, ai-ml-14]
+    summary: >-
+      Neural networks have enough capacity to memorise their training set, so regularisation is
+      how generalisation is bought back. This rung covers L2 weight decay, dropout (randomly
+      zeroing activations during training so the network cannot rely on any single unit), early
+      stopping on validation loss, and how augmentation and normalisation also regularise. It
+      revisits rung 03's under/overfitting curve, now as train and validation loss per epoch.
+    key_points:
+      - "L2 penalty / weight decay shrinks weights; its strength is a hyperparameter."
+      - "Dropout: train-time random masking with rescaling (inverted dropout), off at evaluation — model.train() versus model.eval()."
+      - "Early stopping: monitor validation loss, keep the best checkpoint, use patience."
+      - "Reading learning curves to diagnose overfitting versus underfitting."
+      - "More data and augmentation as the strongest regulariser (bridge to rung 19)."
+    diagram: >-
+      Two learning-curve plots of train and validation loss versus epoch: (a) unregularised —
+      validation loss turns upward after some epoch, with the early-stopping point marked; (b) with
+      dropout and weight decay — a narrower gap and a lower validation minimum.
+    example: >-
+      PyTorch lab: deliberately overfit a 3-layer MLP on 1,000 FashionMNIST images for 30 epochs
+      and plot train versus validation loss; add nn.Dropout(0.5) and weight_decay=1e-4 in AdamW and
+      rerun; implement early stopping with patience 3 that saves the best state_dict. Forget
+      model.eval() once on purpose and observe the noisy validation numbers.
+    presentation: standard
+    sources:
+      - title: "Kaggle Learn — Intro to Deep Learning"
+        url: https://www.kaggle.com/learn/intro-to-deep-learning
+        locator: "Lesson 4 \"Overfitting and Underfitting\"; Lesson 5 \"Dropout and Batch Normalization\""
+        kind: course
+        verified: false
+      - title: "Srivastava et al. — Dropout: A Simple Way to Prevent Neural Networks from Overfitting (JMLR 2014)"
+        url: https://jmlr.org/papers/v15/srivastava14a.html
+        locator: "Figure 1 (dropout network) and the \"Model Description\" section (train-time masking, test-time scaling)"
+        kind: paper
+        verified: false
+      - title: "CS231n notes — Neural Networks Part 2"
+        url: https://cs231n.github.io/neural-networks-2/
+        locator: "Section \"Regularization\" (L2, L1, max norm, dropout, inverted dropout)"
+        kind: course
+        verified: false
+
+  - id: ai-ml-18
+    title: "Convolutional networks: the intuition"
+    level: I
+    est_min: 30
+    prereqs: [ai-ml-14]
+    summary: >-
+      Images break the MLP: a 224×224 colour image has 150,528 inputs, and a fully connected
+      layer ignores that neighbouring pixels are related. Convolutional layers slide small learned
+      filters across the image, sharing weights and preserving spatial structure; pooling and
+      strides shrink the map while channels grow, building a hierarchy from edges to textures to
+      parts. CS231n lecture 5 and its notes are the reference; Kaggle's Computer Vision course is
+      the hands-on version.
+    key_points:
+      - "Convolution as a sliding dot product (rung 05 again); kernel size, stride, padding, output size (W − F + 2P)/S + 1."
+      - "Local connectivity and weight sharing: parameter count versus a dense layer."
+      - "Channels: RGB in, many feature maps out; ReLU after each convolution."
+      - "Max pooling and how the receptive field grows with depth."
+      - "The classic shape [conv → ReLU → pool] × N → flatten → dense head; ResNet's skip connections in one sentence."
+    diagram: >-
+      A 5×5 input grid with a 3×3 filter sliding at stride 1 to produce a 3×3 feature map (one
+      output cell computed explicitly); then a network sketch image → conv/ReLU → pool → conv/ReLU
+      → pool → flatten → dense → class scores, with tensor shapes annotated at each stage.
+    example: >-
+      PyTorch: apply a hand-made 3×3 vertical-edge kernel (columns 1, 0, −1) with F.conv2d to a
+      synthetic 8×8 image whose left half is dark and right half bright, and print the feature map.
+      Then create nn.Conv2d(3, 16, 3, padding=1), check the output shape for a (1, 3, 32, 32) input,
+      and verify the parameter count 3·3·3·16 + 16 = 448 against model.parameters().
+    presentation: standard
+    sources:
+      - title: "Stanford CS231n — Deep Learning for Computer Vision"
+        url: https://cs231n.stanford.edu/
+        locator: "Lecture 5 \"Convolutional Neural Networks\" (2017 lecture-video numbering; find the matching lecture on the current schedule page)"
+        kind: course
+        verified: false
+      - title: "CS231n notes — Convolutional Neural Networks: Architectures, Convolution / Pooling Layers"
+        url: https://cs231n.github.io/convolutional-networks/
+        locator: "Sections \"Convolutional Layer\" (local connectivity, spatial arrangement, parameter sharing), \"Pooling Layer\", \"ConvNet Architectures\""
+        kind: course
+        verified: false
+      - title: "Kaggle Learn — Computer Vision"
+        url: https://www.kaggle.com/learn/computer-vision
+        locator: "Lesson 2 \"Convolution and ReLU\"; Lesson 3 \"Maximum Pooling\"; Lesson 4 \"The Sliding Window\""
+        kind: course
+        verified: false
+
+  - id: ai-ml-19
+    title: "Transfer learning and data augmentation"
+    level: I
+    est_min: 30
+    prereqs: [ai-ml-17, ai-ml-18]
+    summary: >-
+      In practice almost nobody trains a vision model from scratch: you take a network pretrained
+      on ImageNet, keep its convolutional base as a feature extractor and train a new head, or
+      fine-tune the top layers, on your small dataset. Data augmentation stretches that small
+      dataset by applying label-preserving transformations — flips, crops, colour jitter, blur —
+      at training time. Albumentations is the library the dou.ua roadmap recommends; this rung
+      covers which augmentations are safe for which task and how to wire them into a PyTorch Dataset.
+    key_points:
+      - "Pretrained base + new head; freezing versus fine-tuning; a lower learning rate for pretrained layers."
+      - "Pretrained weights come with an expected input size and normalisation — respect them."
+      - "Augmentation as encoding invariances; label-preserving versus label-breaking transforms (e.g. horizontal flip on text or digits)."
+      - "Albumentations Compose pipelines; geometric versus pixel-level transforms; the same transform applied to masks and boxes for segmentation and detection."
+      - "Augment at train time only; test-time augmentation as an optional extra."
+    diagram: >-
+      Two parts: (1) a frozen pretrained convolutional base (greyed out) feeding a new trainable
+      classification head; (2) one input photo fanning out into six augmented variants (flip, crop,
+      rotate, brightness, blur, cutout) that all map to the same label.
+    example: >-
+      Lab: an Albumentations pipeline A.Compose([A.HorizontalFlip(p=0.5),
+      A.RandomBrightnessContrast(p=0.3), A.Normalize(), ToTensorV2()]) inside a PyTorch Dataset's
+      __getitem__; visualise eight augmented copies of one image. Then load torchvision's resnet18
+      with pretrained weights, replace model.fc with nn.Linear(512, num_classes), freeze the rest,
+      and train one epoch on a small image-folder dataset.
+    presentation: standard
+    sources:
+      - title: "Albumentations documentation"
+        url: https://albumentations.ai/docs/
+        locator: "Introduction (what image augmentation is and why it helps); getting-started guide for classification; transforms reference (pixel-level vs spatial-level)"
+        kind: docs
+        verified: false
+      - title: "Kaggle Learn — Computer Vision"
+        url: https://www.kaggle.com/learn/computer-vision
+        locator: "Lesson 1 \"The Convolutional Classifier\" (pretrained base + head); Lesson 6 \"Data Augmentation\""
+        kind: course
+        verified: false
+      - title: "CS231n notes — Transfer Learning"
+        url: https://cs231n.github.io/transfer-learning/
+        locator: "Sections \"ConvNet as fixed feature extractor\", \"Fine-tuning the ConvNet\", \"When and how to fine-tune?\" (CS231n Lecture 7, 2017 numbering)"
+        kind: course
+        verified: false
+
+  # ─────────────────── Phase 3 — Modern deep learning and LLMs (I) ───────────────────
+
+  - id: ai-ml-20
+    title: "Embeddings and representation learning"
+    level: I
+    est_min: 25
+    prereqs: [ai-ml-05, ai-ml-14]
+    summary: >-
+      An embedding maps discrete things — words, tokens, products, users, documents — to dense
+      vectors whose geometry carries meaning, so similar items sit close by cosine similarity
+      (rung 05). Word2vec showed such vectors can be learned as a side effect of a simple
+      prediction task, and every modern model, from recommenders to LLMs, starts with an embedding
+      table learned the same way. This is also the foundation of semantic search and RAG (rung 28).
+    key_points:
+      - "One-hot versus dense vectors; an embedding layer is a lookup table, equivalent to one-hot × matrix."
+      - "Learning by prediction: skip-gram and CBOW, the context window, negative sampling (intuition only)."
+      - "The distributional hypothesis; vector-arithmetic analogies and their limits."
+      - "Static word vectors versus contextual embeddings (Transformer hidden states)."
+      - "Sentence/document embedding models for similarity search; dimensionality and normalisation."
+    diagram: >-
+      Left: a one-hot vector for "king" multiplied by an embedding matrix selects one row. Right: a
+      2-D projection with clusters (animals, countries, verbs) and the king − man + woman ≈ queen
+      parallelogram.
+    example: >-
+      Lab: nn.Embedding(10, 4) in PyTorch to see that it is just a table. Then with
+      sentence-transformers' all-MiniLM-L6-v2, embed six sentences (two about car washes, two about
+      Scala, two about cats), compute the cosine-similarity matrix and check the clusters. Add one
+      Ukrainian sentence and compare against paraphrase-multilingual-MiniLM-L12-v2.
+    presentation: standard
+    sources:
+      - title: "Jay Alammar — The Illustrated Word2vec"
+        url: https://jalammar.github.io/illustrated-word2vec/
+        locator: "Sections \"Word Embeddings\", \"Language Modeling\", \"Skipgram\", \"Negative Sampling\""
+        kind: blog
+        verified: false
+      - title: "StatQuest — Word Embedding and Word2Vec"
+        url: https://statquest.org/video-index/
+        locator: "Video index → \"Word Embedding and Word2Vec, Clearly Explained!!!\""
+        kind: video
+        verified: false
+      - title: "Mikolov et al. — Efficient Estimation of Word Representations in Vector Space (2013)"
+        url: https://arxiv.org/abs/1301.3781
+        locator: "§3 \"New Log-linear Models\" (CBOW, Skip-gram) with Figure 1; §4 on the word-analogy test"
+        kind: paper
+        verified: false
+
+  - id: ai-ml-21
+    title: "Attention from first principles"
+    level: I
+    est_min: 30
+    prereqs: [ai-ml-20]
+    summary: >-
+      Attention lets each token build its representation as a weighted average of other tokens'
+      values, with the weights computed from how well its query matches their keys — dot products
+      (rung 05) turned into a probability distribution by softmax (rung 09). Scaled dot-product
+      attention, softmax(QKᵀ/√d_k)·V, is one line of linear algebra, and causal masking makes it
+      usable for next-token prediction. This rung builds it by hand before rung 22 assembles the
+      full Transformer.
+    key_points:
+      - "The problem: meaning depends on context; the fixed-size RNN bottleneck as historical motivation."
+      - "Queries, keys and values as three learned projections of the same embeddings (self-attention)."
+      - "Scores QKᵀ, scaling by √d_k so the softmax does not saturate, softmax over keys, weighted sum of V."
+      - "The causal mask: a token may only attend to earlier positions."
+      - "Cost grows as O(n²) in sequence length — the root of context-window limits (rungs 25–26)."
+    diagram: >-
+      A four-token sentence: for token 3, arrows to tokens 1–4 labelled with attention weights
+      (summing to 1) from softmax(q₃·kᵢ/√d). Below, the matrix form: Q (n×d) × Kᵀ (d×n) → n×n
+      score matrix with the upper triangle masked → row-wise softmax → × V.
+    example: >-
+      numpy lab: four tokens with random 8-dim embeddings and random W_q, W_k, W_v (8×4); compute
+      Q, K, V, the scaled scores, a causal mask (−inf above the diagonal), a row-wise softmax and
+      the output weights @ V; assert every row sums to 1 and row 0 attends only to itself. Then
+      compare with torch.nn.functional.scaled_dot_product_attention(q, k, v, is_causal=True).
+    presentation: standard
+    sources:
+      - title: "3Blue1Brown — Neural Networks"
+        url: https://www.3blue1brown.com/topics/neural-networks
+        locator: "Ch. 6 \"Attention in transformers, step-by-step\" (formerly \"…visually explained\") — the query/key dot-product grid, softmax and masking segments"
+        kind: video
+        verified: false
+      - title: "Vaswani et al. — Attention Is All You Need (2017)"
+        url: https://arxiv.org/abs/1706.03762
+        locator: "§3.2.1 \"Scaled Dot-Product Attention\" (equation 1 and the footnote on √d_k), Figure 2 left"
+        kind: paper
+        verified: false
+      - title: "StatQuest — Attention for Neural Networks"
+        url: https://statquest.org/video-index/
+        locator: "Video index → \"Attention for Neural Networks, Clearly Explained!!!\""
+        kind: video
+        verified: false
+
+  - id: ai-ml-22
+    title: "The Transformer, block by block"
+    level: I
+    est_min: 30
+    prereqs: [ai-ml-21]
+    summary: >-
+      "Attention Is All You Need" (2017) combined multi-head self-attention with position-wise
+      feed-forward layers, residual connections, layer normalisation and positional encodings into
+      the Transformer; essentially every modern LLM is a stack of its decoder blocks. This rung
+      walks one block end to end with tensor shapes, explains why several heads, why residuals,
+      and how position enters a model whose attention is otherwise order-blind. It closes with the
+      three families: encoder-only (BERT), encoder–decoder (the original, T5) and decoder-only (GPT, Claude).
+    key_points:
+      - "Multi-head attention: h heads of size d_model/h in parallel, concatenated and projected."
+      - "The position-wise feed-forward network (typically 4× wider) holds much of the parameter count."
+      - "Residual stream plus layer norm (pre-norm in modern models) makes deep stacks trainable."
+      - "Position: sinusoidal encodings in the paper; learned and rotary (RoPE) encodings in modern models."
+      - "Encoder-only versus encoder–decoder versus decoder-only; the final linear + softmax over the vocabulary."
+    diagram: >-
+      One decoder block as a vertical stack: token embeddings + positions → LayerNorm → masked
+      multi-head self-attention → add (residual) → LayerNorm → feed-forward (d → 4d → d) → add →
+      next block; shapes (B, T, C) annotated at each step; after the last block → linear → softmax
+      over the vocabulary.
+    example: >-
+      PyTorch lab: implement a ~40-line pre-norm decoder block (rung-21 attention or
+      nn.MultiheadAttention, LayerNorm, a 2-layer MLP with GELU) with d_model = 64, 4 heads, T = 8;
+      push a (2, 8, 64) tensor through two stacked blocks printing shapes; count parameters per
+      block and compare with ≈ 12·d² (4d² for the attention projections + 8d² for the MLP) plus
+      biases and norms.
+    presentation: standard
+    sources:
+      - title: "Vaswani et al. — Attention Is All You Need (2017)"
+        url: https://arxiv.org/abs/1706.03762
+        locator: "§3.1 \"Encoder and Decoder Stacks\" with Figure 1; §3.2.2 \"Multi-Head Attention\"; §3.3 \"Position-wise Feed-Forward Networks\"; §3.5 \"Positional Encoding\""
+        kind: paper
+        verified: false
+      - title: "Jay Alammar — The Illustrated Transformer"
+        url: https://jalammar.github.io/illustrated-transformer/
+        locator: "Sections \"The Beast With Many Heads\", \"Representing The Order of The Sequence Using Positional Encoding\", \"The Residuals\", \"The Final Linear and Softmax Layer\""
+        kind: blog
+        verified: false
+      - title: "Andrej Karpathy — Let's build GPT: from scratch, in code, spelled out"
+        url: https://www.youtube.com/watch?v=kCc8FmEb1nY
+        locator: "Chapters on multi-headed self-attention, the feed-forward layer, residual connections and layernorm (second half of the video; chapter list in the description)"
+        kind: video
+        verified: false
+
+  - id: ai-ml-23
+    title: "Tokenisation: how text becomes tokens"
+    level: I
+    est_min: 25
+    prereqs: [ai-ml-22]
+    summary: >-
+      Models do not see characters or words; they see integer token ids produced by a tokenizer,
+      usually byte-pair encoding (BPE), which merges frequent byte sequences into a fixed-size
+      vocabulary. Tokenisation explains a surprising number of LLM quirks — trouble counting
+      letters, arithmetic oddities, whitespace sensitivity — and it sets the price, because APIs
+      bill per token and non-English text such as Ukrainian often needs more tokens per word.
+      Karpathy's tokenizer lecture builds BPE from scratch.
+    key_points:
+      - "Why not characters or whole words: sequence length versus vocabulary size versus unknown words."
+      - "BPE training: start from bytes, repeatedly merge the most frequent adjacent pair; the vocabulary is the merge list."
+      - "Byte-level BPE covers any Unicode; alternatives: WordPiece, SentencePiece/Unigram."
+      - "Token count drives cost, latency and context usage; language and script matter (Cyrillic, code, numbers)."
+      - "Quirks traced to tokenisation: spelling and counting tasks, leading spaces, special tokens."
+    diagram: >-
+      A toy corpus (the low/lower/newest/widest style example from Sennrich et al.) going through
+      three successive merges, each merge adding one vocabulary entry; a side table maps the final
+      token ids back to strings.
+    example: >-
+      Lab: count tokens for the same two sentences in English and in Ukrainian — with tiktoken for an
+      open tokenizer and with Anthropic's token-counting endpoint for Claude — compute the ratio and
+      print the token pieces to see where words split. Then implement five BPE merges in ~20 lines
+      of Python on the toy vocabulary from Sennrich et al. (Algorithm 1) and print each merge.
+    presentation: standard
+    sources:
+      - title: "Andrej Karpathy — Let's build the GPT Tokenizer"
+        url: https://www.youtube.com/watch?v=zduSFxRajkE
+        locator: "Opening segment on why tokenization causes LLM weirdness; the BPE implementation segment (pair counting and merging); chapter list in the description"
+        kind: video
+        verified: false
+      - title: "Sennrich, Haddow, Birch — Neural Machine Translation of Rare Words with Subword Units (2015)"
+        url: https://arxiv.org/abs/1508.07909
+        locator: "§3.2 \"Byte Pair Encoding\", Algorithm 1 and Figure 1"
+        kind: paper
+        verified: false
+      - title: "Hugging Face LLM Course"
+        url: https://huggingface.co/learn/llm-course
+        locator: "Chapter 6 (the Tokenizers library), section \"Byte-Pair Encoding tokenization\""
+        kind: course
+        verified: false
+
+  - id: ai-ml-24
+    title: "Pretraining vs fine-tuning vs RLHF"
+    level: I
+    est_min: 30
+    prereqs: [ai-ml-22, ai-ml-23]
+    summary: >-
+      A chat model is built in stages. Pretraining teaches a Transformer to predict the next token
+      over an enormous text corpus, producing a base model that continues documents rather than
+      answering questions. Supervised fine-tuning on curated conversations teaches the assistant
+      format, and reinforcement learning — from human preferences (RLHF), AI feedback, or
+      verifiable rewards — shapes behaviour beyond what demonstrations can teach. Knowing which
+      stage produced a behaviour tells you whether to fix it with prompting, fine-tuning or a
+      different model.
+    key_points:
+      - "Pretraining objective: next-token cross-entropy over the vocabulary; a base model is a document completer."
+      - "Scale trades off parameters, data and compute (compute-optimal scaling, Chinchilla) — cite numbers from the source."
+      - "Supervised fine-tuning: imitation of demonstrations in a chat template."
+      - "RLHF pipeline: preference pairs → reward model → policy optimisation (PPO) with a KL penalty; DPO as the reward-model-free alternative."
+      - "RL from verifiable rewards (maths, code) and why reasoning models came out of it."
+    diagram: >-
+      A three-stage pipeline: internet-scale text → pretraining → base model; curated dialogues →
+      SFT → instruction model; prompts + preference comparisons → reward model → RL (PPO) or DPO →
+      assistant model. Each arrow is labelled with its data and its objective.
+    example: >-
+      Lab: (1) a model guessing uniformly over a 50,000-token vocabulary has loss ln(50000) ≈ 10.8
+      nats per token; compute the analogous baseline for Karpathy's 65-character Shakespeare model,
+      ln(65) ≈ 4.17, and compare with the validation loss he reaches in "Let's build GPT".
+      (2) Implement the DPO loss for one preference pair in numpy from given policy and reference
+      log-probabilities, and watch it fall as the chosen response's log-probability rises.
+    presentation: standard
+    sources:
+      - title: "Andrej Karpathy — Deep Dive into LLMs like ChatGPT"
+        url: https://www.youtube.com/watch?v=7xTGNNLPyMI
+        locator: "Chapters on pretraining (data, tokenization, training, base model), post-training/SFT, and reinforcement learning incl. RLHF (chapter list in the description)"
+        kind: video
+        verified: false
+      - title: "Ouyang et al. — Training language models to follow instructions with human feedback (InstructGPT, 2022)"
+        url: https://arxiv.org/abs/2203.02155
+        locator: "Figure 2 (the three steps: SFT, reward model, PPO) and the \"Models\" subsection of §3 Methods"
+        kind: paper
+        verified: false
+      - title: "Hugging Face blog — Illustrating Reinforcement Learning from Human Feedback (RLHF)"
+        url: https://huggingface.co/blog/rlhf
+        locator: "Sections on pretraining language models, reward model training, and fine-tuning with RL"
+        kind: blog
+        verified: false
+
+  - id: ai-ml-25
+    title: "Inference: sampling, temperature and the KV cache"
+    level: I
+    est_min: 25
+    prereqs: [ai-ml-24]
+    summary: >-
+      Generation is a loop: run the model on the context, get logits over the vocabulary, turn them
+      into a distribution, pick a token, append it, repeat. Decoding choices — greedy, temperature,
+      top-k, top-p — trade determinism against diversity and explain why the same prompt can give
+      different answers. The KV cache stores each layer's keys and values so every new token costs
+      one incremental step instead of recomputing the prefix; it is why prefill and decode behave
+      differently and why long contexts are memory-hungry.
+    key_points:
+      - "Autoregressive decoding; logits → softmax with temperature T (T → 0 approaches greedy, T > 1 flattens)."
+      - "Top-k and top-p (nucleus) sampling; why greedy and beam search produce repetitive open-ended text."
+      - "Prefill (parallel over the prompt) versus decode (one token at a time); time-to-first-token versus tokens per second."
+      - "KV-cache size ≈ 2 × layers × KV heads × head_dim × tokens × bytes per value; grouped-query attention shrinks it."
+      - "Stop sequences and max tokens; temperature 0 is not a hard determinism guarantee on hosted APIs (quote the provider's docs)."
+    diagram: >-
+      The generation loop: tokens so far → model (per-layer KV-cache blocks growing by one column
+      per step) → logits → softmax(logits / T) → top-p filter → sample → append token → back into
+      the model; a side bar contrasts the single prefill step over the whole prompt with the
+      one-token decode steps.
+    example: >-
+      numpy lab: logits [2.0, 1.0, 0.5, 0.1, −1.0] for five candidate tokens; compute softmax at
+      T = 0.2, 1.0 and 2.0; apply top-p 0.9 and renormalise; sample 1,000 times at each setting and
+      tabulate the frequencies. Then compute the KV cache for a hypothetical model with 32 layers,
+      8 KV heads, head_dim 128, a 32,768-token context and 2-byte values: 2·32·8·128·32768·2 bytes
+      = 4 GiB per sequence.
+    presentation: standard
+    sources:
+      - title: "Hugging Face blog — How to generate text: using different decoding methods"
+        url: https://huggingface.co/blog/how-to-generate
+        locator: "Sections \"Greedy Search\", \"Beam search\", \"Sampling\" (temperature), \"Top-K Sampling\", \"Top-p (nucleus) sampling\""
+        kind: blog
+        verified: false
+      - title: "Holtzman et al. — The Curious Case of Neural Text Degeneration (2019)"
+        url: https://arxiv.org/abs/1904.09751
+        locator: "Figure 1 (degenerate repetition from beam search) and §3 on nucleus, top-k and temperature sampling"
+        kind: paper
+        verified: false
+      - title: "Hugging Face Transformers docs — KV cache"
+        url: https://huggingface.co/docs/transformers/kv_cache
+        locator: "Opening explanation of key/value caching during generation and the cache strategies table"
+        kind: docs
+        verified: false
+
+  - id: ai-ml-26
+    title: "Context windows and prompting as programming"
+    level: I
+    est_min: 25
+    prereqs: [ai-ml-25]
+    summary: >-
+      For an application developer the context window is the program's entire working memory:
+      system prompt, instructions, documents, tool results and history all compete for a finite
+      token budget, and the model's attention over them is not uniform. Prompting is therefore
+      closer to programming than to wording — clear role and task, structured inputs, examples,
+      explicit output contracts, room to think — and context engineering decides what enters the
+      window at each step. Anthropic's documentation is the reference for Claude.
+    key_points:
+      - "The context window as working memory: input plus output tokens; long-context cost and the lost-in-the-middle effect."
+      - "Prompt structure: system prompt for role, clear and direct instructions, XML-tagged inputs, few-shot examples, output contracts."
+      - "Letting the model think (chain of thought, extended thinking) and when it is worth the tokens."
+      - "Context engineering: retrieve just in time, compact or summarise history, keep tool outputs small."
+      - "Prompt caching for stable prefixes; prompts versioned and tested like code (20-llm-agent-systems/production-llmops.md §3)."
+    diagram: >-
+      A stacked bar of one context window: system prompt (cached) | tool definitions | retrieved
+      documents | conversation history | current user turn | reserved output budget; arrows show
+      which segments get compacted or evicted as the conversation grows.
+    example: >-
+      Lab: call the Anthropic Messages API with curl twice for the same task — turn a car-wash
+      support ticket into JSON — first as a one-line prompt, then with a system role, the ticket in
+      <ticket> tags, one example and an explicit JSON schema; compare five runs of each. Measure each
+      prompt with the token-counting endpoint (POST /v1/messages/count_tokens).
+    presentation: standard
+    sources:
+      - title: "Claude developer documentation"
+        url: https://docs.claude.com/
+        locator: "Build with Claude → Prompt engineering (overview; be clear and direct; use examples; let Claude think; use XML tags; system prompts) and → Context windows"
+        kind: docs
+        verified: false
+      - title: "Anthropic Engineering — Effective context engineering for AI agents"
+        url: https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
+        locator: "Sections on context as a finite resource and on long-horizon techniques (compaction, structured note-taking, sub-agents)"
+        kind: blog
+        verified: false
+      - title: "Liu et al. — Lost in the Middle: How Language Models Use Long Contexts (2023)"
+        url: https://arxiv.org/abs/2307.03172
+        locator: "Figure 1 (U-shaped accuracy versus the position of the relevant document)"
+        kind: paper
+        verified: false
+
+  - id: ai-ml-27
+    title: "Evaluating LLM systems"
+    level: I
+    est_min: 30
+    prereqs: [ai-ml-11, ai-ml-26]
+    summary: >-
+      LLM outputs are non-deterministic free text, so "does it work?" becomes a measurement
+      problem: define success criteria, build an eval set from real traffic and edge cases, grade
+      with code where possible, with a calibrated LLM judge where not, and with humans to anchor
+      both. Section 20 of this repo already covers agent evaluation and LLM-as-judge at interview
+      depth; this rung is the bridge from foundations — it connects them to rung 11's metrics and
+      adds the statistics needed to tell a real improvement from noise.
+    key_points:
+      - "Success criteria first: specific, measurable and tied to the product (rung 11 applied to text)."
+      - "Grader hierarchy: deterministic checks → model-graded rubrics → human review; cost versus fidelity."
+      - "LLM-as-judge biases (position, verbosity, self-preference) and calibrating the judge against human labels (llm-as-judge.md §4–5)."
+      - "Building the eval set: real traffic, failure-driven cases, held-out data; trajectory versus outcome for agents (evaluating-agents.md §3–5)."
+      - "Noise: k samples per case and confidence intervals — with 50 cases at ~80% pass rate the 95% interval is roughly ±11 points."
+    diagram: >-
+      The evaluation ladder: assertion-style checks → offline eval set with graders → LLM judge
+      calibrated against human labels → online A/B or shadow traffic; a feedback arrow carries
+      production failures back into the eval set.
+    example: >-
+      Python lab: a 20-case eval for the rung-26 ticket-to-JSON prompt with a code grader (valid
+      JSON, required keys, allowed enum values) plus a 3-point rubric scored by a judge model; label
+      10 outputs yourself and compute judge–human agreement; bootstrap a 95% confidence interval on
+      the pass rate with numpy.
+    presentation: standard
+    sources:
+      - title: "This repo — 20-llm-agent-systems/evaluating-agents.md"
+        url: https://github.com/yurii-mysak/scala-training-docs/blob/main/20-llm-agent-systems/evaluating-agents.md
+        locator: "§2 \"The evaluation ladder\"; §3 \"Building the offline eval set\"; §5 \"Trajectory versus outcome evaluation\""
+        kind: docs
+        verified: false
+      - title: "This repo — 20-llm-agent-systems/llm-as-judge.md"
+        url: https://github.com/yurii-mysak/scala-training-docs/blob/main/20-llm-agent-systems/llm-as-judge.md
+        locator: "§3 \"Rubric design\"; §4 \"Biases, and what to do about them\"; §5 \"Calibrating against human labels\""
+        kind: docs
+        verified: false
+      - title: "Claude developer documentation"
+        url: https://docs.claude.com/
+        locator: "Test & evaluate → \"Define success criteria\" and \"Develop test cases\" (eval design principles, grading methods)"
+        kind: docs
+        verified: false
+
+  - id: ai-ml-28
+    title: "RAG done properly"
+    level: I
+    est_min: 30
+    prereqs: [ai-ml-20, ai-ml-27]
+    summary: >-
+      Retrieval-augmented generation puts relevant documents into the context so the model answers
+      from your data instead of its memory. Done properly it is a search system first and an LLM
+      feature second: chunking, hybrid lexical plus embedding retrieval, reranking, and — the step
+      most often skipped — evaluating retrieval separately from generation. The repo's
+      rag-and-retrieval.md covers the pipeline; this rung adds the foundations (embeddings from
+      rung 20, ranking metrics) and Anthropic's contextual retrieval technique.
+    key_points:
+      - "Pipeline: ingest → chunk → embed and index → retrieve (BM25 + vectors) → rerank → assemble context → generate with citations."
+      - "Chunking trade-offs; contextual retrieval: prepend chunk-specific context before embedding and BM25 indexing."
+      - "Hybrid search and reciprocal rank fusion; cross-encoder rerankers."
+      - "Retrieval metrics — recall@k, MRR, nDCG — measured on labelled queries before touching the generator."
+      - "Generation checks (groundedness, citation accuracy); when long context or agentic search beats one-shot RAG (rag-and-retrieval.md §7)."
+    diagram: >-
+      Two lanes. Offline: documents → chunker → contextualiser → embedder + BM25 indexer →
+      indexes. Online: query → hybrid retrieval → rank fusion → reranker → top-k chunks → prompt →
+      answer with citations. Evaluation probes attach after the reranker (recall@k) and after
+      generation (faithfulness).
+    example: >-
+      Python lab: eight short documents about car-wash membership rules and five labelled
+      questions; retrieve with rank_bm25 and with sentence-transformers cosine similarity, fuse with
+      reciprocal rank fusion (score = Σ 1/(60 + rank)), and compute recall@3 and MRR for BM25,
+      vectors and the fusion. Feed the top-3 fused chunks to Claude with an instruction to cite
+      chunk ids.
+    presentation: standard
+    sources:
+      - title: "This repo — 20-llm-agent-systems/rag-and-retrieval.md"
+        url: https://github.com/yurii-mysak/scala-training-docs/blob/main/20-llm-agent-systems/rag-and-retrieval.md
+        locator: "§1 \"The pipeline\"; §2 \"Chunking\"; §4 \"Hybrid search\"; §5 \"Reranking\"; §6 \"Evaluating retrieval\"; §7 \"Agentic retrieval versus one-shot RAG\""
+        kind: docs
+        verified: false
+      - title: "Anthropic — Introducing Contextual Retrieval"
+        url: https://www.anthropic.com/news/contextual-retrieval
+        locator: "Sections on contextual embeddings + contextual BM25, adding a reranker, and the reported retrieval-failure reductions (quote the numbers)"
+        kind: blog
+        verified: false
+      - title: "Lewis et al. — Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (2020)"
+        url: https://arxiv.org/abs/2005.11401
+        locator: "Figure 1 and §2 \"Methods\" (retriever + generator)"
+        kind: paper
+        verified: false
+
+  - id: ai-ml-29
+    title: "Agents as distributed systems"
+    level: I
+    est_min: 30
+    prereqs: [ai-ml-26, ai-ml-27]
+    summary: >-
+      An agent is an LLM in a loop that chooses tools, observes results and decides when to stop,
+      which makes it a distributed system with a non-deterministic coordinator. Anthropic's
+      "Building effective agents" separates workflows (predefined code paths: chaining, routing,
+      parallelisation, orchestrator–workers, evaluator–optimiser) from agents (model-directed
+      control flow) and argues for the simplest pattern that works. This rung maps those patterns
+      onto the Akka reflexes already written up in the repo's agent-architectures.md: supervision,
+      at-least-once delivery with idempotent tools, timeouts, budgets and backpressure.
+    key_points:
+      - "The augmented LLM (model + tools + retrieval + memory) as the building block."
+      - "Workflow patterns versus autonomous agents; add autonomy only when it pays for itself."
+      - "The loop: model call → tool_use → execute → tool_result → repeat; stop conditions and step/token budgets."
+      - "Failure modes mapped: tool timeout ≈ ask timeout, retries need idempotency keys, conversation state ≈ single-writer entity (agent-architectures.md §5, agent-state-and-checkpointing.md)."
+      - "Multi-agent orchestration multiplies tokens and coordination errors — worth it when parallel breadth pays."
+    diagram: >-
+      An agent loop drawn like an actor system: an orchestrator LLM (supervisor) dispatching
+      messages to worker agents and tools, each tool call carrying an idempotency key and a timeout;
+      a budget meter (steps, tokens, money) and a checkpoint store beside the loop.
+    example: >-
+      Python lab (~50 lines with the anthropic SDK): a one-tool agent (lookup_order(order_id)) using
+      the Messages API tool-use loop; add a max_steps budget, a per-tool timeout, an idempotency key
+      on a refund tool, and log each step as a JSON line. Inject a tool failure and watch whether the
+      loop recovers or stops cleanly.
+    presentation: standard
+    sources:
+      - title: "Anthropic Engineering — Building effective agents"
+        url: https://www.anthropic.com/engineering/building-effective-agents
+        locator: "Sections \"Building block: The augmented LLM\", the workflow patterns (prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer), \"Agents\", and the appendix on prompt-engineering your tools"
+        kind: blog
+        verified: false
+      - title: "This repo — 20-llm-agent-systems/agent-architectures.md"
+        url: https://github.com/yurii-mysak/scala-training-docs/blob/main/20-llm-agent-systems/agent-architectures.md
+        locator: "§1 \"The decomposition\"; §3 \"Topologies\"; §5 \"Agents as distributed systems\"; §6 \"When an agent is the wrong answer\""
+        kind: docs
+        verified: false
+      - title: "Anthropic Engineering — How we built our multi-agent research system"
+        url: https://www.anthropic.com/engineering/multi-agent-research-system
+        locator: "Architecture overview (orchestrator–worker) and the discussion of token usage and when multi-agent systems are worth the cost"
+        kind: blog
+        verified: false
+
+  # ──────────────────── Phase 4 — AI engineering frontier (I → A) ────────────────────
+
+  - id: ai-ml-30
+    title: "MCP and tool-use protocols in depth"
+    level: I
+    est_min: 25
+    prereqs: [ai-ml-29]
+    summary: >-
+      Tool use is a contract: the model sees a name, a description and a JSON Schema, emits a
+      structured call, and your code executes it and returns a result. The Model Context Protocol
+      standardises that contract between hosts (Claude Code, desktop apps, IDEs) and servers,
+      adding resources, prompts, capability negotiation and transports on top of JSON-RPC 2.0.
+      You already build MCP servers; this rung goes under the hood — lifecycle, transports,
+      security — and into what makes a tool easy for a model to use correctly.
+    key_points:
+      - "Native tool use: tool definitions, tool_use / tool_result blocks, tool_choice, parallel tool calls."
+      - "MCP architecture: host, client, server; server primitives (tools, resources, prompts) and client features (sampling, roots, elicitation)."
+      - "Lifecycle and transports: initialize and capability negotiation; stdio versus Streamable HTTP; authorization for remote servers."
+      - "Tool design for agents: fewer, higher-level tools, namespacing, token-efficient responses, actionable errors, descriptions written as prompts."
+      - "Security: tool output is untrusted input (prompt injection), tool poisoning, least privilege, confirmation before side effects."
+    diagram: >-
+      Sequence diagram: host (Claude Code) ↔ MCP client ↔ MCP server — initialize → capabilities →
+      tools/list → the model decides on a tool_use → tools/call → result → tool_result back into the
+      model's context; a dashed trust boundary encloses the server and the external API it calls.
+    example: >-
+      Lab: a ~25-line MCP server with the official Python SDK (FastMCP) exposing one tool,
+      get_wash_status(site_id), with typed parameters and a precise description; inspect it with
+      npx @modelcontextprotocol/inspector, list tools, call it and read the JSON-RPC messages. Then
+      rewrite the description and error message following Anthropic's tool-writing guidance and
+      compare how Claude Code uses the tool before and after.
+    presentation: deep
+    sources:
+      - title: "Model Context Protocol"
+        url: https://modelcontextprotocol.io/
+        locator: "Learn → Architecture overview; Specification (latest revision) → Base protocol (lifecycle, transports), Server features (tools, resources, prompts), Client features (sampling, roots, elicitation), Authorization"
+        kind: docs
+        verified: false
+      - title: "Anthropic Engineering — Writing effective tools for agents — with agents"
+        url: https://www.anthropic.com/engineering/writing-tools-for-agents
+        locator: "Section on principles for writing effective tools (choosing tools, namespacing, returning meaningful context, token efficiency, prompt-engineering tool descriptions)"
+        kind: blog
+        verified: false
+      - title: "Claude developer documentation"
+        url: https://docs.claude.com/
+        locator: "Agents and tools → Tool use → Overview and \"How to implement tool use\" (tool definitions, tool_choice, parallel tool use)"
+        kind: docs
+        verified: false
+
+  - id: ai-ml-31
+    title: "Claude Code and Agent SDK patterns"
+    level: I
+    est_min: 25
+    prereqs: [ai-ml-29, ai-ml-30]
+    summary: >-
+      Claude Code is a production agent harness you already use daily, and the Claude Agent SDK
+      exposes the same harness — agent loop, tools, context compaction, subagents, permissions,
+      hooks — as a library for your own agents. This rung reads Claude Code as a reference
+      architecture: how it manages context (CLAUDE.md, compaction, subagents with isolated
+      context, skills loaded on demand), how it constrains actions (permission modes, hooks), how
+      it extends (MCP, slash commands, plugins), and how to run it headless in scripts and CI.
+    key_points:
+      - "The harness loop: gather context → take action → verify work → repeat (the Agent SDK framing)."
+      - "Context management: CLAUDE.md memory, auto-compaction, subagents as context isolation, skills loaded on demand."
+      - "Control: permission modes and allow/deny rules; PreToolUse/PostToolUse hooks as policy enforcement points."
+      - "Extension points: MCP servers, custom slash commands, skills, plugins."
+      - "Programmatic use: claude -p with JSON output, the Agent SDK query loop in Python or TypeScript, and where this fits in CI (rung 36)."
+    diagram: >-
+      Concentric layers: the model at the core → the agent loop (gather context, act, verify) →
+      harness services (compaction, subagents, permissions, hooks) → extension points (MCP
+      servers, skills, slash commands, plugins) → surfaces (interactive CLI, headless print mode,
+      Agent SDK embedded in your own service).
+    example: >-
+      Lab: (1) a PreToolUse hook script that blocks Bash commands matching rm -rf and appends every
+      tool call to a JSONL audit log; (2) run claude -p "list the TODOs in this repo as JSON" with
+      JSON output format from a shell script and parse the result with jq; (3) the same task as
+      ~15 lines with the Agent SDK's query() in Python, restricted to the Read, Grep and Glob tools.
+    presentation: deep
+    sources:
+      - title: "Claude Code / Claude developer hub"
+        url: https://claude.dev/
+        locator: "Claude Code docs → hooks reference; settings and permissions; subagents; skills; headless / programmatic mode; Agent SDK overview"
+        kind: docs
+        verified: false
+      - title: "Anthropic Engineering — Building agents with the Claude Agent SDK"
+        url: https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk
+        locator: "Section on the agent feedback loop (gather context, take action, verify work) and the tools/subagents/compaction discussion"
+        kind: blog
+        verified: false
+      - title: "Anthropic Engineering — Claude Code: Best practices for agentic coding"
+        url: https://www.anthropic.com/engineering/claude-code-best-practices
+        locator: "Sections \"Customize your setup\" (CLAUDE.md, allowed tools) and \"Use headless mode to automate your infra\""
+        kind: blog
+        verified: false
+
+  - id: ai-ml-32
+    title: "Calibration: when 0.8 means 80%"
+    level: I
+    est_min: 25
+    prereqs: [ai-ml-09, ai-ml-11]
+    summary: >-
+      A model is calibrated when, among all the cases it scores 0.8, about 80% turn out positive.
+      Calibration is what makes a probability usable for decisions — thresholds,
+      abstain-and-escalate rules, expected-cost routing — and it is separate from accuracy: a
+      model can rank perfectly and still be overconfident. Modern deep networks are often
+      miscalibrated, and simple post-hoc fixes (temperature scaling, Platt scaling, isotonic
+      regression) repair much of it. This is the prerequisite for the decision models in rungs 33–35.
+    key_points:
+      - "Definition; the reliability diagram; expected calibration error (ECE) and its binning caveats."
+      - "Proper scoring rules — log loss and Brier score — reward calibrated probabilities; accuracy and AUC do not."
+      - "Why modern networks are overconfident (Guo et al.) and temperature scaling as a one-parameter fix fitted on validation data."
+      - "Platt (sigmoid) versus isotonic calibration in scikit-learn's CalibratedClassifierCV, and their data needs."
+      - "Using calibrated probabilities: expected-cost thresholds and abstention (act if p ≥ τ, otherwise escalate)."
+    diagram: >-
+      A reliability diagram: predicted-confidence bins on the x-axis, observed accuracy on the
+      y-axis, the diagonal as perfect calibration; an overconfident model's bars fall below the
+      diagonal at high confidence, and the same model after temperature scaling hugs it; a small
+      histogram of prediction counts sits underneath.
+    example: >-
+      scikit-learn lab: train GaussianNB and LogisticRegression on make_classification
+      (n_samples=20000); plot calibration_curve for both and compute brier_score_loss and log_loss;
+      wrap GaussianNB in CalibratedClassifierCV(method="isotonic") and re-plot. Then implement
+      temperature scaling for a softmax classifier by finding T that minimises validation NLL with
+      scipy.optimize.minimize_scalar.
+    presentation: deep
+    sources:
+      - title: "Guo, Pleiss, Sun, Weinberger — On Calibration of Modern Neural Networks (ICML 2017)"
+        url: https://arxiv.org/abs/1706.04599
+        locator: "Figure 1 (LeNet vs ResNet reliability diagrams); §2 definitions (reliability diagrams, ECE); §4.2 temperature scaling"
+        kind: paper
+        verified: false
+      - title: "scikit-learn User Guide — Probability calibration"
+        url: https://scikit-learn.org/stable/modules/calibration.html
+        locator: "Sections \"Calibration curves\" and \"Calibrating a classifier\" (sigmoid vs isotonic, CalibratedClassifierCV usage)"
+        kind: docs
+        verified: false
+
+  - id: ai-ml-33
+    title: "Decision models: Jev and the System One idea"
+    level: A
+    est_min: 30
+    prereqs: [ai-ml-32]
+    summary: >-
+      A decision model offers a different contract from a chat model: you supply context, a
+      question and a closed set of options, and it returns a calibrated probability for each
+      option — a fast, "System One" judgement rather than deliberate free-text generation.
+      TypeSafe's Jev, described in a September 2026 post and reachable through Vercel AI Gateway
+      and OpenRouter, works this way. This rung explains the contract, what calibrated option
+      probabilities buy you over parsing an LLM's text answer, and how to call Jev; because these
+      sources post-date the model's training data, every product claim in the lesson must be a
+      verbatim quote.
+    key_points:
+      - "The contract: (context, question, options) → probability per option, versus prompt → text; no output parsing, no off-list answers."
+      - "System One versus System Two (Kahneman's framing): fast classification-style judgement versus deliberate multi-step generation."
+      - "Why calibration (rung 32) is the product: thresholds, abstention and expected-cost decisions become arithmetic."
+      - "Access through OpenAI-compatible gateways (OpenRouter, Vercel AI Gateway): model id, request shape and pricing come from the guides, never from memory."
+      - "Evaluating one: accuracy plus log loss/Brier and a reliability diagram on your own labelled cases, against an LLM baseline."
+    diagram: >-
+      Two contracts side by side. Left: a chat LLM receives a prompt and emits free text that a
+      parser must map to an option, with a failure branch for unparseable or off-list answers.
+      Right: a decision model receives options [A, B, C] and emits a probability vector such as
+      [0.71, 0.22, 0.07], which feeds a rule "act if max p ≥ τ, else escalate".
+    example: >-
+      Lab: following the OpenRouter Jev guide exactly (model id and request fields as documented
+      there), send one curl request with a car-wash support ticket and four routing options and
+      print the returned probabilities. Send the same ticket to a chat model asking for one option
+      name, and compare latency (curl -w '%{time_total}') and the effort of handling each output.
+      Label ten tickets and save them for rung 34.
+    presentation: deep
+    sources:
+      - title: "mager.co — Jev decision model (2026-09-19)"
+        url: https://mager.co/blog/2026-09-19-jev-decision-model/
+        locator: "Whole post — what Jev returns, the System One framing, how it is accessed through gateways"
+        kind: blog
+        verified: false
+      - title: "OpenRouter docs — community guide: Jev"
+        url: https://openrouter.ai/docs/guides/community/jev
+        locator: "Request format (question and option list), response fields carrying the probabilities, model id"
+        kind: docs
+        verified: false
+      - title: "Vercel AI Gateway documentation"
+        url: https://vercel.com/docs/ai-gateway
+        locator: "Getting started; models and providers; OpenAI-compatible API"
+        kind: docs
+        verified: false
+
+  - id: ai-ml-34
+    title: "Routing and tool selection as classification: Clef on Workers AI"
+    level: A
+    est_min: 30
+    prereqs: [ai-ml-30, ai-ml-33]
+    summary: >-
+      Many decisions inside an agent are classification in disguise: which tool to call, which
+      sub-agent or model tier to route to, whether to escalate to a human. Cloudflare's Clef and
+      Clef-flash, open-weight decision models released on Workers AI on 2026-10-01 and positioned
+      against Jev, make it practical to run such classifiers at the edge and to inspect or
+      fine-tune them. This rung frames routing as classification, sets out when a decision model
+      beats an LLM and when it does not, and builds a router with an abstention threshold.
+    key_points:
+      - "Routing and tool selection as K-way classification: the options are tool names or routes, a closed and known label set."
+      - "When a decision model wins: high volume, tight latency or cost budgets, closed option sets, need for calibrated confidence and auditability."
+      - "When an LLM wins: open-ended output, multi-step reasoning, option sets that change per request without good descriptions, or when tool arguments are needed and not just the choice."
+      - "Clef versus Clef-flash versus Jev — open weights versus hosted, size versus latency — stated only as the sources state it, with quotes."
+      - "Router design: confidence threshold τ, fallback to an LLM or a human below τ, every decision logged for evaluation; cascades continue in rung 37."
+    diagram: >-
+      A router flowchart: incoming request → decision model over {billing_tool, wash_status_tool,
+      refund_agent, human} → if max p ≥ τ dispatch to that option, else → LLM fallback or human
+      queue; a side panel plots accuracy, coverage (share auto-routed) and cost per 1,000 requests
+      as τ varies.
+    example: >-
+      Lab: call Clef-flash through the Workers AI REST API (POST
+      https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/ai/run/ followed by the model id
+      from the changelog, with the input format it documents) on the ten labelled tickets from
+      rung 33; compute accuracy and Brier score; sweep τ from 0.5 to 0.95 and plot coverage against
+      accuracy; put Jev and a chat-model baseline in the same table.
+    presentation: deep
+    sources:
+      - title: "Cloudflare changelog — Clef on Workers AI (2026-10-01)"
+        url: https://developers.cloudflare.com/changelog/post/2026-10-01-clef-workers-ai/
+        locator: "Whole entry — model ids (Clef, Clef-flash), input/output schema, licence and availability"
+        kind: news
+        verified: false
+      - title: "Flavio Copes — Clef"
+        url: https://flaviocopes.com/clef/
+        locator: "Whole post — practical walkthrough of calling Clef and what it returns"
+        kind: blog
+        verified: false
+      - title: "The Register — Cloudflare tries to outplay Jev with open-weight Clef models (2026-10-01)"
+        url: https://www.theregister.com/ai-and-ml/2026/10/01/cloudflare-tries-to-outplay-jev-with-open-weight-clef-models/5300649
+        locator: "Comparison with Jev; open-weight licensing and positioning"
+        kind: news
+        verified: false
+
+  - id: ai-ml-35
+    title: "RL fine-tuning of decision models"
+    level: A
+    est_min: 30
+    prereqs: [ai-ml-16, ai-ml-24, ai-ml-34]
+    summary: >-
+      A decision model's output is a probability distribution over options, which makes it a
+      natural policy for reinforcement learning: sample an option, observe a reward (was the route
+      right, did the tool call succeed), and push probability toward options that earned reward.
+      This rung builds the policy-gradient idea from REINFORCE to the group-relative baseline used
+      by GRPO, shows why a 0/1 reward collapses calibration while a proper scoring rule preserves
+      it, and covers the practical path for open-weight models like Clef: LoRA adapters, a KL
+      penalty against the reference model, and offline evaluation before rollout.
+    key_points:
+      - "Policy gradient in one line: ∇J = E[R · ∇log π(a|s)]; baselines cut variance; GRPO uses the mean reward of a sampled group as the baseline, with no value network."
+      - "Rewards from logs: outcome labels, delayed signals, and bandit feedback (you only see the outcome of the option you chose)."
+      - "Calibration-preserving objectives: log score or Brier versus 0/1 correctness, whose optimum is a deterministic, overconfident policy."
+      - "Stability: KL penalty to the reference model, small learning rates, LoRA adapters on open weights."
+      - "Reward hacking and distribution shift; offline evaluation and shadow traffic before promotion (rung 36)."
+    diagram: >-
+      An RL loop: context (ticket) → decision-model policy π(option | context) → a group of K
+      sampled options → environment (tool runs or a human verifies) → rewards → GRPO update
+      (advantage = reward − group mean, KL to the reference model) → updated LoRA adapter; a side
+      gauge tracks ECE from the reliability diagram so calibration drift stays visible.
+    example: >-
+      numpy lab: a 3-option softmax policy for one context where the correct option is B 70% of
+      the time and A 30%. (a) REINFORCE with 0/1 reward — sample an option, reward 1 if it matches
+      the sampled label, θ += lr·R·∇log π — and watch p(B) climb toward 1. (b) Gradient ascent on
+      the log score log π(label) — and watch p converge to about [0.3, 0.7, 0.0]. Compare Brier
+      scores. Finally replace the single sample in (a) with a group of 8 and a group-mean baseline,
+      GRPO-style, and compare gradient variance.
+    presentation: deep
+    sources:
+      - title: "OpenAI Spinning Up in Deep RL"
+        url: https://spinningup.openai.com/
+        locator: "Introduction to RL → Part 3 \"Intro to Policy Optimization\" (deriving the simplest policy gradient; baselines)"
+        kind: course
+        verified: false
+      - title: "Shao et al. — DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models (2024)"
+        url: https://arxiv.org/abs/2402.03300
+        locator: "The reinforcement-learning section introducing Group Relative Policy Optimization (GRPO), and the PPO-versus-GRPO figure"
+        kind: paper
+        verified: false
+      - title: "Hugging Face TRL documentation"
+        url: https://huggingface.co/docs/trl
+        locator: "GRPOTrainer page; PEFT/LoRA integration"
+        kind: docs
+        verified: false
+
+  - id: ai-ml-36
+    title: "Evals in CI: regression gates for non-deterministic systems"
+    level: A
+    est_min: 30
+    prereqs: [ai-ml-27, ai-ml-31]
+    summary: >-
+      Once prompts, models, tools and decision thresholds are code, every change needs a
+      regression gate — but the system under test is stochastic, slow, and costs money per run.
+      This rung designs an evals-in-CI pipeline: a tiered suite (fast deterministic checks on
+      every PR, sampled model-graded evals nightly), statistically sound pass/fail rules, pinned
+      model and judge versions, and budget controls. It operationalises the repo's
+      evaluating-agents.md §7 "Regression detection in CI" with concrete tooling.
+    key_points:
+      - "Tiering: smoke (deterministic, every commit) → regression set (sampled, per PR, budgeted) → full suite and human review (nightly or pre-release)."
+      - "Gate on intervals, not points: several samples per case, bootstrap or Wilson intervals; pass@k versus pass^k for consistency."
+      - "Pin everything that can drift — model snapshot ids, judge prompt and model, dataset version — and record them in the run artifact."
+      - "Flakiness: quarantine, temperature policy, separating model regressions from infrastructure errors."
+      - "Cost and time budgets in CI; caching unchanged cases; tooling options (promptfoo, Inspect, plain pytest)."
+    diagram: >-
+      CI pipeline: PR opened → lint and unit tests → deterministic eval tier (seconds) → sampled
+      regression tier (k samples × N cases, budget cap) → compare with the baseline run (bootstrap
+      interval on the difference) → gate pass/fail → artifact (scores, model ids, cost); a nightly
+      job runs the full suite and refreshes the baseline.
+    example: >-
+      Lab: a GitHub Actions workflow (~30 lines of YAML) that runs a pytest-based eval of the
+      rung-27 ticket-to-JSON prompt on 20 cases × 3 samples, writes results.json, and fails when the
+      95% bootstrap interval of (new − baseline) pass rate lies entirely below zero — a confident
+      regression — while only warning when the interval overlaps zero. The bootstrap is about 15
+      lines of numpy.
+    presentation: deep
+    sources:
+      - title: "This repo — 20-llm-agent-systems/evaluating-agents.md"
+        url: https://github.com/yurii-mysak/scala-training-docs/blob/main/20-llm-agent-systems/evaluating-agents.md
+        locator: "§7 \"Regression detection in CI\"; §11 \"A practical eval architecture\"; §12 \"Anti-patterns\""
+        kind: docs
+        verified: false
+      - title: "Hamel Husain — Your AI Product Needs Evals"
+        url: https://hamel.dev/blog/posts/evals/
+        locator: "The three levels: unit tests, human and model evaluation, A/B testing; the section on running assertions in CI"
+        kind: blog
+        verified: false
+      - title: "promptfoo documentation"
+        url: https://www.promptfoo.dev/docs/intro/
+        locator: "Configuration → assertions and metrics; integrations → CI/CD (GitHub Actions)"
+        kind: docs
+        verified: false
+
+  - id: ai-ml-37
+    title: "Cost and latency engineering"
+    level: A
+    est_min: 30
+    prereqs: [ai-ml-25, ai-ml-34]
+    summary: >-
+      In production, tokens are money and time-to-first-token is user experience, so cost and
+      latency become first-class design constraints. This rung builds a cost model from token
+      counts, then works through the levers in order of payoff: shorter and cached prompts, the
+      right model tier per request (routing and cascades, with a decision model from rung 34 as
+      the router), batch APIs for offline work, streaming for perceived latency, and on the
+      serving side KV-cache management, continuous batching and speculative decoding. It extends
+      the repo's production-llmops.md §4–6.
+    key_points:
+      - "Cost model: (input tokens × input price + output tokens × output price) × volume; output tokens dominate generation latency."
+      - "Prompt caching of stable prefixes; batch processing for non-interactive jobs; per-request token budgets."
+      - "Model cascades and routing: cheap model or decision model first, escalate on low confidence, measure quality per tier."
+      - "Latency anatomy: queueing, prefill (TTFT), decode (tokens/s), tool round-trips; streaming and parallel tool calls."
+      - "Serving-side levers for open weights: continuous batching, PagedAttention KV management, quantisation, speculative decoding."
+    diagram: >-
+      Left: a latency waterfall for one agent turn (network → queue → prefill/TTFT → decode → tool
+      call → second model call). Right: a cost waterfall showing monthly spend after each lever
+      (caching, routing, batching) is applied.
+    example: >-
+      Python lab: a cost calculator for a support assistant at 270k interactions per month (the
+      volume in section 20's case study), 3k input and 400 output tokens per call, 2.5 calls per
+      interaction; take current prices from the provider's pricing page rather than memory. Model
+      three levers — 80% of input served from a cached prefix, 60% of traffic resolved by a
+      decision-model router, nightly summarisation moved to batch processing — and print the
+      monthly total after each.
+    presentation: deep
+    sources:
+      - title: "This repo — 20-llm-agent-systems/production-llmops.md"
+        url: https://github.com/yurii-mysak/scala-training-docs/blob/main/20-llm-agent-systems/production-llmops.md
+        locator: "§4 \"Cost and token budgeting\"; §5 \"Latency budgets and streaming UX\"; §6 \"Caching\"; §7 \"Rate limits, retries, provider failover\""
+        kind: docs
+        verified: false
+      - title: "Claude developer documentation"
+        url: https://docs.claude.com/
+        locator: "Build with Claude → Prompt caching; Batch processing; Token counting; Streaming messages; and the pricing page"
+        kind: docs
+        verified: false
+      - title: "Kwon et al. — Efficient Memory Management for Large Language Model Serving with PagedAttention (vLLM, 2023)"
+        url: https://arxiv.org/abs/2309.06180
+        locator: "Introduction and early figures on KV-cache memory waste; the PagedAttention method section"
+        kind: paper
+        verified: false
+
+  - id: ai-ml-38
+    title: "Capstone: ship a small ML or agent project end to end"
+    level: A
+    est_min: 30
+    prereqs: [ai-ml-36, ai-ml-37]
+    summary: >-
+      The ladder ends by shipping something real and small enough to finish in a few sessions: a
+      problem statement and metric, data or an eval set, a baseline, a model or agent, an
+      evaluation report, a deployment and monitoring. This rung is the plan and the definition of
+      done rather than a lecture; suggested projects reuse what was built along the way — a
+      calibrated ticket router (decision model versus fine-tuned classifier versus LLM), an MCP
+      server with evals in CI, or a Kaggle tabular submission with a written post-mortem. The
+      write-up becomes the filed lesson.
+    key_points:
+      - "Scope by metric: one user-facing decision, one primary metric, one guardrail metric, a baseline to beat."
+      - "Data and evals first: a labelled set (100+ cases or a Kaggle split) built before the model."
+      - "Baselines in order: rule or heuristic → classical ML (rung 10) or decision model (rung 33) → LLM or agent; keep the simplest that meets the bar."
+      - "Ship it: a containerised service or MCP server, evals in CI (rung 36), a cost and latency budget (rung 37), logging for online evaluation."
+      - "Post-mortem: what the metric hid, a calibration check, the next iteration; file into 24-ai-ml-foundations."
+    diagram: >-
+      A project timeline: problem and metric → data/eval set → baseline → model or agent →
+      offline eval report → deploy behind a CI gate → monitor (online metrics, drift, cost) →
+      feedback into the eval set, with "definition of done" checkpoints marked along it.
+    example: >-
+      Lab (the first ten minutes of the capstone): write a one-page project brief in Markdown —
+      problem, user, decision, metric and target, guardrail, data source, baseline, eval plan,
+      deployment target, cost budget — for one suggested project, and create the repo skeleton
+      (src/, evals/, .github/workflows/eval.yml, README) with one failing eval test that defines done.
+    presentation: deep
+    sources:
+      - title: "Google — Rules of Machine Learning: Best Practices for ML Engineering (Zinkevich)"
+        url: https://developers.google.com/machine-learning/guides/rules-of-ml
+        locator: "Sections \"Before Machine Learning\" (Rules #1–#3) and \"ML Phase I: Your First Pipeline\""
+        kind: docs
+        verified: false
+      - title: "Made With ML (Goku Mohandas)"
+        url: https://madewithml.com/
+        locator: "Lessons on product design and systems design, model evaluation, CI/CD workflows and monitoring"
+        kind: course
+        verified: false
+      - title: "Kaggle Learn — Intro to Machine Learning"
+        url: https://www.kaggle.com/learn/intro-to-machine-learning
+        locator: "Lesson 7 \"Machine Learning Competitions\" (for the Kaggle-submission capstone option)"
+        kind: course
+        verified: false

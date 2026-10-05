@@ -1,0 +1,1789 @@
+<title>IT Iaido Dojo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@400;500&family=Red+Hat+Text:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Shippori+Mincho+B1:wght@600;700&display=swap">
+<style>
+/* Layout: one calm, left-aligned column (max 52rem). A masthead carries the day number and a
+   five-stroke streak tally above an indigo band, then Today, Tracks, History and How it works. */
+:root {
+  --paper: #EEF0F5;
+  --surface: #FAFBFD;
+  --sunk: #E4E7EF;
+  --ink: #181B29;
+  --ink-2: #434960;
+  --ink-3: #5F657B;
+  --rule: #D3D7E2;
+  --rule-strong: #B1B7C9;
+  --ai: #283C8E;
+  --ai-hover: #1E2F75;
+  --ai-on: #FFFFFF;
+  --ai-soft: #DFE4F5;
+  --pass: #276B44;
+  --pass-soft: #D8EDE0;
+  --review: #8F5608;
+  --review-soft: #F3E5CB;
+  --skip: #5C6275;
+  --skip-soft: #E3E5EC;
+  --danger: #A3271F;
+  --danger-soft: #F6DFDC;
+  --code-bg: #E8EBF2;
+
+  --f-display: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", Georgia, "Times New Roman", serif;
+  --f-body: "Red Hat Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "Red Hat Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --t-xs: 0.75rem;
+  --t-sm: 0.8125rem;
+  --t-base: 0.9375rem;
+  --t-read: 1rem;
+  --t-md: 1.1875rem;
+  --t-lg: 1.375rem;
+  --t-xl: 2.125rem;
+
+  --r-s: 4px;
+  --r-m: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #11131B;
+    --surface: #181B26;
+    --sunk: #222634;
+    --ink: #E5E7EF;
+    --ink-2: #B4B9CA;
+    --ink-3: #8C92A7;
+    --rule: #2B3041;
+    --rule-strong: #444A5F;
+    --ai: #9DAEF5;
+    --ai-hover: #B9C5F8;
+    --ai-on: #11131B;
+    --ai-soft: #242C4C;
+    --pass: #74C594;
+    --pass-soft: #182E20;
+    --review: #E3AB55;
+    --review-soft: #372A13;
+    --skip: #A2A7B8;
+    --skip-soft: #262934;
+    --danger: #F2897E;
+    --danger-soft: #3A1C19;
+    --code-bg: #1E2230;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #11131B;
+  --surface: #181B26;
+  --sunk: #222634;
+  --ink: #E5E7EF;
+  --ink-2: #B4B9CA;
+  --ink-3: #8C92A7;
+  --rule: #2B3041;
+  --rule-strong: #444A5F;
+  --ai: #9DAEF5;
+  --ai-hover: #B9C5F8;
+  --ai-on: #11131B;
+  --ai-soft: #242C4C;
+  --pass: #74C594;
+  --pass-soft: #182E20;
+  --review: #E3AB55;
+  --review-soft: #372A13;
+  --skip: #A2A7B8;
+  --skip-soft: #262934;
+  --danger: #F2897E;
+  --danger-soft: #3A1C19;
+  --code-bg: #1E2230;
+  color-scheme: dark;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--t-base);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.page {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding-inline: clamp(16px, 4vw, 32px);
+  padding-block: 28px 72px;
+}
+h1, h2, h3, h4, h5, h6 { text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--ai); text-underline-offset: 2px; }
+code, pre { font-family: var(--f-mono); }
+:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; border-radius: 2px; }
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+.num { font-variant-numeric: tabular-nums lining-nums; }
+
+/* ---------- masthead ---------- */
+.mast {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 28px;
+  padding-bottom: 14px;
+  border-bottom: 3px solid var(--ai);
+}
+.mast-id { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.name {
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: var(--t-lg);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+.mast-date { color: var(--ink-2); font-size: var(--t-sm); }
+.mast-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.day { display: flex; align-items: baseline; gap: 7px; }
+.day-label { font-size: var(--t-sm); color: var(--ink-2); }
+.day-num {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: var(--t-xl);
+  line-height: 1;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.streak { display: flex; flex-direction: column; gap: 5px; }
+.tally { display: flex; gap: 9px; height: 18px; }
+.tally:empty { display: none; }
+.tally-group { position: relative; display: flex; gap: 4px; }
+.tally-group i { display: block; width: 2.5px; height: 100%; background: var(--ai); border-radius: 2px; }
+.tally-group.full::after {
+  content: "";
+  position: absolute;
+  left: -4px; right: -4px; top: 50%;
+  height: 2.5px;
+  margin-top: -1px;
+  background: var(--ai);
+  border-radius: 2px;
+  transform: rotate(-27deg);
+}
+.tally-more { font-size: var(--t-xs); color: var(--ai); font-weight: 700; line-height: 18px; }
+.streak-label { font-size: var(--t-sm); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.sync {
+  margin-top: 8px;
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+}
+
+/* ---------- banner ---------- */
+.banner {
+  margin-top: 18px;
+  padding: 10px 14px;
+  border-radius: var(--r-s);
+  border: 1px solid var(--rule-strong);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+}
+.banner.warn { border-color: var(--danger); background: var(--danger-soft); color: var(--ink); }
+
+/* ---------- sections ---------- */
+main { display: flex; flex-direction: column; gap: 48px; margin-top: 30px; }
+section { min-width: 0; }
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+h2 {
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: var(--t-md);
+  line-height: 1.3;
+}
+.quiet { color: var(--ink-3); font-size: var(--t-sm); list-style: none; padding: 6px 0; }
+
+/* ---------- buttons ---------- */
+.btn {
+  font: inherit;
+  font-size: var(--t-sm);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 12px;
+  border-radius: var(--r-s);
+  border: 1px solid var(--rule-strong);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  line-height: 1.2;
+  transition: background-color .15s ease, color .15s ease;
+}
+.btn:hover:not(:disabled) { background: var(--sunk); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn .ico svg { width: 13px; height: 13px; display: block; }
+.btn-primary { background: var(--ai); border-color: var(--ai); color: var(--ai-on); padding-inline: 16px; }
+.btn-primary:hover:not(:disabled) { background: var(--ai-hover); border-color: var(--ai-hover); }
+.btn-passed { color: var(--pass); border-color: var(--pass); }
+.btn-passed:hover:not(:disabled) { background: var(--pass-soft); }
+.btn-review { color: var(--review); border-color: var(--review); }
+.btn-review:hover:not(:disabled) { background: var(--review-soft); }
+.btn-skipped { color: var(--skip); }
+.btn-skipped:hover:not(:disabled) { background: var(--skip-soft); }
+.btn-quiet { color: var(--ink); background: var(--surface); }
+.btn-toggle { color: var(--ai); border-color: transparent; padding-inline: 6px 8px; }
+.btn-toggle:hover:not(:disabled) { background: var(--ai-soft); }
+.chev {
+  width: 7px; height: 7px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform .15s ease;
+  flex: none;
+}
+[aria-expanded="true"] > .chev { transform: translateY(1px) rotate(-135deg); }
+.linkish {
+  font: inherit; color: var(--ai); background: none; border: 0; padding: 0;
+  text-decoration: underline; text-underline-offset: 2px; cursor: pointer;
+}
+
+/* ---------- pills ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 9px 1px 7px;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+.pill .ico svg { width: 12px; height: 12px; display: block; }
+.pill.count { font-size: var(--t-sm); padding: 3px 12px 3px 9px; font-variant-numeric: tabular-nums; }
+.s-sent { color: var(--ai); border-color: var(--ai); background: transparent; }
+.s-passed { color: var(--pass); border-color: var(--pass); background: var(--pass-soft); }
+.s-review { color: var(--review); border-color: var(--review); border-style: dashed; background: var(--review-soft); }
+.s-skipped { color: var(--skip); border-color: var(--skip); border-style: dotted; background: transparent; }
+
+.level {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 7px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-s);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  line-height: 1.7;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.notches { display: inline-flex; align-items: flex-end; gap: 2px; height: 10px; }
+.notches i { display: block; width: 3px; background: var(--rule-strong); border-radius: 1px; }
+.notches i:nth-child(1) { height: 5px; }
+.notches i:nth-child(2) { height: 7.5px; }
+.notches i:nth-child(3) { height: 10px; }
+.notches i.on { background: var(--ink-2); }
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+  min-width: 0;
+}
+.slot { font-weight: 700; color: var(--ink); }
+.from { color: var(--ink); font-weight: 600; }
+
+/* ---------- today ---------- */
+.cards { display: flex; flex-direction: column; gap: 14px; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-m);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.card-top { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.lesson-no {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2rem; height: 2rem;
+  border: 1.5px solid var(--ai);
+  border-radius: var(--r-s);
+  color: var(--ai);
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: var(--t-md);
+  line-height: 1;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.card-title {
+  margin: 2px 0 0;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: var(--t-lg);
+  line-height: 1.3;
+}
+.card-summary { color: var(--ink-2); max-width: 65ch; }
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 12px;
+  margin-top: 2px;
+  border-top: 1px solid var(--rule);
+}
+.marks { display: flex; flex-wrap: wrap; gap: 8px; }
+.card-err { color: var(--danger); font-size: var(--t-sm); }
+
+.card-marked {
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-color: var(--state, var(--rule));
+  background: var(--state-soft, var(--surface));
+}
+.card-marked.is-passed { --state: var(--pass); --state-soft: var(--pass-soft); }
+.card-marked.is-review { --state: var(--review); --state-soft: var(--review-soft); border-style: dashed; }
+.card-marked.is-skipped { --state: var(--skip); --state-soft: var(--skip-soft); border-style: dotted; }
+.marked-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.marked-title { font-weight: 600; overflow-wrap: anywhere; }
+.marked-note { font-size: var(--t-sm); color: var(--ink-2); }
+
+.calm {
+  border: 1px dashed var(--rule-strong);
+  border-radius: var(--r-m);
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 100%;
+}
+.calm-lead { font-family: var(--f-display); font-weight: 700; font-size: var(--t-md); }
+.calm p:not(.calm-lead) { color: var(--ink-2); max-width: 62ch; }
+.preview {
+  margin: 8px 0 0;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 8px 18px;
+}
+.preview dt { font-weight: 700; }
+.preview dd { margin: 0; color: var(--ink-2); }
+
+.more {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+.more-note { font-size: var(--t-sm); color: var(--ink-2); flex: 1 1 18rem; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.more-note .err-line { color: var(--danger); }
+.more-note code, .help code {
+  font-size: .92em;
+  background: var(--code-bg);
+  padding: .05em .4em;
+  border-radius: 3px;
+  color: var(--ink);
+}
+.say { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.say .btn { min-height: 28px; padding: 3px 10px; font-size: var(--t-xs); }
+
+/* ---------- tracks ---------- */
+.tracks { list-style: none; margin: 0; padding: 0; }
+.track-row {
+  display: grid;
+  grid-template-columns: minmax(9rem, 15rem) minmax(0, 1fr) auto;
+  grid-template-areas: "head ladder count" ". next next";
+  align-items: center;
+  gap: 4px 18px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.track-row:first-child { border-top: 1px solid var(--rule); }
+.tr-head { grid-area: head; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-width: 0; }
+.tr-name { font-weight: 600; }
+.weight {
+  font-size: var(--t-xs);
+  font-weight: 600;
+  color: var(--ai);
+  background: var(--ai-soft);
+  border-radius: 999px;
+  padding: 0 8px;
+  line-height: 1.7;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ladder {
+  grid-area: ladder;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 2px;
+  height: 10px;
+}
+.ladder i { display: block; background: var(--sunk); border-radius: 1px; box-shadow: inset 0 0 0 1px var(--rule); }
+.ladder i.on { background: var(--ai); box-shadow: none; }
+.ladder-bar { grid-area: ladder; display: block; height: 10px; background: var(--sunk); border-radius: 2px; overflow: hidden; }
+.ladder-bar > span { display: block; height: 100%; background: var(--ai); }
+.tr-count {
+  grid-area: count;
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  min-width: 4.5em;
+}
+.tr-next { grid-area: next; font-size: var(--t-sm); color: var(--ink-2); }
+.next-title { color: var(--ink); }
+
+/* ---------- history ---------- */
+.filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-bottom: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font: inherit;
+  font-size: var(--t-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  min-height: 30px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-strong);
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.chip:hover { background: var(--sunk); }
+.chip[aria-pressed="true"] { background: var(--ai); border-color: var(--ai); color: var(--ai-on); }
+.chip .n { font-variant-numeric: tabular-nums; opacity: .8; }
+.track-filter { display: inline-flex; align-items: center; gap: 8px; font-size: var(--t-sm); color: var(--ink-2); }
+.track-filter select {
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-s);
+  padding: 4px 8px;
+  min-height: 30px;
+  max-width: 14rem;
+}
+.hist { list-style: none; margin: 0; padding: 0; }
+.h-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr) auto;
+  gap: 4px 16px;
+  padding: 12px 0 12px 14px;
+  border-bottom: 1px solid var(--rule);
+}
+.h-row::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 13px; bottom: 13px;
+  width: 3px;
+  border-radius: 2px;
+}
+.h-row.is-passed::before { background: var(--pass); }
+.h-row.is-review::before { background: repeating-linear-gradient(to bottom, var(--review) 0 5px, transparent 5px 8px); }
+.h-row.is-skipped::before { background: repeating-linear-gradient(to bottom, var(--skip) 0 2px, transparent 2px 5px); }
+.h-row.is-sent::before { background: transparent; box-shadow: inset 0 0 0 1px var(--ai); }
+.h-date { display: flex; flex-direction: column; gap: 1px; font-size: var(--t-sm); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.h-no { font-size: var(--t-xs); color: var(--ink-3); }
+.h-main { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
+.h-title { font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+.h-note { font-size: var(--t-sm); color: var(--ink-2); }
+.h-due { color: var(--review); font-weight: 600; }
+.h-main .btn-toggle { margin-left: -6px; min-height: 30px; }
+.h-status { justify-self: end; }
+.h-body { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 8px; padding: 6px 0 4px; min-width: 0; }
+.h-foot { margin-top: 14px; }
+
+/* ---------- lesson body (rendered Markdown) ---------- */
+.lesson-body {
+  font-size: var(--t-read);
+  line-height: 1.68;
+  color: var(--ink);
+  max-width: 70ch;
+  min-width: 0;
+  padding-top: 4px;
+}
+.lesson-body > :first-child { margin-top: 0; }
+.lesson-body p, .lesson-body ul, .lesson-body ol, .lesson-body pre,
+.lesson-body blockquote, .lesson-body .table-wrap, .lesson-body details { margin: 0 0 .95em; }
+.lesson-body ul, .lesson-body ol { padding-left: 1.4em; }
+.lesson-body li + li { margin-top: .3em; }
+.lesson-body .md-h1, .lesson-body .md-h2 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: var(--t-md);
+  line-height: 1.35;
+  margin: 1.7em 0 .5em;
+  padding-top: .7em;
+  border-top: 1px solid var(--rule);
+}
+.lesson-body .md-h3 { font-size: var(--t-read); font-weight: 700; margin: 1.3em 0 .4em; }
+.lesson-body .md-h4, .lesson-body .md-h5, .lesson-body .md-h6 { font-size: var(--t-base); font-weight: 700; color: var(--ink-2); margin: 1.1em 0 .3em; }
+.lesson-body code { font-size: .87em; background: var(--code-bg); padding: .08em .35em; border-radius: 3px; }
+.lesson-body pre {
+  background: var(--code-bg);
+  border-radius: var(--r-s);
+  padding: 12px 14px;
+  overflow-x: auto;
+  font-size: .84rem;
+  line-height: 1.55;
+  tab-size: 2;
+}
+.lesson-body pre code { background: none; padding: 0; font-size: inherit; border-radius: 0; }
+.lesson-body .lesson-meta {
+  margin: 0 0 1.1em;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-3);
+  font-size: var(--t-sm);
+}
+.lesson-body .lesson-meta p { margin: 0; }
+.lesson-body blockquote.evidence {
+  padding: 10px 14px 10px 16px;
+  border-left: 3px solid var(--rule-strong);
+  background: var(--sunk);
+  border-radius: 0 var(--r-s) var(--r-s) 0;
+  color: var(--ink-2);
+  font-size: .95rem;
+}
+.lesson-body blockquote > :last-child { margin-bottom: 0; }
+.lesson-body details {
+  border: 1px solid var(--rule);
+  border-radius: var(--r-s);
+  background: var(--surface);
+  padding: 4px 12px;
+  margin-top: .4em;
+}
+.lesson-body summary { cursor: pointer; color: var(--ai); font-weight: 600; font-size: var(--t-sm); padding: 2px 0; }
+.lesson-body details[open] summary { margin-bottom: 6px; }
+.lesson-body details > :last-child { margin-bottom: 6px; }
+.lesson-body img { max-width: 100%; height: auto; }
+.lesson-body hr { border: 0; border-top: 1px solid var(--rule); margin: 1.4em 0; }
+.lesson-body .table-wrap { overflow-x: auto; }
+.lesson-body table { border-collapse: collapse; font-size: var(--t-sm); }
+.lesson-body th, .lesson-body td { border: 1px solid var(--rule); padding: 6px 10px; text-align: left; vertical-align: top; }
+.lesson-body th { background: var(--sunk); }
+.lesson-body pre.mermaid {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  color: var(--ink-3);
+  font-size: .78rem;
+  white-space: pre;
+  text-align: left;
+}
+.lesson-body pre.mermaid[data-processed="true"] { color: var(--ink); text-align: center; white-space: normal; padding: 14px; }
+.lesson-body pre.mermaid svg { max-width: 100%; height: auto; }
+.lesson-body pre.mermaid-failed::before {
+  content: "Diagram source (the diagram renderer did not load)";
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--f-body);
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+.md-raw { white-space: pre-wrap; font-size: .84rem; background: var(--code-bg); padding: 12px 14px; border-radius: var(--r-s); }
+
+/* ---------- help ---------- */
+.help { border-top: 1px solid var(--rule); padding-top: 14px; }
+.help > summary { list-style: none; display: flex; align-items: center; gap: 10px; cursor: pointer; width: fit-content; }
+.help > summary::-webkit-details-marker { display: none; }
+.help > summary .chev { color: var(--ai); }
+.help[open] > summary .chev { transform: translateY(1px) rotate(-135deg); }
+.help-body {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 22px 36px;
+}
+.help-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.help h3 { margin: 0; font-size: var(--t-base); font-weight: 700; }
+.help p { color: var(--ink-2); font-size: var(--t-sm); }
+.help dl { margin: 0; display: flex; flex-direction: column; gap: 8px; font-size: var(--t-sm); }
+.help dl > div { display: grid; grid-template-columns: 8.5rem minmax(0, 1fr); gap: 2px 12px; align-items: baseline; }
+.help dt { margin: 0; }
+.help dd { margin: 0; color: var(--ink-2); }
+.cmds dt code { white-space: nowrap; }
+
+.foot { margin-top: 40px; font-size: var(--t-xs); color: var(--ink-3); }
+
+@media (max-width: 640px) {
+  .mast { align-items: flex-start; }
+  .card { padding: 16px; }
+  .card-title { font-size: var(--t-md); }
+  .card-actions { justify-content: flex-start; }
+  .track-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "head count" "ladder ladder" "next next"; gap: 6px 12px; }
+  .h-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .h-date { grid-column: 1 / -1; flex-direction: row; gap: 10px; }
+  .preview { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .preview dd { margin-bottom: 8px; }
+  .help dl > div { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+
+<div class="page">
+  <header class="mast">
+    <div class="mast-id">
+      <h1 class="name">IT Iaido Dojo</h1>
+      <p class="mast-date" id="mast-date"></p>
+    </div>
+    <div class="mast-stats" id="mast-stats"></div>
+  </header>
+  <p class="sync" id="sync" hidden></p>
+  <p class="banner" id="banner" role="status" hidden></p>
+  <p class="visually-hidden" id="live" aria-live="polite"></p>
+
+  <main>
+    <section id="today" aria-labelledby="today-h">
+      <div class="sec-head"><h2 id="today-h">Today</h2></div>
+      <div class="cards" id="today-list"></div>
+      <div class="more" id="more" hidden>
+        <div id="more-action"></div>
+        <div class="more-note" id="more-note" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="tracks" aria-labelledby="tracks-h">
+      <div class="sec-head"><h2 id="tracks-h">Tracks</h2></div>
+      <ul class="tracks" id="tracks-list"></ul>
+    </section>
+
+    <section id="history" aria-labelledby="history-h">
+      <div class="sec-head"><h2 id="history-h">History</h2></div>
+      <div class="filters">
+        <div class="chips" id="status-chips" role="group" aria-label="Filter by status"></div>
+        <label class="track-filter" for="track-filter">Track
+          <select id="track-filter"><option value="all">All tracks</option></select>
+        </label>
+      </div>
+      <ol class="hist" id="history-list"></ol>
+      <div class="h-foot" id="history-foot"></div>
+    </section>
+
+    <section aria-label="How it works">
+      <details class="help" id="help">
+        <summary><h2>How it works</h2><span class="chev" aria-hidden="true"></span></summary>
+        <div class="help-body">
+          <div class="help-col">
+            <h3>The daily rhythm</h3>
+            <p>Two lessons arrive at 09:00 Kyiv, by email and here. Lesson 1 is the next rung of one of your tracks. Lesson 2 is researched that morning from fresh sources. At 20:00 a reminder goes out if a lesson is still open.</p>
+            <h3>Marking a lesson</h3>
+            <dl>
+              <div><dt><span data-pill="sent"></span></dt><dd>Delivered and still open. You can request more only when nothing is open.</dd></div>
+              <div><dt><span data-pill="passed"></span></dt><dd>Done. The next sync files it into the knowledge base.</dd></div>
+              <div><dt><span data-pill="review"></span></dt><dd>Comes back for another look a week later, with a review date.</dd></div>
+              <div><dt><span data-pill="skipped"></span></dt><dd>Not filed. The ladder moves on.</dd></div>
+            </dl>
+            <p>Marks made here are copied into the repo at the next sync. The repo is the record and this page is its live view. Undo works until you leave the page.</p>
+          </div>
+          <div class="help-col">
+            <h3>Commands in the IT Iaido project chat</h3>
+            <dl class="cmds">
+              <div><dt><code>passed both</code></dt><dd>Mark today's two lessons passed.</dd></div>
+              <div><dt><code>passed 1</code></dt><dd>Mark lesson 1 passed. The number is the one on the lesson card.</dd></div>
+              <div><dt><code>review 2</code></dt><dd>Send lesson 2 back for review in a week.</dd></div>
+              <div><dt><code>skip 1</code></dt><dd>Skip lesson 1.</dd></div>
+              <div><dt><code>next 2</code></dt><dd>Two more lessons now, same as Request 2 more.</dd></div>
+              <div><dt><code>pause until &lt;date&gt;</code></dt><dd>No deliveries until that date.</dd></div>
+              <div><dt><code>change weight &lt;track&gt; &lt;n&gt;</code></dt><dd>How many of every 16 core lessons come from that track.</dd></div>
+              <div><dt><code>add track &lt;name&gt;</code></dt><dd>Start a new ladder.</dd></div>
+              <div><dt><code>resend today</code></dt><dd>Send today's email again.</dd></div>
+            </dl>
+          </div>
+        </div>
+      </details>
+    </section>
+  </main>
+  <p class="foot" id="foot"></p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ------------------------------------------------------------ constants */
+  var SERVER = 'Claude Code Remote';
+  var TOOL = 'fire_trigger';
+  var MERMAID_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js';
+  var PREFS_KEY = 'it-iaido-dojo:prefs';
+  var PAGE_SIZE = 40;
+  var REQUEST_WINDOW_MS = 30 * 60 * 1000;
+  var LEVELS = { B: 'Beginner', I: 'Intermediate', A: 'Advanced' };
+  var LEVEL_N = { B: 1, I: 2, A: 3 };
+  var STATUS_LABEL = { sent: 'Sent', passed: 'Passed', review: 'Review', skipped: 'Skipped' };
+  var MARK_LABEL = { passed: 'Passed', review: 'Review again', skipped: 'Skip' };
+  var FILTERS = [['all', 'All'], ['passed', 'Passed'], ['review', 'Review'], ['skipped', 'Skipped'], ['sent', 'Sent']];
+  var LOST = { revoked: 1, not_granted: 1, capability_disabled: 1, capability_removed: 1 };
+  var ICONS = {
+    passed: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.4 6.4l2.3 2.3 4.9-5.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    review: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M9.6 6.2a3.6 3.6 0 1 1-1.2-2.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M9.7 1.6v2.3H7.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    skipped: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.4 3l3 3-3 3M6.6 3l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    sent: '<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="3.7" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>'
+  };
+
+  /* ------------------------------------------------------------ state */
+  var S = {
+    dbState: 'connecting',          // connecting | ready | absent | lost
+    db: null,
+    mcpP: Promise.resolve(null),
+    permP: Promise.resolve(null),
+    lessons: new Map(),             // id -> normalised lesson
+    tracks: [],
+    meta: null,
+    unhandled: [],                  // requests with handled:false
+    loaded: { lessons: false, tracks: false, meta: false, requests: false },
+    subErr: {},
+    canWrite: null,                 // user.can("data.write"): true | false | null (not told)
+    readOnly: false,                // set when a well-formed write is refused
+    pending: new Set(),             // lesson ids with a write in flight
+    cardErr: new Map(),
+    sessionMarks: new Map(),        // id -> {status, at} marked during this visit (for undo)
+    open: new Set(),                // "today:<id>" / "hist:<id>" lesson bodies shown
+    filter: { status: 'all', track: 'all' },
+    histLimit: PAGE_SIZE,
+    helpOpen: false,
+    req: { state: 'idle' },         // idle | requesting | requested | manual | failed
+    permHint: false,
+    focusNext: null,                // {key, until, scroll}
+    queued: false,
+    trackSig: ''
+  };
+  var bodyCache = new Map();        // key -> {md, el}
+  var unsub = {};
+  var retries = {};
+
+  /* ------------------------------------------------------------ helpers */
+  function $(id) { return document.getElementById(id); }
+  function str(v) { return typeof v === 'string' ? v : (v == null ? '' : String(v)); }
+  function int(v) { if (v === null || v === undefined || v === '') return null; var n = Number(v); return isFinite(n) ? Math.round(n) : null; }
+  function codeOf(e, dflt) { return (e && typeof e.code === 'string' && e.code) || dflt || 'unavailable'; }
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function safeId(s) { return String(s).replace(/[^A-Za-z0-9_-]/g, '_'); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+  function h(tag, props) {
+    var el = document.createElement(tag);
+    if (props) {
+      Object.keys(props).forEach(function (k) {
+        var v = props[k];
+        if (v === null || v === undefined || v === false) return;
+        if (k === 'class') el.className = v;
+        else el.setAttribute(k, v === true ? '' : String(v));
+      });
+    }
+    for (var i = 2; i < arguments.length; i++) append(el, arguments[i]);
+    return el;
+  }
+  function append(el, c) {
+    if (c === null || c === undefined || c === false) return;
+    if (Array.isArray(c)) { c.forEach(function (x) { append(el, x); }); return; }
+    el.append(c instanceof Node ? c : String(c));
+  }
+  function icon(name) {
+    var s = document.createElement('span');
+    s.className = 'ico';
+    s.innerHTML = ICONS[name] || '';
+    return s;
+  }
+  function statusPill(s) { return h('span', { class: 'pill s-' + s }, icon(s), STATUS_LABEL[s] || s); }
+  function levelPill(code) {
+    if (!LEVELS[code]) return null;
+    var n = LEVEL_N[code], notches = h('span', { class: 'notches', 'aria-hidden': 'true' });
+    for (var i = 1; i <= 3; i++) notches.append(h('i', { class: i <= n ? 'on' : null }));
+    return h('span', { class: 'level' }, notches, LEVELS[code]);
+  }
+  function httpsUrl(u) { u = str(u).trim(); return /^https:\/\//i.test(u) ? u : ''; }
+
+  /* ------------------------------------------------------------ dates (Europe/Kyiv) */
+  var TZ = (function () {
+    var zones = ['Europe/Kyiv', 'Europe/Kiev'];
+    for (var i = 0; i < zones.length; i++) {
+      try { new Intl.DateTimeFormat('en-GB', { timeZone: zones[i] }).format(0); return zones[i]; } catch (e) { /* next */ }
+    }
+    return 'UTC';
+  })();
+  function fmt(opts, d) {
+    try { return new Intl.DateTimeFormat('en-GB', Object.assign({ timeZone: TZ }, opts)).format(d); } catch (e) { return ''; }
+  }
+  function kyivToday() {
+    try {
+      var parts = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+      var g = function (t) { var p = parts.find(function (x) { return x.type === t; }); return p ? p.value : ''; };
+      return g('year') + '-' + g('month') + '-' + g('day');
+    } catch (e) { return new Date().toISOString().slice(0, 10); }
+  }
+  function ymdDate(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(str(s));
+    return m ? new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], 12)) : null;
+  }
+  function fmtDay(s) {
+    var d = ymdDate(s);
+    if (!d) return '';
+    try { return new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', weekday: 'short', day: 'numeric', month: 'short' }).format(d); } catch (e) { return str(s); }
+  }
+  function toDate(iso) { var d = new Date(iso); return isNaN(d.getTime()) ? null : d; }
+  function fmtTime(iso) { var d = toDate(iso); return d ? fmt({ hour: '2-digit', minute: '2-digit', hour12: false }, d) : ''; }
+  function fmtStamp(iso) { var d = toDate(iso); return d ? fmt({ weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false }, d) : ''; }
+
+  /* ------------------------------------------------------------ prefs (per viewer, best effort) */
+  function loadPrefs() {
+    try {
+      var p = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}') || {};
+      if (typeof p.status === 'string' && FILTERS.some(function (f) { return f[0] === p.status; })) S.filter.status = p.status;
+      if (typeof p.track === 'string' && p.track) S.filter.track = p.track;
+      S.helpOpen = p.help === true;
+    } catch (e) { /* storage unavailable */ }
+  }
+  function savePrefs() {
+    try { localStorage.setItem(PREFS_KEY, JSON.stringify({ status: S.filter.status, track: S.filter.track, help: S.helpOpen })); } catch (e) { /* ignore */ }
+  }
+
+  /* ------------------------------------------------------------ data normalisation */
+  function normLesson(id, d) {
+    var lvl = str(d.level).toUpperCase();
+    var m = /-(\d+)$/.exec(id);
+    return {
+      id: id,
+      date: str(d.date) || str(d.sent_at).slice(0, 10),
+      slot: d.slot === 'fresh' ? 'fresh' : 'core',
+      track: str(d.track),
+      trackName: str(d.track_name),
+      level: LEVELS[lvl] ? lvl : '',
+      title: str(d.title).trim() || 'Untitled lesson',
+      estMin: int(d.est_min),
+      status: STATUS_LABEL[d.status] ? d.status : 'sent',
+      sentAt: str(d.sent_at),
+      markedAt: d.marked_at == null ? null : str(d.marked_at),
+      summary: str(d.summary).trim(),
+      md: typeof d.md === 'string' ? d.md : '',
+      filedTo: str(d.filed_to),
+      reviewDue: str(d.review_due),
+      n: m ? Number(m[1]) : null
+    };
+  }
+  function normTrack(id, d) {
+    var total = Math.max(0, int(d.total) || 0);
+    var done = Math.max(0, int(d.done) || 0);
+    if (total) done = Math.min(done, total);
+    return {
+      key: str(d.key) || id,
+      name: str(d.name) || str(d.key) || id,
+      weight: int(d.weight),
+      total: total,
+      done: done,
+      nextTitle: str(d.next_title).trim(),
+      nextLevel: str(d.next_level).toUpperCase()
+    };
+  }
+  // Newest delivery first; inside one delivery, lesson 1 before lesson 2 (the numbers chat commands use).
+  function newestFirst(a, b) {
+    if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+    if (a.sentAt !== b.sentAt) return a.sentAt < b.sentAt ? 1 : -1;
+    return (a.n || 0) - (b.n || 0);
+  }
+  function trackName(l) {
+    if (l.trackName) return l.trackName;
+    var t = S.tracks.find(function (x) { return x.key === l.track; });
+    if (t) return t.name;
+    if (l.track === 'fresh') return 'Fresh research';
+    return l.track || 'Unsorted';
+  }
+  function openLessons() {
+    var out = [];
+    S.lessons.forEach(function (l) { if (l.status === 'sent') out.push(l); });
+    return out;
+  }
+  function canMark() { return S.dbState === 'ready' && S.canWrite !== false && !S.readOnly; }
+
+  /* ------------------------------------------------------------ Markdown -> safe DOM */
+  var mdEngine = null;
+  function getMarked() {
+    if (mdEngine !== null) return mdEngine;
+    var M = window.marked;
+    if (!M) { mdEngine = false; return mdEngine; }
+    var renderer = {
+      code: function (code, lang) {
+        var text = code, info = lang;
+        if (code && typeof code === 'object') { text = code.text; info = code.lang; }
+        var l = str(info).trim().split(/\s+/)[0].toLowerCase();
+        if (l === 'mermaid') return '<pre class="mermaid">' + esc(str(text)) + '</pre>\n';
+        return false;
+      }
+    };
+    try {
+      if (typeof M.Marked === 'function') { mdEngine = new M.Marked({ gfm: true }); mdEngine.use({ renderer: renderer }); }
+      else if (typeof M.parse === 'function') { M.use({ gfm: true, renderer: renderer }); mdEngine = M; }
+      else mdEngine = false;
+    } catch (e) { mdEngine = false; }
+    return mdEngine;
+  }
+
+  var DROP_TAGS = { script: 1, style: 1, iframe: 1, frame: 1, frameset: 1, object: 1, embed: 1, applet: 1, link: 1, meta: 1, base: 1, form: 1, input: 1, button: 1, select: 1, textarea: 1, option: 1, noscript: 1, template: 1, svg: 1, math: 1, video: 1, audio: 1, source: 1, track: 1, canvas: 1, dialog: 1 };
+  var URL_ATTRS = { href: 1, src: 1, 'xlink:href': 1, action: 1, formaction: 1, poster: 1, background: 1, cite: 1, data: 1 };
+  function urlAllowed(v, isImg) {
+    var s = str(v).replace(/[\u0000-\u0020\u007F]+/g, '');
+    var m = /^([a-z][a-z0-9+.\-]*):/i.exec(s);
+    if (!m) return true;
+    var scheme = m[1].toLowerCase();
+    if (scheme === 'http' || scheme === 'https' || scheme === 'mailto') return true;
+    return !!(isImg && /^data:image\/(png|gif|jpe?g|webp);/i.test(s));
+  }
+  function sanitize(root) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT);
+    var drop = [], n;
+    while ((n = walker.nextNode())) {
+      if (n.nodeType === 8) { drop.push(n); continue; }
+      var tag = n.localName;
+      if (DROP_TAGS[tag]) { drop.push(n); continue; }
+      Array.prototype.slice.call(n.attributes).forEach(function (a) {
+        var name = a.name.toLowerCase();
+        if (name.indexOf('on') === 0 || name === 'style' || name === 'srcset' || name === 'id' || name === 'name' || name === 'target') { n.removeAttribute(a.name); return; }
+        if (name === 'class' && tag !== 'pre' && tag !== 'code') { n.removeAttribute(a.name); return; }
+        if (URL_ATTRS[name] && !urlAllowed(a.value, tag === 'img' && name === 'src')) n.removeAttribute(a.name);
+      });
+    }
+    drop.forEach(function (x) { if (x.parentNode) x.parentNode.removeChild(x); });
+  }
+  var HEADING_MAP = { h1: 'h4', h2: 'h4', h3: 'h5', h4: 'h6', h5: 'h6', h6: 'h6' };
+  function enhance(root) {
+    Array.prototype.slice.call(root.querySelectorAll('h1,h2,h3,h4,h5,h6')).forEach(function (el) {
+      var nh = document.createElement(HEADING_MAP[el.localName]);
+      nh.className = 'md-' + el.localName;
+      while (el.firstChild) nh.appendChild(el.firstChild);
+      el.parentNode.replaceChild(nh, el);
+    });
+    Array.prototype.slice.call(root.querySelectorAll('a[href]')).forEach(function (a) {
+      if (/^https?:/i.test(a.getAttribute('href') || '')) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener noreferrer'); }
+    });
+    Array.prototype.slice.call(root.querySelectorAll('table')).forEach(function (t) {
+      var w = document.createElement('div');
+      w.className = 'table-wrap';
+      t.parentNode.replaceChild(w, t);
+      w.appendChild(t);
+    });
+    var first = root.firstElementChild;
+    if (first && first.localName === 'blockquote') first.classList.add('lesson-meta');
+    Array.prototype.slice.call(root.querySelectorAll('blockquote')).forEach(function (b) {
+      if (!b.classList.contains('lesson-meta')) b.classList.add('evidence');
+    });
+  }
+  function buildBody(l, key) {
+    var wrap = h('div', { class: 'lesson-body', id: 'body-' + safeId(key) });
+    var src = str(l.md);
+    if (!src.trim()) {
+      wrap.append(h('p', { class: 'quiet' }, 'The lesson text is not in the Dojo yet. It arrives with the next sync.'));
+      return wrap;
+    }
+    src = src.replace(/^\s*#[ \t]+[^\n]*\n?/, '');   // the card already shows the title
+    var engine = getMarked();
+    var html = null;
+    if (engine) { try { html = engine.parse(src); } catch (e) { html = null; } }
+    if (typeof html !== 'string') {
+      wrap.append(h('pre', { class: 'md-raw' }, src));
+      return wrap;
+    }
+    var tpl = document.createElement('template');
+    tpl.innerHTML = html;
+    sanitize(tpl.content);
+    enhance(tpl.content);
+    wrap.appendChild(tpl.content);
+    return wrap;
+  }
+  function lessonBody(key, l) {
+    var c = bodyCache.get(key);
+    if (!c || c.md !== l.md) {
+      c = { md: l.md, el: buildBody(l, key) };
+      bodyCache.set(key, c);
+    }
+    return c.el;
+  }
+
+  /* ------------------------------------------------------------ mermaid (lazy, from cdnjs) */
+  var mermaidLoad = null;
+  var mermaidChain = Promise.resolve();
+  function loadMermaid() {
+    if (window.mermaid && typeof window.mermaid.run === 'function') return Promise.resolve(window.mermaid);
+    if (!mermaidLoad) {
+      mermaidLoad = new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = MERMAID_SRC;
+        s.async = true;
+        s.onload = function () { if (window.mermaid && typeof window.mermaid.run === 'function') resolve(window.mermaid); else reject(new Error('mermaid missing')); };
+        s.onerror = function () { mermaidLoad = null; reject(new Error('mermaid failed to load')); };
+        (document.head || document.documentElement).appendChild(s);
+      });
+    }
+    return mermaidLoad;
+  }
+  function isDark() {
+    var t = document.documentElement.getAttribute('data-theme');
+    if (t === 'dark') return true;
+    if (t === 'light') return false;
+    try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) { return false; }
+  }
+  function mermaidConfig() {
+    var cs = getComputedStyle(document.documentElement);
+    var v = function (n) { return cs.getPropertyValue(n).trim(); };
+    return {
+      startOnLoad: false,
+      securityLevel: 'strict',
+      theme: 'base',
+      fontFamily: v('--f-body'),
+      themeVariables: {
+        darkMode: isDark(),
+        fontSize: '14px',
+        background: v('--surface'),
+        primaryColor: v('--ai-soft'),
+        primaryTextColor: v('--ink'),
+        primaryBorderColor: v('--ai'),
+        secondaryColor: v('--sunk'),
+        tertiaryColor: v('--surface'),
+        lineColor: v('--ink-2'),
+        textColor: v('--ink'),
+        mainBkg: v('--ai-soft'),
+        nodeBorder: v('--ai'),
+        clusterBkg: v('--sunk'),
+        clusterBorder: v('--rule-strong'),
+        edgeLabelBackground: v('--surface'),
+        noteBkgColor: v('--review-soft'),
+        noteTextColor: v('--ink'),
+        noteBorderColor: v('--review')
+      }
+    };
+  }
+  function runMermaid() {
+    var nodes = Array.prototype.slice.call(document.querySelectorAll('.lesson-body pre.mermaid:not([data-processed]):not([data-queued])'));
+    if (!nodes.length) return;
+    nodes.forEach(function (n) { n.setAttribute('data-queued', ''); });
+    mermaidChain = mermaidChain.then(function () {
+      return loadMermaid().then(function (mm) {
+        var live = nodes.filter(function (n) { return n.isConnected; });
+        nodes.forEach(function (n) { if (!n.isConnected) n.removeAttribute('data-queued'); });
+        if (!live.length) return;
+        try { mm.initialize(mermaidConfig()); } catch (e) { /* keep defaults */ }
+        return Promise.resolve(mm.run({ nodes: live, suppressErrors: true })).catch(function () { /* per-diagram errors stay visible as source */ })
+          .then(function () { live.forEach(function (n) { n.removeAttribute('data-queued'); }); });
+      }).catch(function () {
+        nodes.forEach(function (n) {
+          n.removeAttribute('data-queued');
+          n.setAttribute('data-processed', 'failed');
+          n.classList.add('mermaid-failed');
+        });
+      });
+    });
+  }
+
+  /* ------------------------------------------------------------ rendering */
+  function scheduleRender() {
+    if (S.queued) return;
+    S.queued = true;
+    setTimeout(render, 0);
+  }
+  // Ask for focus on a control that may only exist (or be enabled) after a write and its snapshot land.
+  function focusLater(key, scroll) { S.focusNext = { key: key, until: Date.now() + 3000, scroll: !!scroll }; }
+
+  function render() {
+    S.queued = false;
+    var want = S.focusNext;
+    var active = document.activeElement;
+    var fk = want ? want.key : ((active && active.getAttribute && active.getAttribute('data-k')) || null);
+
+    renderMast();
+    renderBanner();
+    renderToday();
+    renderTracks();
+    renderHistory();
+    renderFoot();
+
+    if (fk) {
+      var target = document.querySelector('[data-k="' + fk.replace(/["\\]/g, '\\$&') + '"]');
+      if (target && !target.disabled) {
+        if (target !== document.activeElement) {
+          try { target.focus({ preventScroll: !(want && want.scroll) }); } catch (e) { target.focus(); }
+        }
+        if (want) S.focusNext = null;
+      } else if (want && Date.now() > want.until) {
+        S.focusNext = null;
+      }
+    }
+    runMermaid();
+  }
+
+  function tally(n) {
+    var wrap = h('span', { class: 'tally', 'aria-hidden': 'true' });
+    var shown = Math.min(n, 30);
+    for (var i = 0; i < shown; i += 5) {
+      var k = Math.min(5, shown - i);
+      var g = h('span', { class: 'tally-group' + (k === 5 ? ' full' : '') });
+      for (var j = 0; j < Math.min(k, 4); j++) g.append(h('i'));
+      wrap.append(g);
+    }
+    if (n > 30) wrap.append(h('span', { class: 'tally-more' }, '+'));
+    return wrap;
+  }
+
+  function renderMast() {
+    var tzNote = TZ === 'UTC' ? ' (UTC)' : ', Kyiv';
+    $('mast-date').textContent = fmt({ weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }, new Date()) + tzNote;
+    var kids = [];
+    var m = S.meta;
+    if (m && int(m.day) !== null) {
+      kids.push(h('div', { class: 'day' }, h('span', { class: 'day-label' }, 'Day'), h('span', { class: 'day-num' }, String(int(m.day)))));
+      var streak = Math.max(0, int(m.streak) || 0);
+      kids.push(h('div', { class: 'streak' }, tally(streak),
+        h('span', { class: 'streak-label' }, streak ? streak + '-day streak' : 'No streak yet')));
+    }
+    if (S.dbState === 'ready' && S.loaded.lessons && S.lessons.size) {
+      var n = openLessons().length;
+      kids.push(h('span', { class: 'pill count ' + (n ? 's-sent' : 's-passed') }, icon(n ? 'sent' : 'passed'), n ? n + ' open' : 'Nothing open'));
+    }
+    $('mast-stats').replaceChildren.apply($('mast-stats'), kids);
+
+    var sync = $('sync');
+    var bits = [];
+    if (m && toDate(m.last_run_at)) bits.push(h('span', { class: 'num' }, 'Last delivery ' + fmtStamp(m.last_run_at)));
+    if (m && str(m.last_run_summary).trim()) bits.push(h('span', null, str(m.last_run_summary).trim()));
+    sync.replaceChildren.apply(sync, bits);
+    sync.hidden = !bits.length;
+  }
+
+  function renderBanner() {
+    var b = $('banner'), msg = '', warn = false;
+    if (S.dbState === 'absent') msg = 'This view can\u2019t reach the Dojo\u2019s data. Open the Dojo on claude.ai while signed in to see and mark lessons.';
+    else if (S.dbState === 'lost') { msg = 'This view lost access to the Dojo\u2019s data. Reload the page to reconnect.'; warn = true; }
+    else if (S.readOnly || S.canWrite === false) msg = 'You can read this Dojo. Marking lessons and requesting more needs Contributor access from its owner.';
+    else {
+      var bad = ['lessons', 'tracks', 'meta'].filter(function (k) { return S.subErr[k]; });
+      if (bad.length) { msg = 'Live updates stopped (' + S.subErr[bad[0]] + '). Reload the page to reconnect.'; warn = true; }
+    }
+    b.className = 'banner' + (warn ? ' warn' : '');
+    b.textContent = msg;
+    b.hidden = !msg;
+  }
+
+  /* --- Today --- */
+  function isFirstRun() { return S.loaded.lessons && S.loaded.meta && S.lessons.size === 0 && !S.meta; }
+
+  function renderToday() {
+    var kids = [];
+    if (S.dbState === 'connecting' || (S.dbState === 'ready' && !S.loaded.lessons)) {
+      kids.push(h('p', { class: 'quiet' }, 'Loading today\u2019s lessons\u2026'));
+    } else if (S.dbState !== 'ready') {
+      kids.push(h('div', { class: 'calm' },
+        h('p', { class: 'calm-lead' }, 'Lessons show here when the Dojo\u2019s data is reachable.'),
+        h('p', null, 'You can still mark lessons from the IT Iaido project chat, for example \u201Cpassed both\u201D or \u201Creview 2\u201D.')));
+    } else if (isFirstRun()) {
+      kids.push(firstRun());
+    } else {
+      var items = [];
+      S.lessons.forEach(function (l) { if (l.status === 'sent' || S.sessionMarks.has(l.id)) items.push(l); });
+      items.sort(newestFirst);
+      if (!items.length) {
+        kids.push(h('div', { class: 'calm' },
+          h('p', { class: 'calm-lead' }, 'Nothing open.'),
+          h('p', null, 'The next two lessons arrive at 09:00 Kyiv. To keep going today, request two more below.')));
+      } else {
+        items.forEach(function (l) { kids.push(todayCard(l)); });
+      }
+    }
+    var list = $('today-list');
+    list.replaceChildren.apply(list, kids);
+    renderMore();
+  }
+
+  function firstRun() {
+    return h('div', { class: 'calm' },
+      h('p', { class: 'calm-lead' }, 'The first lessons arrive at 09:00 Kyiv.'),
+      h('p', null, 'Each morning two lessons land here and in your inbox: the next rung of one of your tracks, and one researched that morning. Mark each one when you have worked through it.'),
+      h('dl', { class: 'preview' },
+        h('dt', null, 'Today'), h('dd', null, 'The day\u2019s lessons, readable in place, with Passed, Review again and Skip.'),
+        h('dt', null, 'Tracks'), h('dd', null, 'Each ladder from basics to advanced, how many rungs are done and what comes next.'),
+        h('dt', null, 'History'), h('dd', null, 'Every lesson ever sent, newest first, filterable by status and track.')));
+  }
+
+  function toggleBtn(key, open, pos) {
+    return h('button', {
+      type: 'button',
+      class: 'btn btn-toggle',
+      'data-act': 'toggle',
+      'data-key': key,
+      'data-pos': pos,
+      'data-k': 'toggle:' + pos + ':' + key,
+      'aria-expanded': open ? 'true' : 'false',
+      'aria-controls': open ? 'body-' + safeId(key) : null
+    }, h('span', { class: 'chev', 'aria-hidden': 'true' }), open ? 'Close lesson' : 'Open lesson');
+  }
+
+  function markGroup(l, pos) {
+    if (!canMark()) return null;
+    var busy = S.pending.has(l.id);
+    return h('div', { class: 'marks', role: 'group', 'aria-label': 'Mark this lesson' },
+      ['passed', 'review', 'skipped'].map(function (s) {
+        return h('button', {
+          type: 'button',
+          class: 'btn btn-' + s,
+          'data-act': 'mark',
+          'data-id': l.id,
+          'data-status': s,
+          'data-k': 'mark:' + s + ':' + pos + ':' + l.id,
+          disabled: busy
+        }, icon(s), MARK_LABEL[s]);
+      }));
+  }
+
+  function todayCard(l) {
+    var mark = S.sessionMarks.get(l.id);
+    // Optimistic: a mark in flight already shows as marked; a failed write puts the card back.
+    if (mark && (l.status !== 'sent' || S.pending.has(l.id))) return markedCard(l, mark);
+    var key = 'today:' + l.id;
+    var open = S.open.has(key);
+    var err = S.cardErr.get(l.id);
+    var titleId = 'title-' + safeId(key);
+    var today = kyivToday();
+    return h('article', { class: 'card', 'aria-labelledby': titleId, 'aria-busy': S.pending.has(l.id) ? 'true' : null },
+      h('div', { class: 'card-top' },
+        l.n ? h('span', { class: 'lesson-no', title: 'Lesson ' + l.n + '. In chat: \u201Cpassed ' + l.n + '\u201D' }, String(l.n)) : null,
+        h('div', { class: 'meta' },
+          h('span', { class: 'slot', title: l.slot === 'fresh' ? 'Researched this morning' : 'From the track ladder' }, l.slot === 'fresh' ? 'Fresh' : 'Core'),
+          h('span', null, trackName(l)),
+          levelPill(l.level),
+          l.estMin ? h('span', { class: 'num' }, l.estMin + ' min') : null,
+          l.date && l.date !== today ? h('span', { class: 'from' }, 'Sent ' + fmtDay(l.date)) : null)),
+      h('h3', { class: 'card-title', id: titleId }, l.title),
+      l.summary ? h('p', { class: 'card-summary' }, l.summary) : null,
+      h('div', { class: 'card-actions' }, toggleBtn(key, open, 'top'), markGroup(l, 'top')),
+      err ? h('p', { class: 'card-err', role: 'alert' }, err) : null,
+      open ? lessonBody(key, l) : null,
+      open ? h('div', { class: 'card-actions' }, toggleBtn(key, true, 'end'), markGroup(l, 'end')) : null);
+  }
+
+  function markedCard(l, mark) {
+    var s = l.status !== 'sent' ? l.status : mark.status, t = fmtTime(mark.at);
+    var notes = {
+      passed: 'Marked passed at ' + t + '. The next sync files it into the knowledge base.',
+      review: 'Marked for review at ' + t + '. It comes back in a week.',
+      skipped: 'Skipped at ' + t + '. The ladder moves on.'
+    };
+    var err = S.cardErr.get(l.id);
+    return h('article', { class: 'card card-marked is-' + s, 'aria-busy': S.pending.has(l.id) ? 'true' : null },
+      statusPill(s),
+      h('div', { class: 'marked-main' },
+        h('p', { class: 'marked-title' }, l.title),
+        h('p', { class: 'marked-note' }, notes[s] || ('Marked ' + (STATUS_LABEL[s] || s) + '.')),
+        err ? h('p', { class: 'card-err', role: 'alert' }, err) : null),
+      canMark() ? h('button', {
+        type: 'button', class: 'btn btn-quiet', 'data-act': 'undo', 'data-id': l.id, 'data-k': 'undo:' + l.id,
+        disabled: S.pending.has(l.id), 'aria-label': 'Undo: reopen \u201C' + l.title + '\u201D'
+      }, 'Undo') : null);
+  }
+
+  /* --- Request 2 more --- */
+  function recentUnhandled() {
+    var latest = null;
+    S.unhandled.forEach(function (r) {
+      var d = toDate(r.created_at);
+      if (d && Date.now() - d.getTime() < REQUEST_WINDOW_MS && (!latest || d > latest)) latest = d;
+    });
+    return latest ? latest.toISOString() : null;
+  }
+  function requestGate() {
+    if (S.dbState !== 'ready') return { ok: false, reason: 'nodb' };
+    if (!S.loaded.lessons || !S.loaded.meta) return { ok: false, reason: 'loading' };
+    var open = openLessons().length;
+    if (open) return { ok: false, reason: 'open', open: open };
+    if (!S.meta || !str(S.meta.trigger_id)) return { ok: false, reason: 'notrigger' };
+    if (!canMark()) return { ok: false, reason: 'readonly' };
+    var waiting = recentUnhandled();
+    if (waiting) return { ok: false, reason: 'waiting', at: waiting };
+    return { ok: true };
+  }
+  function sayNext2() {
+    return h('span', { class: 'say' },
+      h('span', null, 'Tell Claude in the IT Iaido project: ', h('code', null, 'next 2')),
+      h('button', { type: 'button', class: 'btn', 'data-act': 'copy', 'data-text': 'next 2', 'data-k': 'copy-next2' }, 'Copy'));
+  }
+  function fireErrInfo(code, message) {
+    switch (code) {
+      case 'needs_reauth': return { text: 'Reconnect Claude Code Remote in claude.ai Settings \u2192 Connectors, then try again.', retry: true };
+      case 'server_not_connected': return { text: 'Add the Claude Code Remote connector in claude.ai Settings \u2192 Connectors, then try again.', retry: true };
+      case 'selection_required': return { text: 'You have more than one Claude Code Remote connector. Pick one when claude.ai asks, then try again.', retry: true };
+      case 'server_not_found': return { text: 'The Claude Code Remote connector no longer exists. Add it again in claude.ai Settings \u2192 Connectors.', retry: true };
+      case 'not_in_manifest': return { text: 'Connector access is off for this page. Turn on Claude Code Remote in the page\u2019s permissions, then try again.', retry: true, perms: true };
+      case 'blocked_by_policy': return { text: 'Your organization blocks this connector tool for you.', retry: false };
+      case 'approval_required': return { text: 'Your organization requires approval for this tool, which this page cannot ask for.', retry: false };
+      case 'tool_error': return { text: 'The scheduler refused the request' + (message ? ': ' + message.slice(0, 200) : '.'), retry: true };
+      case 'server_unavailable':
+      case 'upstream_error':
+      case 'rate_limited': return { text: 'No answer from the scheduler. The job may still have started, so wait a few minutes before trying again.', retry: true };
+      case 'cancelled': return { text: 'The call was cancelled before it finished.', retry: true };
+      case 'consent_required': return { text: 'Allow Claude Code Remote for this page when claude.ai asks, then try again.', retry: true };
+      case 'not_granted':
+      case 'capability_disabled':
+      case 'capability_removed':
+      case 'transform_error':
+      case 'bad_request': return { text: 'This view cannot call connectors.', retry: false };
+      default: return { text: message ? message.slice(0, 200) : 'The call failed.', retry: true };
+    }
+  }
+  function saveErrText(code) {
+    switch (code) {
+      case 'invalid_argument':
+      case 'transform_error': return 'This view can only read the Dojo, so the request was not saved.';
+      case 'resource_exhausted': return 'Too many changes at once. Wait a few seconds and try again.';
+      case 'quota_exceeded': return 'The Dojo database is full. Ask Claude in the IT Iaido project to prune old requests.';
+      default: return LOST[code] ? 'This view lost access to the Dojo data. Reload the page and try again.' : 'Try again in a moment.';
+    }
+  }
+
+  function renderMore() {
+    var box = $('more'), action = $('more-action'), note = $('more-note');
+    if (S.dbState === 'connecting' || (S.dbState === 'ready' && (!S.loaded.lessons || !S.loaded.meta))) { box.hidden = true; return; }
+    box.hidden = false;
+    var g = requestGate(), r = S.req;
+    var busy = r.state === 'requesting';
+    var settled = r.state === 'requested' || r.state === 'manual' || (r.state === 'failed' && r.stage === 'fire');
+    var btn = h('button', {
+      type: 'button', class: 'btn btn-primary', 'data-act': 'request', 'data-k': 'request',
+      disabled: !g.ok || busy || settled, 'aria-busy': busy ? 'true' : null
+    }, busy ? 'Requesting\u2026' : 'Request 2 more');
+    action.replaceChildren(btn);
+
+    var lines = [];
+    if (busy) {
+      lines.push(h('span', null, 'Saving the request and starting the lesson job\u2026'));
+    } else if (r.state === 'requested') {
+      lines.push(h('span', null, 'Requested at ' + fmtTime(r.at) + '. Two lessons arrive in a few minutes.'));
+    } else if (r.state === 'manual') {
+      lines.push(h('span', null, 'Request saved at ' + fmtTime(r.at) + '. This view can\u2019t start the job itself.'));
+      lines.push(sayNext2());
+    } else if (r.state === 'failed' && r.stage === 'save') {
+      lines.push(h('span', { class: 'err-line' }, 'The request was not saved: ', h('code', null, r.code), '. ' + saveErrText(r.code)));
+    } else if (r.state === 'failed') {
+      var info = fireErrInfo(r.code, r.message);
+      lines.push(h('span', { class: 'err-line' }, 'Request saved, but starting the job failed: ', h('code', null, r.code), '.'));
+      lines.push(h('span', null, info.text));
+      var row = [];
+      if (info.retry) row.push(h('button', { type: 'button', class: 'btn', 'data-act': 'refire', 'data-k': 'refire' }, 'Try again'));
+      if (info.perms) row.push(h('button', { type: 'button', class: 'btn', 'data-act': 'perms', 'data-k': 'perms' }, 'Manage permissions'));
+      if (row.length) lines.push(h('span', { class: 'say' }, row));
+      if (S.permHint) lines.push(h('span', null, 'Open this artifact\u2019s Permissions menu in claude.ai and turn on Claude Code Remote.'));
+      lines.push(sayNext2());
+    } else {
+      switch (g.reason) {
+        case undefined:
+          lines.push(h('span', null, 'Nothing is open, so you can ask for two more now. They arrive in a few minutes.'));
+          break;
+        case 'open':
+          lines.push(h('span', null, 'Available once every sent lesson is marked (' + g.open + ' still open).'));
+          break;
+        case 'notrigger':
+          lines.push(h('span', null, 'Not set up yet: the morning job saves its trigger here on its first run.'));
+          lines.push(sayNext2());
+          break;
+        case 'readonly':
+          lines.push(h('span', null, 'Requesting lessons needs Contributor access.'));
+          break;
+        case 'waiting':
+          lines.push(h('span', null, 'A request from ' + fmtTime(g.at) + ' is waiting for the job. Lessons arrive in a few minutes.'));
+          break;
+        case 'nodb':
+          lines.push(sayNext2());
+          break;
+        default:
+          break;
+      }
+    }
+    note.replaceChildren.apply(note, lines);
+  }
+
+  /* --- Tracks --- */
+  function ladder(done, total) {
+    var label = done + ' of ' + total + ' rungs done';
+    var el, fill;
+    if (total > 0 && total <= 48) {
+      el = h('span', { class: 'ladder', role: 'img', 'aria-label': label });
+      for (var i = 0; i < total; i++) el.append(h('i', { class: i < done ? 'on' : null }));
+      return el;
+    }
+    fill = h('span');
+    fill.style.width = (total ? Math.round(done / total * 100) : 0) + '%';
+    return h('span', { class: 'ladder-bar', role: 'img', 'aria-label': label }, fill);
+  }
+  function trackRow(t) {
+    var next;
+    if (t.nextTitle) {
+      var lv = t.nextLevel ? ' (' + (LEVELS[t.nextLevel] || t.nextLevel) + ')' : '';
+      next = ['Next: ', h('span', { class: 'next-title' }, t.nextTitle), lv];
+    } else {
+      next = [t.total && t.done >= t.total ? 'Ladder complete.' : 'The next rung is picked at the next delivery.'];
+    }
+    return h('li', { class: 'track-row' },
+      h('div', { class: 'tr-head' },
+        h('span', { class: 'tr-name' }, t.name),
+        t.weight !== null ? h('span', { class: 'weight', title: t.weight + ' of every 16 core lessons' }, t.weight + '/16') : null),
+      ladder(t.done, t.total),
+      h('span', { class: 'tr-count' }, t.done + ' / ' + t.total),
+      h('p', { class: 'tr-next' }, next));
+  }
+  function renderTracks() {
+    var kids = [];
+    if (S.dbState === 'connecting' || (S.dbState === 'ready' && !S.loaded.tracks)) kids.push(h('li', { class: 'quiet' }, 'Loading tracks\u2026'));
+    else if (S.dbState !== 'ready') kids.push(h('li', { class: 'quiet' }, 'Tracks show here when the Dojo\u2019s data is reachable.'));
+    else if (!S.tracks.length) kids.push(h('li', { class: 'quiet' }, 'Tracks appear with the first delivery: one row per ladder, from basics to advanced, with rungs done and the next rung.'));
+    else {
+      S.tracks.slice().sort(function (a, b) {
+        var wa = a.weight === null ? -1 : a.weight, wb = b.weight === null ? -1 : b.weight;
+        return wb - wa || a.name.localeCompare(b.name);
+      }).forEach(function (t) { kids.push(trackRow(t)); });
+    }
+    var list = $('tracks-list');
+    list.replaceChildren.apply(list, kids);
+  }
+
+  /* --- History --- */
+  function trackOptions() {
+    var seen = new Map();
+    S.tracks.forEach(function (t) { seen.set(t.key, t.name); });
+    S.lessons.forEach(function (l) { if (l.track && !seen.has(l.track)) seen.set(l.track, l.track === 'fresh' ? 'Fresh research' : (l.trackName || l.track)); });
+    var opts = [['all', 'All tracks']];
+    Array.from(seen.entries()).sort(function (a, b) { return a[1].localeCompare(b[1]); }).forEach(function (e) { opts.push(e); });
+    return opts;
+  }
+  function syncFilters() {
+    var sel = $('track-filter');
+    var opts = trackOptions();
+    var sig = JSON.stringify(opts);
+    if (sig !== S.trackSig) {
+      S.trackSig = sig;
+      sel.replaceChildren.apply(sel, opts.map(function (o) { return h('option', { value: o[0] }, o[1]); }));
+    }
+    var loadedAll = S.loaded.lessons && S.loaded.tracks;
+    if (loadedAll && !opts.some(function (o) { return o[0] === S.filter.track; })) S.filter.track = 'all';
+    if (opts.some(function (o) { return o[0] === S.filter.track; })) sel.value = S.filter.track;
+
+    var inTrack = [];
+    S.lessons.forEach(function (l) { if (S.filter.track === 'all' || l.track === S.filter.track) inTrack.push(l); });
+    var counts = { all: inTrack.length, passed: 0, review: 0, skipped: 0, sent: 0 };
+    inTrack.forEach(function (l) { counts[l.status] = (counts[l.status] || 0) + 1; });
+    Array.prototype.slice.call($('status-chips').children).forEach(function (b) {
+      var s = b.getAttribute('data-status');
+      b.setAttribute('aria-pressed', s === S.filter.status ? 'true' : 'false');
+      b.querySelector('.n').textContent = S.loaded.lessons ? String(counts[s] || 0) : '';
+    });
+    return inTrack;
+  }
+  function filedLine(l) {
+    var repo = S.meta && httpsUrl(S.meta.repo_url);
+    var target = repo ? h('a', { href: repo.replace(/\/+$/, '') + '/blob/HEAD/' + l.filedTo.replace(/^\/+/, ''), target: '_blank', rel: 'noopener noreferrer' }, l.filedTo) : h('code', null, l.filedTo);
+    return h('p', { class: 'h-note' }, 'Filed to ', target);
+  }
+  function histRow(l) {
+    var key = 'hist:' + l.id;
+    var open = S.open.has(key);
+    return h('li', { class: 'h-row is-' + l.status },
+      h('div', { class: 'h-date' }, h('span', null, fmtDay(l.date) || 'Undated'), l.n ? h('span', { class: 'h-no' }, 'No. ' + l.n) : null),
+      h('div', { class: 'h-main' },
+        h('p', { class: 'h-title' }, l.title),
+        h('div', { class: 'meta' },
+          l.slot === 'fresh' ? h('span', { class: 'slot' }, 'Fresh') : null,
+          h('span', null, trackName(l)),
+          levelPill(l.level)),
+        l.status === 'review' ? h('p', { class: 'h-note h-due' }, l.reviewDue ? 'Review due ' + fmtDay(l.reviewDue) : 'The review date is set at the next sync.') : null,
+        l.status === 'passed' && l.filedTo ? filedLine(l) : null,
+        toggleBtn(key, open, 'top')),
+      h('div', { class: 'h-status' }, statusPill(l.status)),
+      open ? h('div', { class: 'h-body' }, lessonBody(key, l), h('div', null, toggleBtn(key, true, 'end'))) : null);
+  }
+  function renderHistory() {
+    var inTrack = syncFilters();
+    var kids = [], foot = [];
+    if (S.dbState === 'connecting' || (S.dbState === 'ready' && !S.loaded.lessons)) kids.push(h('li', { class: 'quiet' }, 'Loading history\u2026'));
+    else if (S.dbState !== 'ready') kids.push(h('li', { class: 'quiet' }, 'History shows here when the Dojo\u2019s data is reachable.'));
+    else if (!S.lessons.size) kids.push(h('li', { class: 'quiet' }, 'Every lesson ever sent will be listed here, newest first.'));
+    else {
+      var rows = inTrack.filter(function (l) { return S.filter.status === 'all' || l.status === S.filter.status; }).sort(newestFirst);
+      if (!rows.length) {
+        kids.push(h('li', { class: 'quiet' }, 'No lessons match these filters. ',
+          h('button', { type: 'button', class: 'linkish', 'data-act': 'clear', 'data-k': 'clear' }, 'Show all lessons')));
+      }
+      rows.slice(0, S.histLimit).forEach(function (l) { kids.push(histRow(l)); });
+      if (rows.length > S.histLimit) {
+        var left = rows.length - S.histLimit;
+        foot.push(h('button', { type: 'button', class: 'btn', 'data-act': 'more', 'data-k': 'more' }, 'Show ' + Math.min(PAGE_SIZE, left) + ' more (' + left + ' left)'));
+      }
+    }
+    var list = $('history-list');
+    list.replaceChildren.apply(list, kids);
+    var f = $('history-foot');
+    f.replaceChildren.apply(f, foot);
+  }
+
+  function renderFoot() {
+    var repo = S.meta && httpsUrl(S.meta.repo_url);
+    var f = $('foot');
+    var kids = ['The repo is the record and this page is its live view.'];
+    if (repo) kids.push(' ', h('a', { href: repo, target: '_blank', rel: 'noopener noreferrer' }, 'Open the knowledge base'));
+    f.replaceChildren.apply(f, kids);
+  }
+
+  /* ------------------------------------------------------------ actions */
+  function announce(text) {
+    var live = $('live');
+    live.textContent = '';
+    setTimeout(function () { live.textContent = text; }, 30);
+  }
+  function withRetry(fn) {
+    return Promise.resolve().then(fn).catch(function (e) {
+      if (codeOf(e) !== 'unavailable') throw e;
+      return sleep(300 + Math.random() * 700).then(fn);
+    });
+  }
+  function markErrText(code) {
+    switch (code) {
+      case 'invalid_argument':
+      case 'transform_error': return 'Not saved: this view can only read the Dojo.';
+      case 'resource_exhausted': return 'Not saved: too many changes at once. Wait a few seconds and try again.';
+      case 'quota_exceeded': return 'Not saved: the Dojo database is full.';
+      default: return LOST[code] ? 'Not saved: this view lost access to the Dojo data. Reload the page.' : 'Not saved (' + code + '). Try again in a moment.';
+    }
+  }
+
+  function mark(id, status) {
+    if (!canMark() || S.pending.has(id) || !S.lessons.has(id)) return;
+    var at = new Date().toISOString();
+    var prevMark = S.sessionMarks.get(id);
+    S.pending.add(id);
+    S.cardErr.delete(id);
+    if (status !== 'sent') S.sessionMarks.set(id, { status: status, at: at });
+    focusLater(status === 'sent' ? 'toggle:top:today:' + id : 'undo:' + id);
+    scheduleRender();
+    withRetry(function () { return S.db.doc('lessons/' + id).update({ status: status, marked_at: at }); })
+      .then(function () {
+        if (status === 'sent') {
+          S.sessionMarks.delete(id);
+          announce('Reopened. The lesson is open again.');
+        } else {
+          announce((status === 'passed' ? 'Marked passed.' : status === 'review' ? 'Marked for review.' : 'Skipped.') + ' Undo is available.');
+        }
+      })
+      .catch(function (e) {
+        var code = codeOf(e);
+        if (status !== 'sent') { if (prevMark) S.sessionMarks.set(id, prevMark); else S.sessionMarks.delete(id); }
+        focusLater(status === 'sent' ? 'undo:' + id : 'mark:' + status + ':top:' + id);
+        if (code === 'invalid_argument' || code === 'transform_error') S.readOnly = true;
+        if (LOST[code]) S.dbState = 'lost';
+        S.cardErr.set(id, markErrText(code));
+      })
+      .then(function () { S.pending.delete(id); scheduleRender(); });
+  }
+
+  function requestMore() {
+    if (S.req.state === 'requesting' || !requestGate().ok) return;
+    var iso = new Date().toISOString();
+    S.req = { state: 'requesting', at: iso };
+    render();
+    withRetry(function () { return S.db.doc('requests/' + iso).set({ type: 'more', created_at: iso, handled: false }); })
+      .then(function () { return fireTrigger(iso); }, function (e) {
+        var code = codeOf(e);
+        if (code === 'invalid_argument' || code === 'transform_error') S.readOnly = true;
+        if (LOST[code]) S.dbState = 'lost';
+        S.req = { state: 'failed', stage: 'save', code: code, at: iso };
+        scheduleRender();
+      });
+  }
+
+  function fireTrigger(iso) {
+    iso = iso || S.req.at || new Date().toISOString();
+    S.req = { state: 'requesting', at: iso };
+    S.permHint = false;
+    scheduleRender();
+    return S.mcpP.catch(function () { return null; }).then(function (mcp) {
+      var tid = S.meta && str(S.meta.trigger_id);
+      if (!mcp || !tid) { S.req = { state: 'manual', at: iso }; scheduleRender(); return; }
+      return mcp.callTool(SERVER, TOOL, { trigger_id: tid, text: 'on-demand: 2 more lessons requested from the Dojo at ' + iso })
+        .then(function () {
+          S.req = { state: 'requested', at: iso };
+          announce('Requested. Two lessons arrive in a few minutes.');
+        }, function (e) {
+          S.req = { state: 'failed', stage: 'fire', code: codeOf(e, 'upstream_error'), message: str(e && e.message), at: iso };
+        })
+        .then(scheduleRender);
+    });
+  }
+
+  function managePerms() {
+    S.permP.catch(function () { return null; }).then(function (p) {
+      if (!p || typeof p.manage !== 'function') { S.permHint = true; scheduleRender(); return; }
+      return Promise.resolve(p.manage()).catch(function () { S.permHint = true; scheduleRender(); });
+    });
+  }
+
+  function copyText(btn, text) {
+    var done = function (label) { btn.textContent = label; setTimeout(function () { btn.textContent = 'Copy'; }, 1800); };
+    try {
+      navigator.clipboard.writeText(text).then(function () { done('Copied'); }, function () { selectNear(btn); done('Selected'); });
+    } catch (e) { selectNear(btn); done('Selected'); }
+  }
+  function selectNear(btn) {
+    var code = btn.parentNode && btn.parentNode.querySelector('code');
+    if (!code) return;
+    try { var r = document.createRange(); r.selectNodeContents(code); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); } catch (e) { /* ignore */ }
+  }
+
+  document.addEventListener('click', function (ev) {
+    var t = ev.target && ev.target.closest ? ev.target.closest('[data-act]') : null;
+    if (!t || t.disabled) return;
+    var act = t.getAttribute('data-act');
+    if (act === 'mark') mark(t.getAttribute('data-id'), t.getAttribute('data-status'));
+    else if (act === 'undo') mark(t.getAttribute('data-id'), 'sent');
+    else if (act === 'toggle') {
+      var key = t.getAttribute('data-key');
+      if (S.open.has(key)) {
+        S.open.delete(key);
+        if (t.getAttribute('data-pos') === 'end') focusLater('toggle:top:' + key, true);
+      } else {
+        S.open.add(key);
+      }
+      render();
+    } else if (act === 'request') requestMore();
+    else if (act === 'refire') fireTrigger(S.req.at);
+    else if (act === 'perms') managePerms();
+    else if (act === 'copy') copyText(t, t.getAttribute('data-text') || '');
+    else if (act === 'more') { S.histLimit += PAGE_SIZE; render(); }
+    else if (act === 'status') { S.filter.status = t.getAttribute('data-status'); S.histLimit = PAGE_SIZE; savePrefs(); render(); }
+    else if (act === 'clear') { S.filter.status = 'all'; S.filter.track = 'all'; S.histLimit = PAGE_SIZE; savePrefs(); focusLater('status:all'); render(); }
+  });
+
+  /* ------------------------------------------------------------ subscriptions (once per collection) */
+  function onLessons(snap) {
+    var m = new Map();
+    snap.docs.forEach(function (d) {
+      if (!d.exists) return;
+      var data = d.data();
+      if (data) m.set(d.id, normLesson(d.id, data));
+    });
+    S.lessons = m;
+    S.loaded.lessons = true;
+    retries.lessons = 0;
+    delete S.subErr.lessons;
+    S.sessionMarks.forEach(function (v, id) {
+      var l = m.get(id);
+      if (!l || (l.status === 'sent' && !S.pending.has(id))) S.sessionMarks.delete(id);
+    });
+    bodyCache.forEach(function (v, key) { if (!m.has(key.slice(key.indexOf(':') + 1))) bodyCache.delete(key); });
+    if (openLessons().length && S.req.state !== 'requesting') S.req = { state: 'idle' };
+    scheduleRender();
+  }
+  function onTracks(snap) {
+    S.tracks = snap.docs.filter(function (d) { return d.exists; }).map(function (d) { return normTrack(d.id, d.data() || {}); });
+    S.loaded.tracks = true;
+    retries.tracks = 0;
+    delete S.subErr.tracks;
+    scheduleRender();
+  }
+  function onMeta(snap) {
+    S.meta = snap.exists ? (snap.data() || null) : null;
+    S.loaded.meta = true;
+    retries.meta = 0;
+    delete S.subErr.meta;
+    scheduleRender();
+  }
+  function onRequests(snap) {
+    S.unhandled = snap.docs.filter(function (d) { return d.exists; }).map(function (d) { return d.data() || {}; })
+      .filter(function (r) { return r.handled === false; });
+    S.loaded.requests = true;
+    retries.requests = 0;
+    scheduleRender();
+  }
+  var SUBS = {
+    lessons: function () { return S.db.collection('lessons').onSnapshot(onLessons, function (e) { subFail('lessons', e); }); },
+    tracks: function () { return S.db.collection('tracks').onSnapshot(onTracks, function (e) { subFail('tracks', e); }); },
+    meta: function () { return S.db.doc('meta/state').onSnapshot(onMeta, function (e) { subFail('meta', e); }); },
+    requests: function () { return S.db.collection('requests').where('handled', '==', false).onSnapshot(onRequests, function (e) { subFail('requests', e); }); }
+  };
+  function startSub(name) {
+    try { unsub[name] = SUBS[name](); } catch (e) { subFail(name, e); }
+  }
+  function subFail(name, e) {
+    var code = codeOf(e);
+    try { if (unsub[name]) unsub[name](); } catch (x) { /* ignore */ }
+    unsub[name] = null;
+    S.loaded[name] = true;
+    if (LOST[code]) S.dbState = 'lost';
+    else if (code === 'unavailable' && (retries[name] || 0) < 3) {
+      retries[name] = (retries[name] || 0) + 1;
+      setTimeout(function () { startSub(name); }, 1500 + Math.random() * 2500 * retries[name]);
+    } else if (name !== 'requests') S.subErr[name] = code;
+    scheduleRender();
+  }
+
+  /* ------------------------------------------------------------ boot */
+  function initStatic() {
+    var chips = $('status-chips');
+    chips.replaceChildren.apply(chips, FILTERS.map(function (f) {
+      return h('button', { type: 'button', class: 'chip', 'data-act': 'status', 'data-status': f[0], 'data-k': 'status:' + f[0], 'aria-pressed': 'false' },
+        f[1], h('span', { class: 'n' }));
+    }));
+    $('track-filter').addEventListener('change', function (e) {
+      S.filter.track = e.target.value || 'all';
+      S.histLimit = PAGE_SIZE;
+      savePrefs();
+      render();
+    });
+    var help = $('help');
+    help.open = !!S.helpOpen;
+    help.addEventListener('toggle', function () { S.helpOpen = help.open; savePrefs(); });
+    Array.prototype.slice.call(document.querySelectorAll('[data-pill]')).forEach(function (el) {
+      el.replaceWith(statusPill(el.getAttribute('data-pill')));
+    });
+  }
+
+  function boot() {
+    loadPrefs();
+    initStatic();
+    render();
+    setInterval(renderMast, 60 * 1000);
+
+    var cl = window.claude;
+    if (!cl || typeof cl.use !== 'function') { S.dbState = 'absent'; render(); return; }
+    var use = function (name) { return Promise.resolve().then(function () { return cl.use(name); }).catch(function () { return null; }); };
+    S.mcpP = use('mcp');
+    S.permP = use('permissions');
+    use('user').then(function (u) {
+      if (!u || typeof u.can !== 'function') return;
+      return Promise.resolve(u.can('data.write')).then(function (w) {
+        if (w === false) { S.canWrite = false; scheduleRender(); } else if (w === true) S.canWrite = true;
+      });
+    }).catch(function () { /* not told: keep the controls */ });
+    use('db').then(function (db) {
+      if (!db) { S.dbState = 'absent'; render(); return; }
+      S.db = db;
+      S.dbState = 'ready';
+      render();
+      ['lessons', 'tracks', 'meta', 'requests'].forEach(startSub);
+    });
+  }
+
+  boot();
+})();
+</script>

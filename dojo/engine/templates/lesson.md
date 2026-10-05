@@ -1,0 +1,52 @@
+---
+{{front_matter}}
+---
+# {{title}}
+
+> {{meta_line}}
+
+## Why this matters
+<!-- WRITER: 2-4 sentences. Why this matters to a senior backend/AI engineer and why it sits here on the ladder. No filler. Delete every HTML comment before the lesson is sent. -->
+{{#core}}
+<!-- CURRICULUM SUMMARY for this rung ({{rung_id}}): {{summary}} -->
+{{/core}}
+{{#fresh}}
+<!-- FRESH LESSON: built from today's research. Say what the item is, who published it, and why it is worth the reader's 20 minutes today. Fresh lessons need at least TWO verbatim quoted passages (blockquote + citation). -->
+{{/fresh}}
+
+{{#primer}}
+## Primer
+<!-- WRITER: this item sits above the reader's current level ({{reader_level_name}}) or its prerequisites are not done yet. 150-300 words: only the prerequisite ideas needed to follow the lesson, with inline citations. Delete this comment. -->
+
+{{/primer}}
+## The idea
+<!-- WRITER: {{presentation_hint}} Exactly one or two mermaid code blocks (a fenced block whose info string is "mermaid"); no other diagram format. Subheadings (###) are allowed. 600-1200 words.
+EVIDENCE RULE (SPEC section 4):
+ - Claims from a book/course/page the reader can open: cite inline, with chapter / section / timestamp, e.g. (Kleppmann, DDIA ch. 3, "Hash Indexes"), (RFC 9000 section 7.2), (3Blue1Brown, "But what is a neural network?", 4:10).
+ - Claims from a blog post, paper, release note, talk or news: a VERBATIM quote of 1-3 sentences in a blockquote, citation directly under it: > "..." - Author or organisation, Title, date, URL. Fetch the page and copy the quote; never paraphrase a quote as if it were verbatim and never invent one.
+ - Numbers, benchmarks and dates carry their citation in the same sentence.
+ - Every URL used appears in Sources; links are fetched and verified before sending. -->
+{{#core}}
+<!-- MUST COVER (key points):
+{{key_points_list}}
+DIAGRAM to draw in mermaid: {{diagram}} -->
+{{/core}}
+
+## Worked example
+<!-- WRITER: 5-10 minutes, concrete and copy-pasteable (code, numbers, or a small lab). You may rename this heading to "## Lab" when the reader runs something. Delete this comment. -->
+{{#core}}
+<!-- EXAMPLE / LAB from the curriculum: {{example}} -->
+{{/core}}
+
+## Self-check
+<!-- WRITER: exactly three questions, each with its answer hidden in details. Delete this comment. -->
+1. <!-- question 1 --> <details><summary>Answer</summary><!-- answer 1 --></details>
+2. <!-- question 2 --> <details><summary>Answer</summary><!-- answer 2 --></details>
+3. <!-- question 3 --> <details><summary>Answer</summary><!-- answer 3 --></details>
+
+## Sources
+<!-- WRITER: one line per source: Author/Org, date, what it contributed, "accessed {{today}}". Every URL cited above must be listed; verify each link by fetching it. Core lessons from web sources need at least one verbatim quoted passage in The idea (blockquote + citation line with URL); fresh lessons at least two. -->
+{{sources_block}}
+
+## Next on this track
+{{next_line}}

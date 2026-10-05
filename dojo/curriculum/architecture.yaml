@@ -1,0 +1,878 @@
+track: architecture
+name: Software architecture & design
+weight: 2
+files_to: 25-software-architecture
+description: >-
+  From code-level design principles (coupling and cohesion, dependency direction, SOLID, information
+  hiding) through architectural styles, DDD, documentation (C4, ADRs), API and integration design and
+  resilience, up to quality-attribute trade-offs, evolutionary architecture, Spotify case studies and a
+  capstone ADR for a real car-wash POS decision. Each level reuses the previous level's vocabulary, and
+  rungs link the existing notes in 15-system-design and 06-databases-and-distributed-data instead of
+  repeating them.
+primary_sources:
+  - title: Martin Fowler — Software Architecture Guide
+    url: https://martinfowler.com/architecture/
+    kind: blog
+    verified: false
+  - title: Robert C. Martin — The Clean Architecture (2012)
+    url: https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
+    kind: blog
+    verified: false
+  - title: The C4 model for visualising software architecture
+    url: https://c4model.com/
+    kind: docs
+    verified: false
+  - title: Architectural Decision Records (adr.github.io)
+    url: https://adr.github.io/
+    kind: docs
+    verified: false
+  - title: Azure Architecture Center — Cloud design patterns
+    url: https://learn.microsoft.com/en-us/azure/architecture/patterns/
+    kind: docs
+    verified: false
+  - title: Spotify Engineering blog
+    url: https://engineering.atspotify.com/
+    kind: blog
+    verified: false
+rungs:
+  # ---------------------------------------------------------------- Beginner — design principles
+  - id: architecture-01
+    title: Coupling and cohesion
+    level: B
+    est_min: 20
+    prereqs: []
+    summary: >-
+      The two words behind almost every design argument: cohesion (things that change together live
+      together) and coupling (how much one module must know about, or change with, another). One
+      before/after refactoring makes the terms concrete, and connascence gives a finer vocabulary for
+      kinds of coupling. Opens the new 25-software-architecture section; the glossary in
+      15-system-design/Architecture-Dev-Process.md §2 stays the quick reference.
+    key_points:
+      - Cohesion — the elements of a module serve one purpose and change for the same reason
+      - Coupling — how far a change in one module forces a change in another; aim for low coupling and high cohesion
+      - Classic coupling kinds from worst to best (content, common, control, stamp, data) and connascence (name, type, meaning, position, algorithm, timing) with strength, locality and degree
+      - Coupling to stable things is cheap, coupling to volatile things is expensive
+    diagram: >-
+      Before and after module diagram — a WashService that computes prices, formats receipts and talks
+      to the payment terminal SDK, split into Pricing, Receipt and a PaymentGateway trait, with arrows
+      showing which module depends on which.
+    example: >-
+      Take a 30-line Scala WashService.completeWash method that prices a wash with a hard-coded match
+      on package-name strings, formats a receipt string and calls the terminal SDK directly. List every
+      reason it could change (new package, receipt layout, new terminal vendor). Extract Pricing and
+      Receipt, put the terminal behind a trait, and count reasons-to-change per module after the split;
+      name the connascence of meaning (magic package strings) you removed.
+    presentation: minimal
+    sources:
+      - title: Connascence
+        url: https://connascence.io/
+        locator: pages on static and dynamic connascence types, and on strength, locality and degree
+        kind: docs
+        verified: false
+      - title: Reducing Coupling (Martin Fowler, IEEE Software, 2001)
+        url: https://martinfowler.com/ieeeSoftware/coupling.pdf
+        locator: whole column (why coupling matters, dependency direction, separated interfaces)
+        kind: paper
+        verified: false
+
+  - id: architecture-02
+    title: Dependency direction and the dependency rule
+    level: B
+    est_min: 20
+    prereqs: [architecture-01]
+    summary: >-
+      Which way arrows point matters more than how many there are. Source-code dependencies should
+      point toward the stable, abstract policy (the domain), never toward volatile details such as
+      frameworks, databases and devices; when control flow has to go the other way, an interface owned
+      by the policy inverts the dependency. This is the dependency rule at the heart of Clean
+      Architecture and the bridge to the D in SOLID.
+    key_points:
+      - Source-code dependency vs runtime control flow — they can point in opposite directions
+      - Depend in the direction of stability, and stable modules should be abstract
+      - The dependency rule — inner circles (entities, use cases) know nothing about outer ones (controllers, gateways, DB, UI)
+      - Invert a dependency with an interface owned by the high-level module, and wire implementations at the composition root (dependency injection)
+      - No dependency cycles between modules
+    diagram: >-
+      Two small diagrams — before, Pricing imports PostgresPriceRepo (the domain depends on the DB);
+      after, Pricing depends on a PriceRepo trait in the domain package and PostgresPriceRepo
+      implements it, with a dashed control-flow arrow still going from domain to DB.
+    example: >-
+      In a tiny Scala project (or on paper) write package domain with trait PriceRepo and
+      class Pricing(repo: PriceRepo), and package infra with class PostgresPriceRepo extends
+      domain.PriceRepo; wire them in Main. Draw the import graph and check no arrow points from
+      domain to infra. Then grep the imports of one real module you own and find one dependency that
+      points the wrong way.
+    presentation: minimal
+    sources:
+      - title: The Clean Architecture (Robert C. Martin, 2012)
+        url: https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
+        locator: sections "The Dependency Rule" and "Crossing boundaries"
+        kind: blog
+        verified: false
+      - title: Inversion of Control Containers and the Dependency Injection pattern (Martin Fowler)
+        url: https://martinfowler.com/articles/injection.html
+        locator: sections "Inversion of Control" and "Forms of Dependency Injection"
+        kind: blog
+        verified: false
+
+  - id: architecture-03
+    title: SOLID in practice I — SRP, OCP, LSP
+    level: B
+    est_min: 25
+    prereqs: [architecture-02]
+    summary: >-
+      The first three SOLID principles read as practical heuristics rather than slogans: a module
+      answers to one actor, it is extended by adding code rather than editing tested code, and a
+      subtype keeps the contract of its base type. Deepens the micro-examples in
+      15-system-design/Architecture-Dev-Process.md §2.1 with Scala-flavoured before/after code.
+    key_points:
+      - SRP — a module is responsible to one actor (one source of change), which is not the same as doing one thing
+      - OCP — add behaviour by adding code (new implementations) instead of editing stable code, and know which axis of change you are protecting
+      - LSP — a subtype must keep the base type's contract (no stronger preconditions, no weaker postconditions); the rectangle/square trap
+      - In Scala, sealed ADTs make OCP a deliberate trade-off — new functions are easy, new cases are not (the expression problem)
+    diagram: >-
+      Class diagram of a DiscountPolicy trait with PercentageDiscount and FixedDiscount, a new
+      LoyaltyTierDiscount added without touching Checkout (OCP), and a broken subtype that throws for
+      small totals (an LSP violation) marked in red.
+    example: >-
+      Write a 20-line Scala Checkout that applies discounts through a match on a string type. Refactor
+      it to a DiscountPolicy trait and add a loyalty-tier policy without touching Checkout (OCP). Then
+      write a policy that throws for totals under 10 and show which existing caller breaks (LSP).
+      Finally name the actor each class answers to (SRP).
+    presentation: minimal
+    sources:
+      - title: The Principles of OOD (Robert C. Martin)
+        url: http://butunclebob.com/ArticleS.UncleBob.PrinciplesOfOod
+        locator: the list of class-design principles (SRP, OCP, LSP) and the linked articles
+        kind: blog
+        verified: false
+      - title: The Clean Code Blog (Robert C. Martin)
+        url: https://blog.cleancoder.com/
+        locator: posts "The Single Responsibility Principle" (May 2014) and "The Open Closed Principle" (May 2014)
+        kind: blog
+        verified: false
+
+  - id: architecture-04
+    title: SOLID in practice II — ISP and DIP
+    level: B
+    est_min: 20
+    prereqs: [architecture-03]
+    summary: >-
+      Interface segregation (clients should not depend on methods they do not use, hence role
+      interfaces) and dependency inversion (the high-level policy owns the abstraction and details
+      implement it). Together with the dependency rule from rung 2 they are what make ports and
+      adapters possible, and they map directly onto Scala traits and constructor injection.
+    key_points:
+      - ISP — split fat interfaces into role interfaces shaped by each client; fewer forced rebuilds and fewer fake methods in test doubles
+      - DIP — high-level and low-level modules both depend on abstractions, and the abstraction belongs to the high-level side
+      - DIP (a principle) vs dependency injection (a technique) vs IoC containers (a tool)
+      - Scala idioms — small traits, constructor parameters, given/using, or effect-system layers for wiring
+    diagram: >-
+      A fat PaymentTerminal interface (authorize, capture, refund, printReceipt, updateFirmware) split
+      into role interfaces used by three clients — Checkout, Refunds and Maintenance.
+    example: >-
+      Take a six-method PaymentTerminal trait and the three clients that use it; write the role
+      interfaces each client actually needs, and a test double for Checkout that now implements two
+      methods instead of six. Then invert one dependency: move an Authorizer trait into the checkout
+      module and make the vendor SDK adapter implement it.
+    presentation: standard
+    sources:
+      - title: RoleInterface (Martin Fowler, bliki)
+        url: https://martinfowler.com/bliki/RoleInterface.html
+        locator: whole entry (role vs header interfaces)
+        kind: blog
+        verified: false
+      - title: Inversion of Control Containers and the Dependency Injection pattern (Martin Fowler)
+        url: https://martinfowler.com/articles/injection.html
+        locator: sections "Inversion of Control", "Constructor Injection with PicoContainer" and "Service Locator vs Dependency Injection"
+        kind: blog
+        verified: false
+      - title: The Principles of OOD (Robert C. Martin)
+        url: http://butunclebob.com/ArticleS.UncleBob.PrinciplesOfOod
+        locator: the Interface Segregation and Dependency Inversion principle entries
+        kind: blog
+        verified: false
+
+  - id: architecture-05
+    title: Composition over inheritance, and information hiding
+    level: B
+    est_min: 25
+    prereqs: [architecture-01]
+    summary: >-
+      Parnas's 1972 criterion — decompose a system by the design decisions likely to change and hide
+      each behind a module interface — is where modularity as we use the word comes from. The rung
+      pairs it with "favour composition over inheritance": inheritance exposes a parent's internals to
+      its subclasses (the fragile base class), while composition and delegation keep the secret
+      hidden. Scala's traits, case classes and ADTs make both concrete.
+    key_points:
+      - Parnas — modularise by secrets (decisions likely to change), not by processing steps
+      - Information hiding — the interface reveals as little as possible about the decision behind it
+      - Fragile base class — a subclass breaks when the parent's internal call pattern changes; inheritance is white-box reuse
+      - Composition and delegation are black-box reuse; Scala trait mixins are still inheritance and need the same care
+      - Algebraic data types plus functions as a composition-first alternative to class hierarchies
+    diagram: >-
+      Parnas's two decompositions of the KWIC index system side by side — modules by processing step
+      vs modules by hidden decision — showing the change "store lines differently in memory" rippling
+      through the first and staying inside one module in the second.
+    example: >-
+      Read the KWIC example in Parnas's paper (its two modularisations). Then, in Scala, subclass
+      java.util.HashSet as CountingSet, override add and addAll to count insertions, call addAll with
+      three elements and observe a count of six, because the parent's addAll calls add internally (the
+      classic fragile-base-class demo). Rewrite it as a wrapper that delegates to a Set and confirm
+      the count is three.
+    presentation: standard
+    sources:
+      - title: On the Criteria To Be Used in Decomposing Systems into Modules (D. L. Parnas, CACM 1972)
+        url: https://dl.acm.org/doi/10.1145/361598.361623
+        locator: the KWIC example — Modularization 1 vs Modularization 2, and the section on the criteria
+        kind: paper
+        verified: false
+      - title: Scala 3 Book — Domain Modeling, Tools
+        url: https://docs.scala-lang.org/scala3/book/domain-modeling-tools.html
+        locator: sections on traits, case classes and enums (ADTs)
+        kind: docs
+        verified: false
+
+  # ---------------------------------------------------------------- Intermediate — structure, DDD, docs, integration
+  - id: architecture-06
+    title: Layered, hexagonal (ports and adapters) and clean architecture
+    level: I
+    est_min: 25
+    prereqs: [architecture-02, architecture-04]
+    summary: >-
+      Three ways of drawing the same idea — keep domain logic independent of delivery and
+      infrastructure. Layering (presentation, domain, data) is the familiar default; hexagonal
+      architecture reframes it as a domain core with ports and interchangeable adapters (UI, tests,
+      DB, devices); Clean Architecture adds concentric policy levels and the dependency rule. The rung
+      shows when each pays for itself and when it is ceremony.
+    key_points:
+      - Presentation–domain–data layering; strict vs relaxed layers; the layer-skipping and anaemic-domain traps
+      - Hexagonal — driving (primary) vs driven (secondary) ports, one adapter per technology, the test harness as just another adapter
+      - Clean Architecture — entities, use cases, interface adapters, frameworks and drivers; data crosses boundaries as simple structures
+      - Same core idea with different emphasis; the cost is indirection and mapping code, so apply it where the domain is non-trivial or the infrastructure volatile
+      - Package by layer vs package by feature or component
+    diagram: >-
+      A car-wash site controller drawn as a hexagon — driving ports (POS UI, mobile-app API, test
+      harness) on the left, driven ports (payment terminal, wash tunnel controller, cloud sync,
+      Postgres) on the right, each with its adapter outside the hexagon.
+    example: >-
+      Take one use case, "start a wash for a member", and list its ports, marking which are driving
+      and which are driven. Write the use-case function signature in Scala so it depends only on ports
+      (MemberRepo, TunnelController, Clock), then a ten-line set of in-memory adapters and one unit
+      test that runs the use case with no database or hardware.
+    presentation: standard
+    sources:
+      - title: PresentationDomainDataLayering (Martin Fowler, bliki)
+        url: https://martinfowler.com/bliki/PresentationDomainDataLayering.html
+        locator: whole entry
+        kind: blog
+        verified: false
+      - title: Hexagonal Architecture (Alistair Cockburn)
+        url: https://alistair.cockburn.us/hexagonal-architecture/
+        locator: sections on intent, ports and adapters, and the test-harness adapter
+        kind: blog
+        verified: false
+      - title: The Clean Architecture (Robert C. Martin, 2012)
+        url: https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
+        locator: the concentric-circles diagram and the sections on each layer
+        kind: blog
+        verified: false
+
+  - id: architecture-07
+    title: DDD basics I — ubiquitous language and bounded contexts
+    level: I
+    est_min: 25
+    prereqs: [architecture-05]
+    summary: >-
+      The strategic half of domain-driven design: a ubiquitous language shared by domain experts and
+      code, and bounded contexts that limit where one model and its language apply, related by a
+      context map. As a Product Owner Yuriy already owns much of the car-wash language, so the lab maps
+      the domain's own words onto contexts.
+    key_points:
+      - Ubiquitous language — the same terms in conversation, documents and code, and renaming code when the language changes
+      - Bounded context — an explicit boundary inside which one model is consistent; the same word (customer, transaction) means different things in different contexts
+      - Context-map relationships — partnership, shared kernel, customer–supplier, conformist, anticorruption layer, open host service with a published language
+      - Contexts tend to align with teams (Conway's law) and often with deployable boundaries, but not necessarily one microservice each
+    diagram: >-
+      A context map for a car-wash platform — Wash Operations, Memberships & Billing, Payments, Site
+      Equipment, Reporting — with relationship labels such as an anticorruption layer toward the
+      payment processor and a published language from Wash Operations to Reporting.
+    example: >-
+      List ten terms the car-wash team uses every day (wash, package, member, plan, redemption,
+      transaction, site, lane, tunnel, upsell). For each, write which context owns it and where the
+      same word means something different elsewhere. Draw the context map, mark one anticorruption
+      layer, and note one place where the code's names disagree with the business language.
+    presentation: standard
+    sources:
+      - title: UbiquitousLanguage (Martin Fowler, bliki)
+        url: https://martinfowler.com/bliki/UbiquitousLanguage.html
+        locator: whole entry
+        kind: blog
+        verified: false
+      - title: BoundedContext (Martin Fowler, bliki)
+        url: https://martinfowler.com/bliki/BoundedContext.html
+        locator: whole entry, including the sales/support context diagram
+        kind: blog
+        verified: false
+      - title: Domain-Driven Design Reference (Eric Evans)
+        url: https://www.domainlanguage.com/ddd/reference/
+        locator: sections "Bounded Context", "Context Map" and the context-relationship patterns
+        kind: docs
+        verified: false
+
+  - id: architecture-08
+    title: DDD basics II — entities, value objects and aggregates
+    level: I
+    est_min: 25
+    prereqs: [architecture-07]
+    summary: >-
+      The tactical building blocks: entities (identity over time), value objects (immutable, compared
+      by value, natural as Scala case classes) and aggregates — the consistency boundary that protects
+      invariants, changes in one transaction and is referenced from outside only by id. Choosing
+      aggregate size is the main design decision; it links forward to transactions in the DDIA track
+      and to 06-databases-and-distributed-data/Event-Sourcing-Guide.md.
+    key_points:
+      - Entity vs value object; making illegal states unrepresentable with value types
+      - Aggregate and aggregate root — invariants enforced inside the boundary, outside references by id only
+      - Rules of thumb — small aggregates, one aggregate per transaction, eventual consistency between aggregates
+      - Domain events as the way aggregates communicate; repositories load and save whole aggregates
+    diagram: >-
+      A Membership aggregate (root Membership; Plate and BillingPeriod value objects inside) with its
+      invariants listed inside the boundary, and a WashTransaction aggregate outside that refers to it
+      only by membershipId.
+    example: >-
+      Model a car-wash Membership in Scala: value objects (Plate, PlanId, Money) as case classes, and
+      an aggregate root with redeemWash(plate, at) and changePlan(planId) returning
+      Either[DomainError, (Membership, List[Event])]. Enforce two invariants (a maximum number of plates
+      per plan; at most one included wash per day). Decide whether WashTransaction belongs in the same
+      aggregate and justify it in two sentences.
+    presentation: standard
+    sources:
+      - title: DDD_Aggregate (Martin Fowler, bliki)
+        url: https://martinfowler.com/bliki/DDD_Aggregate.html
+        locator: whole entry
+        kind: blog
+        verified: false
+      - title: ValueObject (Martin Fowler, bliki)
+        url: https://martinfowler.com/bliki/ValueObject.html
+        locator: whole entry
+        kind: blog
+        verified: false
+      - title: Effective Aggregate Design (Vaughn Vernon)
+        url: https://www.dddcommunity.org/library/vernon_2011/
+        locator: Parts I–II — the rules on true invariants, small aggregates, reference by identity, eventual consistency outside the boundary
+        kind: paper
+        verified: false
+
+  - id: architecture-09
+    title: Documenting architecture I — the C4 model
+    level: I
+    est_min: 20
+    prereqs: [architecture-06]
+    summary: >-
+      The C4 model gives architecture diagrams a shared set of abstractions (person, software system,
+      container, component) and zoom levels (context, containers, components, code), plus notation
+      guidance that makes a diagram readable without its author. It replaces whiteboard
+      boxes-and-arrows with something reviewable, and pairs with ADRs in the next rung.
+    key_points:
+      - Abstractions first, notation second — person, software system, container (a separately runnable or deployable unit), component
+      - Level 1 system context, level 2 containers, level 3 components; level 4 code is usually generated or skipped
+      - Supplementary diagrams — system landscape, dynamic, deployment
+      - Notation — a title and key on every diagram, element type and technology on every box, labelled one-directional arrows
+      - Diagrams as code (Structurizr DSL, PlantUML, Mermaid C4) so diagrams are versioned with the repo
+    diagram: >-
+      A C4 level-2 container diagram of the car-wash platform — POS at the site, site controller,
+      cloud API, member mobile app, payment provider and reporting database — written in Mermaid C4
+      syntax.
+    example: >-
+      Draw the system-context and container diagrams (levels 1 and 2) for the car-wash platform in
+      Mermaid (C4Context and C4Container) or Structurizr DSL. Then review them against the notation
+      guidance on c4model.com and fix every miss — missing technology labels, unlabelled or
+      two-headed arrows, no key.
+    presentation: standard
+    sources:
+      - title: The C4 model for visualising software architecture
+        url: https://c4model.com/
+        locator: sections "Abstractions", "Diagrams" (System context, Container, Component, Code, supplementary) and "Notation"
+        kind: docs
+        verified: false
+
+  - id: architecture-10
+    title: Documenting architecture II — architecture decision records
+    level: I
+    est_min: 20
+    prereqs: [architecture-09]
+    summary: >-
+      An ADR is a short note capturing one architecturally significant decision — its context, the
+      decision, its status and its consequences — that is superseded rather than edited. Michael
+      Nygard's 2011 format and the MADR template make decisions reviewable and give future maintainers
+      the "why" that code and diagrams cannot. This sets up the capstone, where Yuriy writes one for a
+      real POS decision.
+    key_points:
+      - Architecturally significant means hard to reverse, cross-cutting or expensive; not every choice deserves an ADR
+      - Nygard's format — title, status, context, decision, consequences; one decision per record; superseded, never rewritten
+      - MADR adds decision drivers and considered options with pros and cons
+      - ADRs live in the repo next to the code, numbered, and enter review through a pull request
+    diagram: >-
+      State diagram of an ADR's life — proposed, accepted, then deprecated or superseded by a later
+      ADR — with the pull-request review step on the way to accepted.
+    example: >-
+      Write a one-page retroactive ADR for a decision already made in a system you know (for example
+      "Akka Cluster Sharding for per-site state" or "Postgres rather than Cassandra for transactions")
+      in MADR format: context and problem, decision drivers, two or three considered options with pros
+      and cons, outcome, consequences. Time-box it to ten minutes and note which section was hardest.
+    presentation: standard
+    sources:
+      - title: Architectural Decision Records (adr.github.io)
+        url: https://adr.github.io/
+        locator: definitions of AD/ADR/ASR and the templates section
+        kind: docs
+        verified: false
+      - title: Documenting Architecture Decisions (Michael Nygard, Cognitect blog, 2011)
+        url: https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions
+        locator: sections "Decision record", "Format" and "Experience"
+        kind: blog
+        verified: false
+      - title: MADR — Markdown Any Decision Records
+        url: https://adr.github.io/madr/
+        locator: the template and its sections (context, decision drivers, considered options, outcome, consequences)
+        kind: docs
+        verified: false
+
+  - id: architecture-11
+    title: API design — resources, versioning, idempotency
+    level: I
+    est_min: 30
+    prereqs: [architecture-08]
+    summary: >-
+      Designing an HTTP API as a set of resources (nouns, collections, standard methods), choosing a
+      versioning and compatibility policy, and making unsafe operations safe to retry with idempotency
+      keys. Links 15-system-design/grpc_protobuf_schema_design.md (§4–§5 for the RPC side) and
+      15-system-design/idempotency-and-deduplication.md (§3 for the full key protocol) instead of
+      repeating them.
+    key_points:
+      - Resource-oriented design — resources and collections, standard methods (list, get, create, update, delete), custom methods sparingly; HTTP verbs and status codes used with intent
+      - Safe vs idempotent methods — GET, PUT and DELETE are idempotent by definition, POST is not; idempotency keys make POST retryable
+      - Compatibility — only additive changes within a major version; versioning in the path, a header or the package; a deprecation policy
+      - Pagination, filtering and errors are part of the contract
+      - REST vs gRPC — the resource model works for both; choose by consumers and tooling
+    diagram: >-
+      The car-wash API's resource tree (sites/{site}/lanes/{lane}, members/{member}/vehicles/{plate},
+      washes/{wash}) with methods on each node, and a POST /washes carrying an Idempotency-Key header
+      through a client retry.
+    example: >-
+      Design six endpoints for "start a wash, list a member's washes, cancel a wash": paths, methods,
+      request and response bodies, status codes. Add an Idempotency-Key to POST /washes and write the
+      server rule in pseudo-code (store key with response; same key and same body replays the stored
+      response; same key with a different body is rejected). List two changes you could ship without a
+      version bump and one that needs v2.
+    presentation: standard
+    sources:
+      - title: Google Cloud API Design Guide — Resource-oriented design
+        url: https://cloud.google.com/apis/design/resources
+        locator: whole page; then the guide's "Standard methods" and "Versioning" pages
+        kind: docs
+        verified: false
+      - title: Azure Architecture Center — RESTful web API design
+        url: https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design
+        locator: sections on organising the API around resources, idempotent operations, and versioning a RESTful web API
+        kind: docs
+        verified: false
+      - title: Designing robust and predictable APIs with idempotency (Stripe blog)
+        url: https://stripe.com/blog/idempotency
+        locator: sections on idempotency keys and on retries with exponential backoff
+        kind: blog
+        verified: false
+
+  - id: architecture-12
+    title: Modular monolith vs microservices — and when to split
+    level: I
+    est_min: 25
+    prereqs: [architecture-07, architecture-11]
+    summary: >-
+      Microservices buy independent deployment and scaling at the price of distributed-systems
+      complexity, the "microservice premium". Fowler's MonolithFirst argues for starting with a
+      well-modularised monolith whose module boundaries follow bounded contexts, and splitting only
+      when a boundary is stable and a concrete force (team autonomy, scaling, release cadence, fault
+      isolation) justifies it. The rung ends with a checklist for the split decision.
+    key_points:
+      - Microservice characteristics — componentisation via services, organised around business capabilities, decentralised data, smart endpoints and dumb pipes
+      - The microservice premium — it only pays off above a certain system complexity; prerequisites such as rapid provisioning, monitoring and deployment
+      - Modular monolith — enforce module boundaries inside one deployable (separate sbt modules, no shared tables, explicit module APIs)
+      - Split triggers — team cognitive load, scaling differences, release cadence, failure isolation; extract with a strangler fig
+      - The distributed-monolith anti-pattern — services that must be deployed together or share a database
+    diagram: >-
+      Fowler's premium sketch — productivity against base complexity, with the monolith and
+      microservice curves crossing — and a marker for where the car-wash platform probably sits today.
+    example: >-
+      Score the car-wash platform's main modules (for example Wash Operations, Memberships, Payments,
+      Reporting, Site Equipment) from 1 to 5 on four split forces (team ownership, scaling difference,
+      change cadence, failure isolation) in a small table. Pick the module with the strongest case for
+      extraction, name the data it would have to own, and list the synchronous calls that would start
+      crossing a network boundary.
+    presentation: standard
+    sources:
+      - title: Microservices (James Lewis and Martin Fowler, 2014)
+        url: https://martinfowler.com/articles/microservices.html
+        locator: section "Characteristics of a Microservice Architecture" and "Are Microservices the Future?"
+        kind: blog
+        verified: false
+      - title: MonolithFirst (Martin Fowler, bliki)
+        url: https://martinfowler.com/bliki/MonolithFirst.html
+        locator: whole entry
+        kind: blog
+        verified: false
+      - title: MicroservicePremium (Martin Fowler, bliki)
+        url: https://martinfowler.com/bliki/MicroservicePremium.html
+        locator: whole entry and its productivity-vs-complexity sketch
+        kind: blog
+        verified: false
+
+  - id: architecture-13
+    title: Event-driven architecture and eventual consistency
+    level: I
+    est_min: 25
+    prereqs: [architecture-12]
+    summary: >-
+      "Event-driven" names at least four different patterns — event notification, event-carried state
+      transfer, event sourcing and CQRS — with very different coupling and consistency consequences.
+      The rung untangles them, then shows how to stay correct with eventual consistency between
+      services: the transactional outbox, idempotent consumers and sagas. It links rather than repeats
+      06-databases-and-distributed-data/Event-Sourcing-Guide.md and
+      15-system-design/event_sourcing_cqrs_sagas_guide.md.
+    key_points:
+      - Event notification vs event-carried state transfer vs event sourcing vs CQRS
+      - Events decouple senders from receivers but hide the overall flow — you need tracing and an event catalogue
+      - The dual-write problem, and the transactional outbox (or CDC) for reliable publishing
+      - Consumers must be idempotent, ordering holds per key only, and sagas (orchestrated or choreographed) coordinate multi-service workflows with compensations
+      - Eventual consistency is a product decision — what may users see stale, and for how long
+    diagram: >-
+      Sequence diagram — the Memberships service commits a PlanChanged row and an outbox row in one
+      transaction; a relay publishes to Kafka; Billing and Notifications consume idempotently, one of
+      them ignoring a redelivered duplicate.
+    example: >-
+      For the flow "member upgrades plan, billing prorates, the site gate then allows the premium
+      package", classify each message as a notification, a state transfer or a command. Write the
+      outbox table DDL (id, aggregate_id, type, payload jsonb, created_at, published_at) and the
+      relay's SELECT ... FOR UPDATE SKIP LOCKED polling loop in pseudo-code, and state the maximum
+      staleness the site gate can tolerate.
+    presentation: standard
+    sources:
+      - title: What do you mean by "Event-Driven"? (Martin Fowler, 2017)
+        url: https://martinfowler.com/articles/201701-event-driven.html
+        locator: the four patterns — Event Notification, Event-Carried State Transfer, Event-Sourcing, CQRS
+        kind: blog
+        verified: false
+      - title: CQRS (Martin Fowler, bliki)
+        url: https://martinfowler.com/bliki/CQRS.html
+        locator: whole entry, especially "When to use it"
+        kind: blog
+        verified: false
+      - title: Pattern — Transactional outbox (microservices.io)
+        url: https://microservices.io/patterns/data/transactional-outbox.html
+        locator: sections Problem, Solution, Resulting context
+        kind: docs
+        verified: false
+
+  - id: architecture-14
+    title: Resilience I — timeouts, retries with backoff, idempotency keys
+    level: I
+    est_min: 25
+    prereqs: [architecture-11]
+    summary: >-
+      The first line of defence for anything called over a network: every call has a timeout derived
+      from latency percentiles, retries are capped and use exponential backoff with jitter and a retry
+      budget, and only idempotent operations (natively or through an idempotency key) are retried.
+      Links 15-system-design/third-party-failure-modes.md (timeouts and retries) and
+      15-system-design/idempotency-and-deduplication.md.
+    key_points:
+      - Timeouts — connect vs request timeouts, set from the dependency's high percentiles plus margin, deadlines propagated across hops
+      - Retries amplify load — retry at one layer only, cap attempts, use a retry budget or token bucket
+      - Exponential backoff with full jitter avoids synchronised retry storms
+      - Retry only transient failures and idempotent operations; idempotency keys make POSTs safe to retry
+    diagram: >-
+      Timeline of 100 clients retrying after a short outage — without jitter (synchronised spikes at
+      each backoff step) and with full jitter (load spread out) — with a retry-budget ceiling drawn.
+    example: >-
+      In 15 lines of Scala or Python implement retry(f, maxAttempts = 4, base = 100 ms, cap = 2 s)
+      with full jitter (sleep a random time between 0 and min(cap, base times 2^attempt)). Simulate 100
+      clients against a server that recovers after one second and count requests per 100 ms bucket
+      with and without jitter. Then decide which of three POS calls (authorise payment, fetch member,
+      open the tunnel gate) may be retried, and with which key.
+    presentation: standard
+    sources:
+      - title: Timeouts, retries, and backoff with jitter (Amazon Builders' Library)
+        url: https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/
+        locator: sections on timeouts, retries and backoff, and jitter
+        kind: blog
+        verified: false
+      - title: Exponential Backoff And Jitter (AWS Architecture Blog)
+        url: https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/
+        locator: the comparison of no jitter, full jitter, equal jitter and decorrelated jitter
+        kind: blog
+        verified: false
+      - title: Retry pattern (Azure Architecture Center)
+        url: https://learn.microsoft.com/en-us/azure/architecture/patterns/retry
+        locator: sections "Solution" and "Issues and considerations"
+        kind: docs
+        verified: false
+
+  - id: architecture-15
+    title: Resilience II — circuit breakers, bulkheads and graceful degradation
+    level: I
+    est_min: 25
+    prereqs: [architecture-14]
+    summary: >-
+      When a dependency is down, stop calling it (a circuit breaker moves between closed, open and
+      half-open), and make sure one slow dependency cannot exhaust shared resources (bulkheads:
+      separate pools, queues and limits per dependency). With fallbacks and load shedding they turn a
+      cascading failure into a degraded mode. Builds on the circuit-breaker pattern already traced
+      through 15-system-design (see the pattern table in its README) and on
+      third-party-failure-modes.md.
+    key_points:
+      - Circuit-breaker states and parameters — failure threshold, open duration, half-open probe; one breaker per dependency or host
+      - Bulkhead — isolate thread pools, connection pools and queues per dependency or tenant so a failure stays local
+      - Fallbacks — cached value, default, queue for later, feature switched off; chosen per use case together with the product owner
+      - Load shedding and backpressure as the server-side counterpart; Akka ships a CircuitBreaker and backpressured streams
+      - Test it with fault injection and watch breaker state in metrics
+    diagram: >-
+      A circuit-breaker state machine (closed to open on threshold, open to half-open after a timeout,
+      half-open back to closed on success or open on failure) next to a bulkhead picture with separate
+      pools for payments and reporting.
+    example: >-
+      For the car-wash site controller list three external dependencies (payment processor, cloud
+      membership API, licence-plate recognition). For each choose breaker thresholds, a bulkhead (pool
+      size or queue) and the degraded behaviour while open (for example offline authorisation up to a
+      limit, a cached member list, manual plate entry), as a small table. Optionally wrap a fake call
+      that fails 60% of the time in akka.pattern.CircuitBreaker and log the state transitions.
+    presentation: standard
+    sources:
+      - title: CircuitBreaker (Martin Fowler, bliki)
+        url: https://martinfowler.com/bliki/CircuitBreaker.html
+        locator: whole entry, including the half-open state
+        kind: blog
+        verified: false
+      - title: Circuit Breaker pattern (Azure Architecture Center)
+        url: https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker
+        locator: sections "Solution" and "Issues and considerations"
+        kind: docs
+        verified: false
+      - title: Bulkhead pattern (Azure Architecture Center)
+        url: https://learn.microsoft.com/en-us/azure/architecture/patterns/bulkhead
+        locator: sections "Solution" and "Issues and considerations"
+        kind: docs
+        verified: false
+
+  # ---------------------------------------------------------------- Advanced — trade-offs, evolution, case studies, capstone
+  - id: architecture-16
+    title: Quality attributes and trade-off analysis (ATAM-lite)
+    level: A
+    est_min: 30
+    prereqs: [architecture-10]
+    summary: >-
+      Architecture is mostly choosing which quality attributes to favour — availability, latency,
+      modifiability, security, cost, operability — when they conflict. The rung teaches
+      quality-attribute scenarios, a lightweight version of SEI's ATAM (utility tree, sensitivity
+      points, trade-off points, risks) and fitness functions as the automated, continuous check that a
+      chosen attribute stays true.
+    key_points:
+      - A quality attribute only means something as a measurable scenario — source, stimulus, environment, artefact, response, response measure
+      - The utility tree prioritises scenarios by business value and technical difficulty (H/M/L)
+      - ATAM outputs — sensitivity points, trade-off points, risks and non-risks
+      - Fitness functions — automated tests or metrics that guard an attribute (latency check, dependency-rule test, cost alarm)
+      - Well-Architected pillars as a checklist of attribute families and their known trade-offs
+    diagram: >-
+      A utility tree — the root "Utility" branching into Availability, Performance, Modifiability,
+      Security and Cost, each with one or two concrete car-wash scenarios rated (value, difficulty).
+    example: >-
+      Write five quality-attribute scenarios for the car-wash POS in six-part form, arrange them in a
+      utility tree, and run ATAM-lite on one decision (for example "the site controller authorises
+      members offline when the cloud is unreachable"): name one sensitivity point, one trade-off point
+      (availability vs revenue or fraud risk) and one risk. Turn one scenario into a fitness function
+      you could automate — metric, threshold, where it runs.
+    presentation: deep
+    sources:
+      - title: ATAM — Method for Architecture Evaluation (Kazman, Klein, Clements; SEI technical report, 2000)
+        url: https://insights.sei.cmu.edu/library/atam-method-for-architecture-evaluation/
+        locator: the steps of the ATAM, quality-attribute utility trees, sensitivity and trade-off points
+        kind: paper
+        verified: false
+      - title: Azure Well-Architected Framework
+        url: https://learn.microsoft.com/en-us/azure/well-architected/
+        locator: the five pillars and the tradeoffs page of each pillar
+        kind: docs
+        verified: false
+      - title: Architectural fitness function (Thoughtworks Technology Radar)
+        url: https://www.thoughtworks.com/radar/techniques/architectural-fitness-function
+        locator: whole blip
+        kind: docs
+        verified: false
+
+  - id: architecture-17
+    title: Evolutionary architecture
+    level: A
+    est_min: 25
+    prereqs: [architecture-16]
+    summary: >-
+      An evolutionary architecture supports guided, incremental change: fitness functions protect what
+      matters, small reversible steps reduce risk, and patterns such as the strangler fig and
+      sacrificial architecture make large migrations safe. Architecture rules encoded as automated
+      checks are also what let many contributors, coding agents included, change a codebase without
+      eroding its structure.
+    key_points:
+      - Incremental change guided by fitness functions (atomic vs holistic, triggered vs continual)
+      - Architecture rules as tests — ArchUnit-style checks for layering, cycles and naming on the JVM
+      - Strangler fig — route traffic gradually from legacy to new code behind a facade; sacrificial architecture
+      - The last responsible moment and reversibility; design for replaceability rather than reuse
+      - Team structure (Conway's law) as an architectural dimension
+    diagram: >-
+      A strangler-fig migration in three stages — a facade in front of the legacy system; the new
+      component serving one route; the legacy system shrunk to the remaining routes and finally
+      removed.
+    example: >-
+      Write two fitness functions for a JVM codebase you know: (1) an ArchUnit rule (runnable from
+      Scala through JUnit) that fails if any class in a ..domain.. package depends on ..infra.. or on
+      akka.http; (2) a CI check that fails when p95 latency in the latest load-test report exceeds a
+      threshold. Then sketch a three-step strangler-fig plan for moving one legacy POS feature behind a
+      facade.
+    presentation: deep
+    sources:
+      - title: Architectural fitness function (Thoughtworks Technology Radar)
+        url: https://www.thoughtworks.com/radar/techniques/architectural-fitness-function
+        locator: whole blip
+        kind: docs
+        verified: false
+      - title: ArchUnit
+        url: https://www.archunit.org/
+        locator: User Guide → layer checks, cycle checks and the ArchUnit JUnit support
+        kind: docs
+        verified: false
+      - title: StranglerFigApplication (Martin Fowler, bliki)
+        url: https://martinfowler.com/bliki/StranglerFigApplication.html
+        locator: whole entry
+        kind: blog
+        verified: false
+
+  - id: architecture-18
+    title: Case study — Spotify's developer platform and Backstage
+    level: A
+    est_min: 25
+    prereqs: [architecture-12, architecture-17]
+    summary: >-
+      How a large engineering organisation keeps hundreds of autonomous teams productive: Spotify's
+      developer platform, golden paths, the Backstage software catalogue (ownership, templates,
+      TechDocs) and fleet-wide change management. The lesson writer picks two or three Spotify
+      Engineering posts and reads them through the lens of earlier rungs — coupling, bounded
+      contexts, recorded decisions and evolutionary change.
+    key_points:
+      - The problem — fragmentation and cognitive load as the number of teams grows
+      - Golden paths — an opinionated, supported way to build a service, offered rather than mandated
+      - Software catalogue with ownership metadata; templates as a consistency mechanism
+      - Fleet management — automated fleet-wide changes (such as dependency upgrades) instead of asking every team
+      - The trade-offs Spotify names — autonomy vs alignment, platform cost, adoption
+    diagram: >-
+      Backstage at the centre — software catalogue, software templates, TechDocs and plugins — with
+      service teams consuming golden paths on one side and the platform team producing them on the
+      other.
+    example: >-
+      After reading the chosen posts, write a half-page "what would transfer" note for your own
+      organisation: the first golden path you would define (for example a new Scala service with
+      logging, metrics and CI), the metadata every service must declare (owner, on-call, dependencies),
+      and one fleet-wide change you would automate. Name the earlier rung each idea connects to.
+    presentation: deep
+    sources:
+      - title: Spotify Engineering blog
+        url: https://engineering.atspotify.com/
+        locator: posts on golden paths, Backstage (open-sourced in 2020), developer experience and fleet management / the fleet-first mindset — the writer picks 2-3
+        kind: blog
+        verified: false
+      - title: Backstage
+        url: https://backstage.io/
+        locator: Docs → Overview ("What is Backstage?"), Software Catalog, Software Templates
+        kind: docs
+        verified: false
+
+  - id: architecture-19
+    title: Case study — Spotify's data and event-delivery platform
+    level: A
+    est_min: 25
+    prereqs: [architecture-13, architecture-18]
+    summary: >-
+      Spotify's event-delivery system and data platform are a long, well-documented migration story,
+      with explicit reasoning about delivery guarantees, operational cost and ownership. The writer
+      picks the relevant posts; the lesson reads them with DDIA vocabulary (logs, at-least-once
+      delivery, batch vs stream) and this track's vocabulary (quality-attribute trade-offs,
+      incremental migration, ownership of data).
+    key_points:
+      - Requirements as quality attributes — completeness, latency, cost and operability of event delivery
+      - Build vs buy — moving from self-run infrastructure to managed services, and what was traded away
+      - Migration strategy — running old and new in parallel, verifying completeness, cutting over incrementally
+      - Ownership — producers own event schemas, the platform owns the pipes
+      - Lessons that transfer to a much smaller system (car-wash POS events)
+    diagram: >-
+      Before/after architecture of event delivery as described in the chosen posts — producers, the
+      old pipeline and its storage, the new managed pipeline and processing — with the parallel-run
+      verification path highlighted.
+    example: >-
+      From the chosen posts extract the system's top three quality-attribute scenarios and its main
+      trade-off point, and write a five-line ADR summary (context, decision, consequences) as Spotify
+      might have written it. Then apply the same lens to the car-wash platform: which site events must
+      never be lost (transactions) and which may be sampled (telemetry), and what each implies for
+      delivery guarantees.
+    presentation: deep
+    sources:
+      - title: Spotify Engineering blog
+        url: https://engineering.atspotify.com/
+        locator: the "Spotify's Event Delivery – The Road to the Cloud" series (2016, parts I–III) and later data-platform posts — the writer picks 2-3
+        kind: blog
+        verified: false
+      - title: Data Mesh Principles and Logical Architecture (Zhamak Dehghani, martinfowler.com)
+        url: https://martinfowler.com/articles/data-mesh-principles.html
+        locator: principles "Domain ownership" and "Data as a product"
+        kind: blog
+        verified: false
+
+  - id: architecture-20
+    title: Capstone — the architect as decision-maker (an ADR for the car-wash POS)
+    level: A
+    est_min: 30
+    prereqs: [architecture-10, architecture-16]
+    summary: >-
+      The ladder ends where architecture work actually happens: making a significant decision under
+      uncertainty and recording it so others can review, challenge and later revisit it. Yuriy picks a
+      real, open decision on the car-wash POS platform, frames it with quality-attribute scenarios,
+      compares two or three options with explicit trade-offs and a fitness function, and writes an ADR
+      ready for team review.
+    key_points:
+      - Choosing an architecturally significant decision — irreversible, cross-cutting or costly
+      - Decision drivers written as quality-attribute scenarios; options include doing nothing
+      - A trade-off table and the decisive argument; risks and how they will be detected (fitness functions)
+      - Consequences, good and bad; status, review path and when to revisit
+      - The architect's role — facilitate the decision, make it explicit, own the follow-through
+    diagram: >-
+      A C4 container or component diagram of the part of the POS the decision touches, with the
+      differences between the options highlighted.
+    example: >-
+      Write the ADR in MADR format for one real open decision — candidates include how site
+      transactions are journaled and reconciled with the cloud, where per-vehicle tier pricing is
+      computed, or how a payment-terminal vendor is abstracted. Include context, at least three
+      decision drivers as scenarios, two or three options with pros and cons, the decision,
+      consequences, one fitness function and a C4 diagram. Time-box it to 30 minutes; it is filed as
+      the capstone and is ready to open as a pull request for team review.
+    presentation: deep
+    sources:
+      - title: MADR — Markdown Any Decision Records
+        url: https://adr.github.io/madr/
+        locator: the full template and the filled-in examples
+        kind: docs
+        verified: false
+      - title: Documenting Architecture Decisions (Michael Nygard, Cognitect blog, 2011)
+        url: https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions
+        locator: sections "Format" and "Experience"
+        kind: blog
+        verified: false
+      - title: The C4 model for visualising software architecture
+        url: https://c4model.com/
+        locator: sections "Diagrams" (Container, Component) and "Notation"
+        kind: docs
+        verified: false

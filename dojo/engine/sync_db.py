@@ -21,11 +21,28 @@ Field notes
 from __future__ import annotations
 
 import argparse
+import re
 import datetime as dt
 
 import common
 import state as state_mod
 from common import DojoError
+
+
+_SRC_LINK = re.compile(r"\[([^\]]+)\]\((https?://[^)\s]+)\)")
+
+
+def _sources(fm: dict, body: str) -> list[dict]:
+    """Front-matter sources, or, when that list is empty (fresh lessons), the links of '## Sources'."""
+    listed = [{"title": x.get("title"), "url": x.get("url")} for x in (fm.get("sources") or []) if isinstance(x, dict)]
+    if listed:
+        return listed
+    m = re.search(r"(?ms)^## Sources\s*$(.*?)(?=^## |\Z)", body)
+    seen, out = set(), []
+    for title, url in _SRC_LINK.findall(m.group(1) if m else ""):
+        if url not in seen:
+            seen.add(url); out.append({"title": title.strip(), "url": url})
+    return out
 
 
 def _db_dir():
@@ -76,8 +93,7 @@ def lesson_doc(entry: dict, tracks: dict[str, dict], lessons: list[dict]) -> dic
         "md": md,
         "filed_to": fm.get("filed_to"),
         "review_due": fm.get("review_due"),
-        "sources": [{"title": s.get("title"), "url": s.get("url")}
-                    for s in (fm.get("sources") or []) if isinstance(s, dict)],
+        "sources": _sources(fm, body),
         "day": lesson_day(fm, lessons),
     }
 

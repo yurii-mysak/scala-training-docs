@@ -28,6 +28,17 @@ Sections 01–16 remain the general knowledge base and are re-tagged for this lo
 
 ---
 
+## Daily practice: IT Iaido
+
+Two lessons a day (15–30 min each) arrive by email and on the Dojo dashboard; everything that drives
+them lives in [`dojo/`](dojo/): the contract ([SPEC](dojo/SPEC.md)), the six ladders in
+[`dojo/curriculum/`](dojo/curriculum/), every lesson ever sent in [`dojo/lessons/`](dojo/lessons/),
+progress in [`dojo/progress/`](dojo/progress/) and the scripts in [`dojo/engine/`](dojo/engine/).
+Lessons marked *passed* are filed into the numbered sections below (new ones appear as
+`24-ai-ml-foundations/`, `25-software-architecture/`, `26-rust/`).
+
+---
+
 ## New sections
 
 | Section | Contents |

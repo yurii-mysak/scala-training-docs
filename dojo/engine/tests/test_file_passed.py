@@ -62,16 +62,21 @@ class NewSectionTests(RepoTestCase):
         for kept in ("## Why this matters", "## Self-check", "## Sources", "```mermaid", "<details>"):
             self.assertIn(kept, text)
 
-    def test_root_readme_gets_a_new_block_after_the_last_numbered_block(self):
+    def test_root_readme_gets_a_new_block_in_its_own_group_before_domain_specific(self):
         fp.file_lesson("2026-10-06-1")
         root = self.read("README.md")
-        block = ("### [24 — AI / ML Foundations](24-ai-ml-foundations/)\n| Level | Topics |\n|-------|--------|\n"
+        block = ("## AI & Machine Learning\n\n"
+                 "### [24 — AI / ML Foundations](24-ai-ml-foundations/)\n| Level | Topics |\n|-------|--------|\n"
                  "| B | [What machine learning actually optimises]"
                  "(24-ai-ml-foundations/what-machine-learning-actually-optimises.md) |\n")
         self.assertIn(block, root)
-        self.assertGreater(root.index("### [24"), root.index("### [16 — AdTech]"))
-        self.assertTrue(root.startswith(support.ROOT_README.split("### [16")[0]), "earlier content untouched")
-        self.assertIn("| A | [High-Scale Bidding Engine](16-adtech/bidding.md) |\n\n### [24", root)
+        # the new group sits between the existing groups and Domain-Specific; nothing else moved
+        self.assertLess(root.index("## AI & Machine Learning"), root.index("## Domain-Specific"))
+        self.assertGreater(root.index("## AI & Machine Learning"), root.index("### [10 — Networking]"))
+        self.assertTrue(root.startswith(support.ROOT_README.split("## Domain-Specific")[0].rstrip("-\n")),
+                        "earlier content untouched")
+        self.assertIn("## Domain-Specific\n\n### [16 — AdTech]", root)
+        self.assertIn("| A | [High-Scale Bidding Engine](16-adtech/bidding.md) |", root)
 
     def test_front_matter_filed_to_and_log(self):
         fp.file_lesson("2026-10-06-1", by="chat")
@@ -161,9 +166,16 @@ class SectionGrowthTests(RepoTestCase):
         self.assertEqual(self.read("26-rust/README.md").splitlines()[0], "# Rust")
         root = self.read("README.md")
         order = [m.group(1) for m in re.finditer(r"^### \[(\d+) — ", root, re.M)]
-        self.assertEqual(order, ["10", "16", "24", "25", "26"])
+        # 25 joins the existing "Infrastructure & Operations" group (after 10); 26 and 24 each create
+        # their own group ("Core Language & Programming", "AI & Machine Learning") before Domain-Specific,
+        # in the order they were filed; 16 stays last.
+        self.assertEqual(order, ["10", "25", "26", "24", "16"])
         self.assertIn("### [25 — Software Architecture & Design](25-software-architecture/)", root)
         self.assertIn("### [26 — Rust](26-rust/)", root)
+        infra = root[root.index("## Infrastructure & Operations"):root.index("## Core Language & Programming")]
+        self.assertIn("### [25 —", infra)
+        self.assertLess(root.index("## Core Language & Programming"), root.index("## AI & Machine Learning"))
+        self.assertLess(root.index("## AI & Machine Learning"), root.index("## Domain-Specific"))
 
     def test_filename_collision_with_another_lesson_gets_the_id_suffix(self):
         self.add_lesson("2026-10-06-1", "ai-ml-01", status="passed", title="Same title")

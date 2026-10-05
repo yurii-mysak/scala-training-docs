@@ -158,6 +158,29 @@ _BLOCK_RE = re.compile(r"^###\s+\[(?P<label>[^\]]+)\]\((?P<path>[^)]*)\)\s*$")
 _ROW_RE = re.compile(r"^\|\s*(?P<lv>[BIA])\s*\|(?P<cell>.*?)\|\s*$")
 
 
+# Which "## group" of the root README a new section block belongs to (SPEC §8.4).
+ROOT_GROUP_FOR = {
+    "24-ai-ml-foundations": "AI & Machine Learning",
+    "25-software-architecture": "Infrastructure & Operations",
+    "26-rust": "Core Language & Programming",
+}
+
+
+def _group_end(lines: list[str], group: str) -> int | None:
+    """Index just after the last table of `## group` (before its trailing --- / next ## heading), or None."""
+    start = next((i for i, l in enumerate(lines) if l.strip() == f"## {group}"), None)
+    if start is None:
+        return None
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if lines[j].startswith("## ") or lines[j].strip() == "---":
+            end = j
+            break
+    while end > start + 1 and not lines[end - 1].strip():
+        end -= 1
+    return end
+
+
 def _blocks(lines: list[str]) -> list[dict]:
     """Every `### [..](folder/)` block with the span of its table: {start, folder, number, tstart, tend}."""
     out = []
@@ -199,12 +222,21 @@ def add_root_link(text: str, folder: str, section_title: str, level: str, link_t
         num = int(m.group(1)) if m else None
         label = f"{m.group(1)} — {section_title}" if m else section_title
         new = ["", f"### [{label}]({folder}/)", ROOT_TABLE_HEADER, ROOT_TABLE_RULE, f"| {level} | {link} |"]
-        numbered = [b for b in blocks if b["number"] is not None]
-        before = [b for b in numbered if num is None or b["number"] < num]
-        anchor = before[-1] if before else (numbered[-1] if numbered else None)   # last one in file order
-        at = anchor["tend"] if anchor else len(lines)
-        if not anchor and lines and lines[-1].strip():
-            new.insert(0, "")
+        group = ROOT_GROUP_FOR.get(folder)
+        at = _group_end(lines, group) if group else None
+        if at is None and group:                        # group heading missing: create it before Domain-Specific
+            new = ["", f"## {group}"] + new
+            dom = next((i for i, l in enumerate(lines) if l.strip() == "## Domain-Specific"), None)
+            at = dom - 1 if dom is not None and dom > 0 and lines[dom - 1].strip() == "---" else (dom if dom is not None else None)
+            if at is not None:
+                new = new + ["", "---"] if lines[at].strip() == "---" else new
+        if at is None:
+            numbered = [b for b in blocks if b["number"] is not None]
+            before = [b for b in numbered if num is None or b["number"] < num]
+            anchor = before[-1] if before else (numbered[-1] if numbered else None)   # last one in file order
+            at = anchor["tend"] if anchor else len(lines)
+            if not anchor and lines and lines[-1].strip():
+                new.insert(0, "")
         lines[at:at] = new
         return "\n".join(lines).rstrip("\n") + "\n", True
 

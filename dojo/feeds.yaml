@@ -25,6 +25,10 @@ level_rule: >-
   below the reader's level is used only when it carries genuinely new information (a release, a
   measurement, an incident) and is written as "what changed", not as re-teaching. The lesson's
   `level` field is the item's level, not the reader's.
+  When the item's topic matches a rung in dojo/curriculum/ (grep the ladder titles and key_points),
+  the item inherits that rung's level — the curriculum's rating wins over the writer's own tag —
+  and an item more than one level above the reader is picked only when the owner has explicitly
+  asked for that topic; it then carries the Primer and says which rungs it previews.
 
 evidence_rule: >-
   Every fresh lesson follows the SPEC section 4 Evidence rule. It is built from sources, so it

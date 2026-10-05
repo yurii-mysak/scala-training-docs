@@ -34,8 +34,9 @@ python3 dojo/engine/sync_db.py all                                   # upload do
 python3 dojo/engine/state.py touch                                   # last_run_at = now; then commit + push
 ```
 
-On-demand lessons use slots 3 and 4 (`--n 3`, `--n 4`, no `--new-day`). The 20:00 reminder reads
-`python3 dojo/engine/state.py show` (`open`) and logs `state.py log reminded --note "..."`.
+On-demand lessons use slots 3 and 4 (`--n 3`, `--n 4`, `--on-demand`, no `--new-day`); `--on-demand`
+exits 2 while any sent lesson is still open. The 20:00 reminder does no repo work: it reads the
+dashboard database (`lessons` with status `sent`) and sends a push + a short email (RUNBOOK §R).
 Eyeball the cadence any time with `python3 dojo/engine/pick.py --dry-run 16`.
 
 ## Behaviour worth knowing

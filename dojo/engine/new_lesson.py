@@ -213,6 +213,8 @@ def main(argv: list[str] | None = None) -> int:
                        help="increment the day counter (once per date; pass on the first lesson of a daily run)")
         p.add_argument("--by", default="job", choices=["job", "dashboard", "chat"], help="who triggered it (log)")
         p.add_argument("--json", action="store_true", help="print details as JSON instead of only the path")
+        p.add_argument("--on-demand", action="store_true",
+                       help="refuse (exit 2) while any sent lesson is still open; use for 'Request 2 more' runs")
         if name == "fresh":
             p.add_argument("--title", required=True)
             p.add_argument("--domain", required=True, help="closest track key, e.g. ai-ml")
@@ -221,6 +223,13 @@ def main(argv: list[str] | None = None) -> int:
             p.add_argument("--files-to", help="KB section folder (default: the domain track's files_to)")
             p.add_argument("--primer", action="store_true", help="add the Primer section (item above reader level)")
     args = ap.parse_args(argv)
+
+    if args.on_demand:
+        open_ids = list(state_mod.load_state().get("open") or [])
+        if open_ids:
+            print(f"error: on-demand refused — {len(open_ids)} lesson(s) still open: {', '.join(open_ids)}",
+                  file=sys.stderr)
+            return 2
 
     result = create_core(args) if args.kind == "core" else create_fresh(args)
     if not result["created"]:

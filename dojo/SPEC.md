@@ -20,7 +20,8 @@ deliberately; everything else follows it.
 - Everything is trackable: every lesson ever sent is a file under `dojo/lessons/`, every
   status change is a line in `dojo/progress/log.jsonl`, and the dashboard shows the same.
 - On demand: two more lessons can be requested, but only when no sent lesson is still open.
-- Delivery 09:00 Europe/Kyiv daily (email + push). Reminder 20:00 Europe/Kyiv only if lessons
+- Delivery by 09:00 Europe/Kyiv daily (email + push; the task is scheduled at 08:52 because
+  on-the-hour runs queue behind everyone else's). Reminder 20:00 Europe/Kyiv only if lessons
   are still open (push + short email).
 - One repo. This repository is the single source of truth. The dashboard database is a cache.
 

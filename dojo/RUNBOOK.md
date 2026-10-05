@@ -60,7 +60,8 @@ into its `files_to` section (creating `24-ai-ml-foundations/`, `25-software-arch
 ## 3. On-demand gate
 
 In **on-demand** mode, after step 1: `python3 dojo/engine/state.py show` → `open`. If any lesson
-is still `sent`, do NOT generate lessons. Send a short email (subject `IT Iaido · still open`) and a
+is still `sent`, do NOT generate lessons (`new_lesson.py … --on-demand` refuses with exit 2 as a
+second guard; pass `--on-demand` on both scaffolds in this mode). Send a short email (subject `IT Iaido · still open`) and a
 push: "Two more unlock once <titles> are marked. Open the Dojo: <dashboard url>", set the request
 documents to `handled: true` (ArtifactData `update` with `if_version`), commit any filing from
 step 2, push, and finish. Otherwise continue.
@@ -163,7 +164,9 @@ Using the versions from step 1 (re-`list` if you wrote anything since):
 
 ## 10. Finish
 
-1. `python3 dojo/engine/state.py touch` (sets `last_run_at`), `python3 dojo/engine/state.py log sent --note "day <day>: <ids>"`.
+1. `python3 dojo/engine/state.py touch` (sets `last_run_at`), `python3 dojo/engine/state.py log sent --note "day <day>: <ids>"`,
+   then `python3 dojo/engine/sync_db.py meta` and `ArtifactData` → `update` `meta/state` from
+   `dojo/out/db/meta/state.json` with its `if_version`, so the Dojo shows this delivery time.
 2. `git add -A dojo && git commit -m "dojo: state after day <day>" && git push origin main`.
 3. Final response, 3–6 lines: mode, the two titles with tracks/levels/minutes, marks synced,
    lessons filed, anything that failed (push, Gmail, diagram) and what you did instead.
@@ -186,3 +189,5 @@ the lesson; if a writer subagent fails, write that lesson yourself to the same s
    tell Claude in the IT Iaido project").
 5. `ArtifactData` → `update` `meta/state` with `{last_reminder_at: <now iso>}` and the document's
    `if_version` (`get` it first). No repo work. Final response: one line.
+6. If Gmail answers "Insufficient scope", the connector lacks send permission: the push already
+   went out, so just say so in the final response. Never retry the email in a loop.

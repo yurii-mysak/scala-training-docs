@@ -1,0 +1,9 @@
+flowchart LR
+  subgraph chat["Chat model"]
+    P["prompt"] --> G["sample text token by token"] --> J["parse the JSON it wrote"]
+  end
+  subgraph dm["Decision model"]
+    S["state and typed questions"] --> D["model"] --> R["a probability for every allowed answer"]
+  end
+  J --> C["your code decides"]
+  R --> T["threshold or expected value"] --> C

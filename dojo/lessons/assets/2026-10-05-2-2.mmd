@@ -1,0 +1,9 @@
+flowchart TD
+  L["200 to 300 labelled past tickets"] --> M["decision model"]
+  M --> P["probability per ticket"]
+  P --> S["log loss and Brier score"]
+  P --> R["reliability table: predicted vs observed"]
+  S --> Q{"calibrated on your data?"}
+  R --> Q
+  Q -->|yes| T["set thresholds from error costs"]
+  Q -->|no| F["rewrite criteria, recalibrate, or keep a human in the loop"]

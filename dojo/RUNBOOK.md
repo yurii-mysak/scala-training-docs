@@ -135,14 +135,17 @@ Order matters: the email links diagram PNGs from GitHub, so push first.
 2. `git add -A dojo 2[0-9]-* [0-9][0-9]-*/ README.md .gitignore` (lesson files, assets, progress,
    filed copies, READMEs), `git commit -m "dojo: day <day> — <title 1> · <title 2>"`, then
    `git fetch origin main && git rebase origin/main && git push origin main`. If the push is
-   refused, retry once after `git pull --rebase`; if it still fails, continue with `--img-mode cid`
+   refused, retry once after `git pull --rebase`; if it still fails, continue with `--img-mode dojo`
    below and say so in the report.
-3. `python3 dojo/engine/render_email.py <id1> <id2>` (add `--img-mode cid` only if the push
-   failed) → `dojo/out/email.json`.
+3. `python3 dojo/engine/render_email.py <id1> <id2>` (add `--img-mode dojo` only if the push
+   failed: the email then links to the Dojo for the diagrams instead of embedding images) →
+   `dojo/out/email.json`. Never use `--img-mode cid` from a job: base64 attachments do not pass
+   reliably through a tool call.
 4. Send with `mcp__Gmail__send_message`: `to: ["yura.mysak@gmail.com"]`, `subject`, `htmlBody`
-   = html, `body` = text. In cid mode add `attachments` = for each attachment
-   `{filename, mimeType: "image/png", inline: true, content: <base64 of the file>}`
-   (`base64 -w0 <path>`).
+   = html, `body` = text. Read the two strings from `dojo/out/email.json` and pass them
+   complete and unchanged. If Gmail answers "Insufficient scope", the Gmail connector was
+   connected without send permission: skip the email, still do the push notification with the
+   words "email failed — read today's lessons on the Dojo", and say so in the final report.
 5. `PushNotification` (status `proactive`): `IT Iaido · Day <day>: <title 1> · <title 2> — in your inbox (<total> min)`.
 
 ## 9. Dashboard database

@@ -1,0 +1,14 @@
+flowchart LR
+    subgraph train["Training loop"]
+        D["Training data (x, y)"] --> M["Model f(x; θ)"]
+        M --> P["Predictions ŷ"]
+        P --> L["Loss L(ŷ, y)"]
+        D -.->|"true y"| L
+        L --> O["Optimiser"]
+        O -->|"update θ"| M
+    end
+    subgraph check["Generalisation check"]
+        U["Unseen data (x, y)"] --> T["Same model, θ frozen"]
+        T --> G["Loss on unseen data"]
+    end
+    M -.->|"after training"| T

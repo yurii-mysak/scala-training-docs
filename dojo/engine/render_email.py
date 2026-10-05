@@ -143,6 +143,8 @@ def md_to_html(md: str, lesson_id: str, attachments: list[dict]) -> str:
     --img-mode raw (default): <img src="https://raw.githubusercontent.com/.../assets/<id>-<k>.png">
       (the job pushes the PNGs to the public repo before sending; Gmail proxies remote images).
     --img-mode cid: inline attachments, <img src="cid:<id>-<k>.png"> (filename doubles as Content-ID).
+    --img-mode dojo: no image at all; a short box links to the Dojo, which renders the Mermaid itself
+      (used when the push failed, since base64 attachments cannot pass reliably through a tool call).
     """
     source = md
 
@@ -157,6 +159,12 @@ def md_to_html(md: str, lesson_id: str, attachments: list[dict]) -> str:
             attachments.append({"filename": f"{cid}.png", "cid": f"{cid}.png", "path": str(png.resolve()),
                                 "mimeType": "image/png", "inline": True})
             return f'\n\n<img src="cid:{cid}.png" alt="diagram"{width}>\n\n'
+        if IMG_MODE["mode"] == "dojo":
+            # No hosted image: point at the Dojo, which renders the Mermaid source itself.
+            dash = state_mod.load_state().get("dashboard_url") or ""
+            return (f'\n\n<p style="margin:12px 0;padding:10px 14px;border:1px dashed #B1B7C9;border-radius:4px;'
+                    f'color:#434960;font-size:14px">Diagram {block["k"]}: open this lesson on the '
+                    f'<a href="{dash}">Dojo</a> to see it rendered.</p>\n\n')
         base = IMG_MODE["raw_base"] or raw_base_for(state_mod.load_state())
         return f'\n\n<img src="{base}{cid}.png" alt="diagram"{width} style="max-width:100%">\n\n'
 
@@ -291,8 +299,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("ids", nargs="+", metavar="LESSON_ID", help="lesson ids (or files), in the order to show")
     ap.add_argument("--out", help="output JSON path (default: dojo/out/email.json)")
     ap.add_argument("--render-diagrams", action="store_true", help="run mermaid.py logic first for each lesson")
-    ap.add_argument("--img-mode", choices=["raw", "cid"], default="raw",
-                    help="raw = link PNGs from the public repo on GitHub (default); cid = inline attachments")
+    ap.add_argument("--img-mode", choices=["raw", "cid", "dojo"], default="raw",
+                    help="raw = link PNGs from the public repo on GitHub (default); cid = inline attachments; "
+                         "dojo = no images, link to the Dojo (fallback when the push failed)")
     args = ap.parse_args(argv)
 
     IMG_MODE["mode"] = args.img_mode

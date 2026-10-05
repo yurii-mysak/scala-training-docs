@@ -11,8 +11,9 @@ deliberately; everything else follows it.
   Slot 2 (`fresh`) is researched the same morning from the feeds in `dojo/feeds.yaml`.
 - Every track is an ordered ladder from basics (B) to advanced (A). A rung is never skipped;
   prerequisites are respected across tracks.
-- Priorities (weight per 16 core lessons): ai-ml 5 · fp-scala 3 · ddia 3 · architecture 2 ·
-  networking 2 · rust 1. AI/ML is the top priority; Rust is a trickle.
+- Priorities (weight per cycle of 18 core lessons): ai-ml 5 · fp-scala 3 · ddia 3 ·
+  claude-academy 2 · architecture 2 · networking 2 · rust 1. AI/ML (with Claude Academy) is the
+  top priority; Rust is a trickle.
 - Presentation also ramps: early rungs = one idea, one diagram, one tiny example; later rungs =
   worked examples, labs, code, trade-off discussion.
 - Only lessons marked `passed` are filed into the knowledge base (the numbered sections of this
@@ -33,7 +34,7 @@ dojo/
   SPEC.md                 this contract
   RUNBOOK.md              what the scheduled job does, step by step (its prompt points here)
   curriculum/
-    ai-ml.yaml  fp-scala.yaml  ddia.yaml  architecture.yaml  networking.yaml  rust.yaml
+    ai-ml.yaml  claude-academy.yaml  fp-scala.yaml  ddia.yaml  architecture.yaml  networking.yaml  rust.yaml
   feeds.yaml              fresh-slot sources, domain mix, research protocol parameters
   progress/
     state.json            picker state (credits, next rung per track, counters)
@@ -56,9 +57,9 @@ first filing, with a README.md in the same format as the other sections.
 ## 3. Curriculum YAML schema (`dojo/curriculum/<track>.yaml`)
 
 ```yaml
-track: ai-ml                    # key; one of ai-ml fp-scala ddia architecture networking rust
+track: ai-ml                    # key = file stem; any number of tracks
 name: AI / ML foundations       # display name
-weight: 5                       # per 16 core lessons
+weight: 5                       # core lessons per cycle (cycle = sum of weights)
 files_to: 24-ai-ml-foundations  # default KB section for passed lessons of this track
 description: one or two sentences on what the ladder covers and the order logic
 primary_sources:                # the books/courses the ladder is built from

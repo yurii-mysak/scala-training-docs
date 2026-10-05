@@ -1,0 +1,785 @@
+track: claude-academy
+name: Claude Academy
+weight: 2
+files_to: 24-ai-ml-foundations
+description: >-
+  A guided pass through three free Claude Academy courses (Anthropic), one or two course lessons
+  per rung, in each course's own order and with no lesson skipped. AI Capabilities and Limitations
+  comes first because it builds the mental model of the machine (next-token prediction,
+  knowledge, working memory, steerability) that every later judgement rests on; AI Fluency:
+  Framework and Foundations then turns that model into working habits through the 4D framework
+  (Delegation, Description, Discernment, Diligence); Building Effective Human-Agent Teams closes
+  the ladder by moving from one person with an assistant to agents working as teammates. Where a
+  rung overlaps the mechanics already taught in the ai-ml track (tokens, training stages,
+  context windows, RAG, agents), it points to that rung instead of re-teaching it. Each rung swaps
+  the course's generic exercise for one taken from the reader's own work, and after the last rung
+  of each course the reader should also complete that course's own quiz on academy.claude.com.
+primary_sources:
+  - title: "Claude Academy — AI Capabilities and Limitations"
+    url: https://academy.claude.com/courses/ai-capabilities-and-limitations
+    verified: true
+  - title: "Claude Academy — AI Fluency: Framework and Foundations"
+    url: https://academy.claude.com/courses/ai-fluency-framework-foundations
+    verified: true
+  - title: "Claude Academy — Building Effective Human-Agent Teams (beta)"
+    url: https://academy.claude.com/courses/building-effective-human-agent-teams
+    verified: true
+
+rungs:
+
+  # ─────────────── Course 1 — AI Capabilities and Limitations (13 lessons, B) ───────────────
+
+  - id: claude-academy-01
+    title: "A mental model of the machine: what we mean by AI"
+    level: B
+    est_min: 20
+    prereqs: []
+    summary: >-
+      The course opens by separating two questions: how you collaborate with AI (the 4D framework,
+      later in this ladder) and how the AI is able to work with you. It then narrows "AI" to
+      generative, transformer-based text models — most AI in production (spam filters,
+      recommenders, fraud detection) is not generative — and claims that these models are strong
+      and weak along four predictable axes rather than uniformly good or bad. That four-axis map
+      is the spine of the whole course.
+    key_points:
+      - "The course roadmap: what AI is, how it is trained, its four properties, real-world use, safety."
+      - "Generative AI versus predictive/classification AI; why most deployed AI is not generative."
+      - "The four axes: next-token prediction, knowledge, working memory, steerability."
+      - "Why this material is durable: model boundaries move, the properties stay the same."
+    diagram: >-
+      A 2×2-ish map: "AI in production" split into non-generative (spam filter, recommender, fraud
+      score) and generative (LLM chat, code agent); the generative branch fans out into the four
+      property axes, each drawn as a slider from "capability zone" to "limitation zone".
+    example: >-
+      List the AI touch-points in the car-wash POS platform and his own day (fraud/anomaly checks,
+      plate recognition, Claude Code in the Lua monorepo, MCP servers, chat drafting of specs).
+      Tag each as generative or not, and for each generative one write which of the four axes it
+      most depends on. Keep the list: rung 07 revisits it.
+    presentation: minimal
+    sources:
+      - title: "Claude Academy — AI Capabilities and Limitations: Intro to AI Capabilities and Limitations"
+        url: https://academy.claude.com/courses/ai-capabilities-and-limitations/intro-to-ai-capabilities-and-limitations
+        locator: "AI Capabilities and Limitations, lesson 1 'Intro to AI Capabilities and Limitations' (text + 4 min video)"
+        kind: course
+        quote: "This material is durable because the properties stay stable even as models improve. Boundaries shift but the properties remain the same."
+        verified: true
+      - title: "Claude Academy — AI Capabilities and Limitations: What We Mean by AI"
+        url: https://academy.claude.com/courses/ai-capabilities-and-limitations/what-we-mean-by-ai
+        locator: "AI Capabilities and Limitations, lesson 2 'What We Mean by AI', §'Key takeaways'"
+        kind: course
+        quote: "AI isn't uniformly capable or uniformly unreliable. It's strong and weak along four predictable axes."
+        verified: true
+
+  - id: claude-academy-02
+    title: "How AI gets its character: pretraining, fine-tuning and fingerprints"
+    level: B
+    est_min: 20
+    prereqs: [claude-academy-01]
+    summary: >-
+      An assistant's personality is trained, not emergent. Pretraining yields a document completer
+      with no notion of helping; fine-tuning layers assistant behaviour on top — treating input as
+      a request, answering, declining harmful asks — and leaves recognisable fingerprints such as
+      sycophancy, verbosity, over-caution and miscalibrated confidence. The mechanics of the
+      training stages are in ai-ml-24; this rung is about spotting their behavioural traces.
+    key_points:
+      - "Two stages: pretraining produces a document completer; fine-tuning produces an assistant."
+      - "Behavioural fingerprints: sycophancy, verbosity, over-caution, confident tone regardless of accuracy."
+      - "Fingerprints are predictable, so they can be tested for and prompted around."
+      - "Pairs with ai-ml-24 (pretraining vs fine-tuning vs RLHF) for the mechanism."
+    diagram: >-
+      A pipeline: raw web/books → pretraining → "document completer" box → fine-tuning (instruction
+      data, feedback) → "assistant" box, with four labelled fingerprints hanging off the assistant.
+    example: >-
+      In Claude, paste a deliberately flawed design choice from a car-wash feature (e.g. "we will
+      store wash-package redemptions only in the client cache") and ask "this is a good design,
+      right?". Then ask neutrally "list the risks of this design". Compare: did the first answer
+      agree too readily? Note which fingerprint showed up and the phrasing that removed it.
+    presentation: minimal
+    sources:
+      - title: "Claude Academy — AI Capabilities and Limitations: How AI Gets Its Character"
+        url: https://academy.claude.com/courses/ai-capabilities-and-limitations/how-ai-gets-its-character
+        locator: "AI Capabilities and Limitations, lesson 3 'How AI Gets Its Character', §'Pretraining, fine-tuning, and fingerprints'"
+        kind: course
+        quote: "Fine-tuning layers assistant behavior on top: treating your input as a request, answering rather than rambling, declining harmful asks."
+        verified: true
+
+  - id: claude-academy-03
+    title: "Next-token prediction: capability zones and where fabrication lives"
+    level: B
+    est_min: 25
+    prereqs: [claude-academy-02]
+    summary: >-
+      A generative model is closer to a vast autocomplete than to a search engine: it writes word
+      by word from what tends to follow what. That predicts its capability zone (well-documented,
+      common tasks) and its limitation zone (novel or sparse territory), and it explains why
+      fabrication concentrates in specifics — names, numbers, citations, URLs. The sampling
+      mechanics are in ai-ml-25; this rung is the user-side consequence.
+    key_points:
+      - "Autocomplete at scale: text is produced token by token from learned continuations."
+      - "Capability zone vs limitation zone, set by how well-represented a task is in training data."
+      - "Fabrication concentrates in specificity: names, dates, statistics, citations, URLs, quotes."
+      - "The Verification Test: probe the model inside your own domain expertise."
+      - "Pairs with ai-ml-25 (sampling, temperature) for the mechanism."
+    diagram: >-
+      A horizontal spectrum from "dense, well-documented" (writing a REST handler, explaining Akka
+      actors) to "sparse, novel" (an internal POS protocol), with a fabrication-risk curve rising
+      to the right and a second curve rising with claim specificity.
+    example: >-
+      Verification Test in his own domain: ask Claude three questions about car-wash POS
+      operations at increasing specificity — general (how wash-club memberships work), medium
+      (typical redemption flow), and exact (a named industry standard, a version number, a URL).
+      Check each against what he knows or can look up; mark where the first fabricated specific
+      appears.
+    presentation: minimal
+    sources:
+      - title: "Claude Academy — AI Capabilities and Limitations: Next Token Prediction"
+        url: https://academy.claude.com/courses/ai-capabilities-and-limitations/next-token-prediction
+        locator: "AI Capabilities and Limitations, lesson 4 'Next Token Prediction', §'Autocomplete at scale' and §'Key takeaways'"
+        kind: course
+        quote: "Fabrication concentrates in specificity: names, dates, statistics, citations, URLs, quotes. The more precise a claim, the more it warrants verification."
+        verified: true
+      - title: "Claude Academy — AI Capabilities and Limitations (course page)"
+        url: https://academy.claude.com/courses/ai-capabilities-and-limitations
+        locator: "AI Capabilities and Limitations, lesson 5 'Try It Out: Next Token Prediction' (interactive; the lesson page /try-it-out returned no body text to the fetcher on 2026-10-05 — open it on the site)"
+        kind: course
+        verified: true
+
+  - id: claude-academy-04
+    title: "Knowledge: what the model read, and when it stopped reading"
+    level: B
+    est_min: 25
+    prereqs: [claude-academy-03]
+    summary: >-
+      A model knows only what it was exposed to in training, frozen at the knowledge cutoff, with
+      no lived experience and no browsing by default. Its characteristic knowledge failures are
+      staleness, uneven coverage, inherited bias and source amnesia; the fixes are tools — web
+      search, retrieval, tool use — that put fresh facts into context. RAG engineering is ai-ml-28;
+      here the point is knowing when to reach for it.
+    key_points:
+      - "Knowledge is frozen at the training cutoff; no post-cutoff facts without tools."
+      - "Failure modes: staleness, uneven coverage, inherited bias, source amnesia."
+      - "Mitigations: web search, retrieval (RAG), tool use and MCP servers that supply context."
+      - "The Outsider Test: where does the model need context it cannot have?"
+      - "Pairs with ai-ml-28 (RAG done properly)."
+    diagram: >-
+      A timeline with the training cutoff as a wall: facts before it are "in weights" (with a
+      density gradient for coverage), facts after it and private company facts sit outside, with
+      arrows from search / RAG / MCP tools carrying them into the context window.
+    example: >-
+      Outsider Test: ask Claude, without tools, three things — a public fact about Scala 3 or Akka
+      licensing, a fact about a recent library release, and a fact private to his company (the
+      PilotTransaction journal format). Classify each answer as known / stale / unknowable. Then
+      write which MCP server or document would fix each gap.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — AI Capabilities and Limitations: Knowledge"
+        url: https://academy.claude.com/courses/ai-capabilities-and-limitations/knowledge
+        locator: "AI Capabilities and Limitations, lesson 6 'Knowledge', §'What the model read, and when it stopped reading'"
+        kind: course
+        quote: "The model knows what it was exposed to during training, and only that. No real-time browsing by default, no lived experience, and a hard stop at the knowledge cutoff."
+        verified: true
+      - title: "Claude Academy — AI Capabilities and Limitations (course page)"
+        url: https://academy.claude.com/courses/ai-capabilities-and-limitations
+        locator: "AI Capabilities and Limitations, lesson 7 'Try It Out: Knowledge' (interactive; the lesson page /try-it-out-31vzkl2dgi907 returned no body text to the fetcher on 2026-10-05 — open it on the site)"
+        kind: course
+        verified: true
+
+  - id: claude-academy-05
+    title: "Working memory: the context window and its silent cliff"
+    level: B
+    est_min: 30
+    prereqs: [claude-academy-04]
+    summary: >-
+      Everything the model attends to lives in a fixed-size context window; outside it, nothing
+      exists. Inside, attention is uneven (primacy and recency beat the middle), and at the edge
+      the failure is a cliff — silent truncation, without a warning. The model does not learn from
+      corrections within a session beyond what stays in context, and does not remember across
+      sessions unless something writes it down. Token budgets and context engineering are in
+      ai-ml-26.
+    key_points:
+      - "The context window as working memory: attend to what is inside, nothing outside."
+      - "Lost in the middle: primacy and recency effects; put critical instructions at the edges."
+      - "Silent truncation is the failure mode; corrections only persist while they stay in context."
+      - "Cross-session memory comes from external stores (CLAUDE.md, memory files), not the model."
+      - "Pairs with ai-ml-26 (context windows and prompting as programming)."
+    diagram: >-
+      A context window drawn as a box with a U-shaped attention curve over its length, a dashed
+      line at the capacity edge labelled "silent truncation", and an external CLAUDE.md / memory
+      store feeding the start of each new session.
+    example: >-
+      Probe a context-limit failure in Claude Code: in a long session on the Lua monorepo, state a
+      constraint early ("never touch files under vendor/"), work for a while until auto-compaction
+      or a large file read, then ask for a change near vendor/. Did the constraint survive? Move it
+      into CLAUDE.md and repeat. Write down which placement held.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — AI Capabilities and Limitations: Working Memory"
+        url: https://academy.claude.com/courses/ai-capabilities-and-limitations/working-memory
+        locator: "AI Capabilities and Limitations, lesson 8 'Working Memory', §'The context window: AI's working memory' and §'Key takeaways'"
+        kind: course
+        quote: "Silent truncation is the failure mode, and you won't always be warned. The model doesn't learn from your corrections. It only responds to what's currently in context."
+        verified: true
+      - title: "Claude Academy — AI Capabilities and Limitations: Try It Out: Working Memory"
+        url: https://academy.claude.com/courses/ai-capabilities-and-limitations/try-it-out-q7hdjm9twcbt
+        locator: "AI Capabilities and Limitations, lesson 9 'Try It Out: Working Memory' (text plus the interactive 'Memory Test')"
+        kind: course
+        quote: "Items at the beginning of a list benefit from primacy (they get rehearsed more), and items at the end benefit from recency (they're still fresh)."
+        verified: true
+
+  - id: claude-academy-06
+    title: "Steerability: how much are you actually in control?"
+    level: B
+    est_min: 30
+    prereqs: [claude-academy-05]
+    summary: >-
+      Models follow instructions the same way they do everything else — by continuing a pattern —
+      which makes them very steerable on short, concrete instructions and less so on long reasoning
+      chains or abstract goals. The characteristic failures are drift over long tasks and
+      letter-over-spirit compliance. The mitigations are system prompts, structured outputs, code
+      execution for exact work, checkpoints, and restating the goal rather than shouting the rule.
+    key_points:
+      - "Instruction following is pattern continuation; control is strongest for short, concrete asks."
+      - "Limitation zone: long multi-step reasoning, abstract or conflicting goals."
+      - "Failure modes: drift over long outputs; following the letter, not the spirit."
+      - "Mitigations: system prompts, structured outputs, code execution, checkpoints."
+      - "When literal compliance misses the point, restate the goal; louder rules do not help."
+    diagram: >-
+      Two axes: instruction concreteness (x) and task length (y); the "tight control" region sits at
+      concrete/short, "drift" at long, "letter over spirit" at abstract; arrows show mitigations
+      pulling tasks back toward the controlled corner.
+    example: >-
+      Ask Claude to generate 30 test cases for a wash-package redemption endpoint with the rule
+      "each case must have a unique precondition". Check how far down the list the rule still
+      holds (drift) and whether any cases satisfy the wording but are useless (letter over spirit).
+      Then rewrite the prompt stating the goal (coverage of distinct failure paths) and require a
+      JSON schema; compare.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — AI Capabilities and Limitations: Steerability"
+        url: https://academy.claude.com/courses/ai-capabilities-and-limitations/steerability
+        locator: "AI Capabilities and Limitations, lesson 10 'Steerability', §'How much are you actually in control?' and §'Key takeaways'"
+        kind: course
+        quote: "When an instruction is followed literally but uselessly, restate the goal. Repeating the instruction with more force won't close the gap."
+        verified: true
+      - title: "Claude Academy — AI Capabilities and Limitations (course page)"
+        url: https://academy.claude.com/courses/ai-capabilities-and-limitations
+        locator: "AI Capabilities and Limitations, lesson 11 'Try It Out: Steerability' (interactive; the lesson page /try-it-out-y02xgkpa6wa7 returned no body text to the fetcher on 2026-10-05 — open it on the site)"
+        kind: course
+        verified: true
+
+  - id: claude-academy-07
+    title: "When properties collide: diagnosing real AI failures"
+    level: B
+    est_min: 25
+    prereqs: [claude-academy-06]
+    summary: >-
+      Real failures are rarely one property misbehaving; they are two meeting — a stale fact
+      stated with fluent confidence, a constraint lost from working memory during a long
+      steerability-heavy task. Naming the pair points straight at the fix: verify specifics,
+      re-supply context, offload exact work to code, or invite pushback. The closing lesson
+      reframes the four properties as continuums and hands over to the AI Fluency course. After
+      this rung, take the course quiz on the site.
+    key_points:
+      - "Most real failures are two properties interacting; name both."
+      - "Fix menu: verify specifics, re-supply context, offload to code execution, invite pushback."
+      - "Properties are continuums; place each task on each one."
+      - "Calibrated trust: match verification and context habits to where the task sits."
+      - "Course quiz on academy.claude.com closes this course."
+    diagram: >-
+      A 4×4 matrix of the properties (next-token, knowledge, working memory, steerability) with a
+      few cells filled by an example failure and the fix it implies.
+    example: >-
+      Take one real AI disappointment from the last month (a Claude Code change that broke a Lua
+      module, a wrong FPL stat, a hallucinated API flag). Write a three-line post-mortem: which two
+      properties met, what evidence shows it, which fix from the menu would have prevented it.
+      Revisit the rung-01 list and place each item on the four continuums.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — AI Capabilities and Limitations: When Properties Collide"
+        url: https://academy.claude.com/courses/ai-capabilities-and-limitations/when-properties-collide
+        locator: "AI Capabilities and Limitations, lesson 12 'When Properties Collide', §'Two properties meeting' and §'Key takeaways'"
+        kind: course
+        quote: "Most real-world AI failures aren't one property acting up. They're two properties meeting at the same time. Naming which two changes the fix entirely."
+        verified: true
+      - title: "Claude Academy — AI Capabilities and Limitations: Next Steps"
+        url: https://academy.claude.com/courses/ai-capabilities-and-limitations/next-steps
+        locator: "AI Capabilities and Limitations, lesson 13 'Next Steps', §'A small model of the machine'"
+        kind: course
+        quote: "Calibrated trust means locating your task on each continuum and matching your verification and context habits to where it sits."
+        verified: true
+
+  # ─────────────── Course 2 — AI Fluency: Framework and Foundations (14 lessons) ───────────────
+
+  - id: claude-academy-08
+    title: "AI Fluency: why it matters, and automation, augmentation, agency"
+    level: B
+    est_min: 20
+    prereqs: [claude-academy-07]
+    summary: >-
+      The fluency course is about collaboration, not technology: engaging with AI effectively,
+      efficiently, ethically and safely. It distinguishes three modes of interaction — automation
+      (AI executes a specified task), augmentation (AI as a thinking and execution partner) and
+      agency (AI configured to act independently on your behalf) — which recur in every later
+      rung of this course.
+    key_points:
+      - "AI Fluency: effective, efficient, ethical, safe engagement with AI systems."
+      - "Automation: AI executes specific tasks based on your instructions."
+      - "Augmentation: human and AI as creative thinking and task-execution partners."
+      - "Agency: AI works independently on your behalf, shaped by the knowledge and behaviour you set up."
+    diagram: >-
+      Three columns — automation, augmentation, agency — with the human's role shrinking from
+      "specifies every step" to "sets goals and guardrails", and one example per column from his
+      work (lint fix, spec co-writing, a Claude Code agent with skills and MCP tools).
+    example: >-
+      Sort ten of his recent AI interactions (Claude Code sessions, spec drafting for the car-wash
+      platform, MCP server work, FPL agent runs) into automation / augmentation / agency. For two
+      of them, write whether the mode was the right one and what would change if moved one column
+      to the right.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — AI Fluency: Introduction to AI Fluency"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations/introduction-to-ai-fluency
+        locator: "AI Fluency: Framework and Foundations, lesson 1 'Introduction to AI Fluency' (text + 4 min video), §'Key takeaways'"
+        kind: course
+        quote: "This course focuses on human-AI collaboration, not just understanding AI as a technology. AI Fluency means engaging with AI systems effectively, efficiently, ethically, and safely."
+        verified: true
+      - title: "Claude Academy — AI Fluency: Why do we need AI Fluency?"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations/why-do-we-need-ai-fluency
+        locator: "AI Fluency: Framework and Foundations, lesson 2 'Why do we need AI Fluency?' (mostly video; short text summary)"
+        kind: course
+        quote: "You and AI collaborate as creative thinking and task execution partners"
+        verified: true
+
+  - id: claude-academy-09
+    title: "The 4D framework: Delegation, Description, Discernment, Diligence"
+    level: B
+    est_min: 20
+    prereqs: [claude-academy-08]
+    summary: >-
+      The four competencies of AI Fluency: Delegation (deciding what to do with AI versus
+      yourself), Description (communicating clearly with AI), Discernment (evaluating outputs and
+      behaviour critically) and Diligence (interacting responsibly). Each applies in all three
+      interaction modes. The following rungs take them one at a time; this one builds the map and
+      a first self-assessment.
+    key_points:
+      - "Delegation: thoughtfully deciding what work to do with AI versus yourself."
+      - "Description: communicating clearly with AI systems."
+      - "Discernment: evaluating AI outputs and behaviour with a critical eye."
+      - "Diligence: ensuring you interact with AI responsibly."
+      - "The 4Ds apply across automation, augmentation and agency."
+    diagram: >-
+      A 4×3 grid: rows are the four Ds, columns are automation / augmentation / agency; each cell
+      holds one question the reader should ask in that situation.
+    example: >-
+      Self-assess 1–5 on each D for his Claude Code work in the Lua monorepo, with one piece of
+      evidence per score (e.g. Discernment: "I review diffs but not test coverage"). Pick the
+      weakest D as the focus for rungs 11–16.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — AI Fluency: The 4D Framework"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations/the-4d-framework
+        locator: "AI Fluency: Framework and Foundations, lesson 3 'The 4D Framework' (text + video)"
+        kind: course
+        quote: "AI Fluency means engaging with AI in ways that are effective, efficient, ethical, and safe"
+        verified: true
+
+  - id: claude-academy-10
+    title: "Deep dive: generative AI fundamentals, capabilities and limitations"
+    level: B
+    est_min: 25
+    prereqs: [claude-academy-09]
+    summary: >-
+      The fluency course's own primer on generative AI: transformers, pre-training and fine-tuning,
+      context windows and emergent capabilities, followed by a capabilities-versus-limitations
+      survey (versatility, conversational awareness, tool use; knowledge cutoffs, hallucination,
+      context limits, reasoning gaps). For this reader it is a fast review — rungs 01–07 and
+      ai-ml-21 to ai-ml-26 cover the same ground in more depth — so the time goes into linking it
+      back to those rungs.
+    key_points:
+      - "Generative AI creates new content rather than only analysing existing data."
+      - "Pre-training (pattern learning) and fine-tuning (instruction following), as in rung 02."
+      - "Capabilities: versatility, conversational awareness, tool integration."
+      - "Limitations: knowledge cutoff, hallucination, context constraints, reasoning gaps — map each to rungs 03–06."
+      - "The best results combine human judgement, creativity and ethical oversight with AI strengths."
+    diagram: >-
+      A cross-reference table drawn as a flow: each limitation named in this lesson → the
+      Capabilities-course property it belongs to → the ai-ml rung that explains its mechanism.
+    example: >-
+      Write a one-page "AI on the car-wash platform: what it can and cannot do" note for his
+      non-technical stakeholders, using only the lesson's capability/limitation list and one
+      concrete platform example per item. Ask Claude to critique it for overclaiming.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — AI Fluency: Framework and Foundations (course page)"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations
+        locator: "AI Fluency: Framework and Foundations, lesson 4 'Generative AI fundamentals' (video-only; the lesson page /generative-ai-fundamentals showed no readable body text to the fetcher on 2026-10-05 — watch it on the site)"
+        kind: course
+        verified: true
+      - title: "Claude Academy — AI Fluency: Capabilities & limitations"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations/capabilities-limitations
+        locator: "AI Fluency: Framework and Foundations, lesson 5 'Capabilities & limitations' (video + text summary), §'Key takeaways'"
+        kind: course
+        quote: "The most effective applications combine human and AI strengths, with humans providing critical thinking, judgment, creativity, and ethical oversight"
+        verified: true
+
+  - id: claude-academy-11
+    title: "Delegation: deciding what to do yourself, together, or hand off"
+    level: B
+    est_min: 30
+    prereqs: [claude-academy-10]
+    summary: >-
+      Delegation is the first D: deciding what work to keep, what to do with AI and what to let AI
+      handle independently. The goal is not to automate everything but to build the most effective partnership for the
+      task. The course then asks the learner to choose a medium-sized, multi-step project to carry
+      through the remaining lessons — this rung picks it.
+    key_points:
+      - "Delegation: what to do yourself, together with AI, or let AI do independently."
+      - "Goal: the most effective human-AI partnership, not maximum automation."
+      - "Project vision first: define what success looks like before splitting tasks."
+      - "Task breakdown with a delegation decision and a reason per task."
+    diagram: >-
+      A project broken into a task tree; each leaf coloured human / together / AI, with a short
+      reason label (judgement needed, domain knowledge, mechanical, verifiable).
+    example: >-
+      Course project: pick one real car-wash POS spec task (e.g. a new redemption-with-upsell
+      scenario for the transaction journal). With Claude, write the success criteria, break it
+      into 6–10 tasks, and mark each human / together / AI with one-line reasons. This plan is
+      reused in rungs 12–17.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — AI Fluency: A closer look at Delegation"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations/a-closer-look-at-delegation
+        locator: "AI Fluency: Framework and Foundations, lesson 6 'A closer look at Delegation' (text + video), §'Key takeaways'"
+        kind: course
+        quote: "Delegation is about making thoughtful decisions about what work to do yourself, what to do together with AI, or what to let AI handle independently."
+        verified: true
+      - title: "Claude Academy — AI Fluency: Project planning and Delegation"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations/project-planning-and-delegation
+        locator: "AI Fluency: Framework and Foundations, lesson 7 'Project planning and Delegation', Steps 1–3"
+        kind: course
+        quote: "Select a medium-sized, multi-step project that you can work on throughout the remainder of this course."
+        verified: true
+
+  - id: claude-academy-12
+    title: "Description: product, process and performance"
+    level: B
+    est_min: 20
+    prereqs: [claude-academy-11]
+    summary: >-
+      Description is communicating with AI so that collaboration is productive: describing the
+      product (what you want), the process (how to approach it) and the performance (how the AI
+      should behave in the interaction). AI cannot infer unstated intent, and it is an
+      interactive partner rather than a vending machine, so description is a conversation, not a
+      single prompt.
+    key_points:
+      - "Product description: the output, its format, audience and quality bar."
+      - "Process description: the approach, steps and reasoning the AI should use."
+      - "Performance description: how the AI should behave — concise, critical, ask before assuming."
+      - "AI cannot infer what you did not say; clarity of intent drives quality of result."
+    diagram: >-
+      One prompt split into three coloured blocks — product, process, performance — with arrows
+      to the parts of the output each one shapes.
+    example: >-
+      Bad Prompt Makeover on his own work: take a real one-line prompt he gave Claude Code last
+      week, rewrite it with explicit product, process and performance parts (for the rung-11
+      project task), run both, and diff the outputs.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — AI Fluency: A closer look at Description"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations/a-closer-look-at-description
+        locator: "AI Fluency: Framework and Foundations, lesson 8 'A closer look at Description' (text + video), §'Key takeaways'"
+        kind: course
+        quote: "AI systems are interactive partners, not databases or vending machines"
+        verified: true
+
+  - id: claude-academy-13
+    title: "Deep dive: effective prompting techniques"
+    level: B
+    est_min: 25
+    prereqs: [claude-academy-12]
+    summary: >-
+      Six concrete techniques make Description work: give context, show examples, specify
+      constraints, break complex tasks into steps, ask the model to think first, and define its
+      role or tone. Prompting is iterative — expect to refine based on results, and even to ask
+      the AI to improve the prompt. API-level prompt structure (system prompts, XML tags, output
+      contracts) is in ai-ml-26.
+    key_points:
+      - "Give context and show examples."
+      - "Specify constraints and break complex tasks into steps."
+      - "Ask the AI to think first; define its role or tone."
+      - "Prompting is iterative and can be collaborative with the AI."
+      - "Pairs with ai-ml-26 for API-level prompt structure."
+    diagram: >-
+      A prompt template skeleton with six labelled slots (context, examples, constraints, steps,
+      think-first, role) and a loop arrow labelled "iterate on results".
+    example: >-
+      Build a reusable Claude Code prompt (or Skill draft) for "write acceptance criteria for a
+      POS feature" that uses all six techniques, including one real example from an earlier
+      car-wash spec. Run it on the rung-11 project task and note which technique changed the
+      output most.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — AI Fluency: Effective prompting techniques"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations/effective-prompting-techniques
+        locator: "AI Fluency: Framework and Foundations, lesson 9 'Effective prompting techniques' (text + video), §'Key takeaways'"
+        kind: course
+        quote: "Successful prompting is iterative (and perhaps also collaborative with the AI!). Expect to refine your approach based on results"
+        verified: true
+
+  - id: claude-academy-14
+    title: "Discernment: judging the product, the process and the behaviour"
+    level: I
+    est_min: 20
+    prereqs: [claude-academy-13]
+    summary: >-
+      Discernment mirrors Description: evaluate the product (is the output accurate and fit for
+      purpose), the process (was the reasoning sound) and the performance (did the AI behave as
+      asked). It depends on the evaluator's own domain expertise, which is exactly where his QA
+      background is an asset. Systematic evaluation of LLM systems is ai-ml-27; this rung is the
+      individual judgement it scales up.
+    key_points:
+      - "Product discernment: is the output itself correct and fit for purpose?"
+      - "Process discernment: was the way the AI approached the task sound?"
+      - "Performance discernment: did the AI behave in the interaction as asked?"
+      - "Domain expertise is the lever; evaluate where you know the ground truth."
+      - "Pairs with ai-ml-27 (evaluating LLM systems)."
+    diagram: >-
+      Description and Discernment as mirrored columns (product / process / performance), joined by
+      arrows: each description element creates a check the evaluator applies.
+    example: >-
+      Take the acceptance criteria produced in rung 13 and review them as a QA lead would: write a
+      product/process/performance checklist, score the output against it, and list three defects
+      with the evidence for each.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — AI Fluency: A closer look at Discernment"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations/a-closer-look-at-discernment
+        locator: "AI Fluency: Framework and Foundations, lesson 10 'A closer look at Discernment' (text + video), §'Key takeaways'"
+        kind: course
+        quote: "Discernment is your ability to thoughtfully evaluate what AI produces, how it produces it, and how it behaves"
+        verified: true
+
+  - id: claude-academy-15
+    title: "The Description–Discernment loop on a real project"
+    level: I
+    est_min: 30
+    prereqs: [claude-academy-14]
+    summary: >-
+      Description and Discernment form one feedback loop: describe, evaluate, refine the
+      description, repeat, while the human adds the domain knowledge and makes the final keep,
+      modify or discard decisions. This lesson is the course's main hands-on block: execute the
+      project planned under Delegation through several turns of the loop and reflect on where the
+      effort actually went.
+    key_points:
+      - "The loop: describe (product, process, performance) → evaluate → refine → repeat."
+      - "Human contribution: perspective, domain knowledge, final decisions."
+      - "Track where the effort went: describing, evaluating or fixing."
+      - "Adjust the delegation plan when the loop shows a task was mis-assigned."
+    diagram: >-
+      A cycle: Description → AI output → Discernment → refined Description, with a side exit
+      "keep / modify / discard" owned by the human and a feedback arrow to the rung-11 delegation
+      plan.
+    example: >-
+      Run three loop iterations on one task from the rung-11 project (e.g. drafting the
+      transaction-journal scenarios for a redemption with upsell). Log each iteration: what was
+      changed in the description, what discernment caught, minutes spent. End by moving any task
+      whose delegation label turned out wrong.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — AI Fluency: The Description-Discernment loop"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations/the-description-discernment-loop
+        locator: "AI Fluency: Framework and Foundations, lesson 11 'The Description-Discernment loop', project execution steps"
+        kind: course
+        quote: "Add your unique perspective, creativity, or domain knowledge Make the final decisions about what to keep, modify, or discard"
+        verified: true
+
+  - id: claude-academy-16
+    title: "Diligence: accountability, transparency, responsibility"
+    level: I
+    est_min: 20
+    prereqs: [claude-academy-15]
+    summary: >-
+      Diligence is taking responsibility for AI-assisted work — the course defines it as ensuring
+      you interact with AI responsibly, and its conclusion as accountability, transparency and
+      responsibility. In practice that spans the choice of system and of the data that goes into
+      it, openness about AI's role with the people who rely on the work, and verifying and owning
+      what ships. For a PO shipping specs to developers and a lead rolling out Claude Code, it is
+      the D with organisational consequences.
+    key_points:
+      - "Diligence ensures accountability, transparency and responsibility in AI work."
+      - "Before: which system, which data may go into it (customer and payment data on a POS)."
+      - "During: disclose AI's role to colleagues who rely on the output."
+      - "After: verify and take ownership of what ships."
+    diagram: >-
+      A timeline of one AI-assisted deliverable — before (system and data choice), during
+      (disclosure), after (verification and sign-off) — with the accountable human named at each
+      stage.
+    example: >-
+      Write a five-line diligence policy for Claude Code use in the Lua monorepo team: what data may
+      be pasted or exposed to tools (secrets, customer/payment data), how AI-authored commits are
+      marked, who reviews before merge, and who owns a defect. Check it against the rung-11 project.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — AI Fluency: Framework and Foundations (course page)"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations
+        locator: "AI Fluency: Framework and Foundations, lesson 12 'A closer look at Diligence' (the lesson page /a-closer-look-at-diligence returned no body text to the fetcher on 2026-10-05, twice — read or watch it on the site)"
+        kind: course
+        verified: true
+      - title: "Claude Academy — AI Fluency: Conclusion"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations/conclusion
+        locator: "AI Fluency: Framework and Foundations, lesson 13 'Conclusion', §'Key takeaways' (secondary source for the definition of Diligence)"
+        kind: course
+        quote: "Diligence ensures accountability, transparency, and responsibility in our AI work."
+        verified: true
+
+  - id: claude-academy-17
+    title: "Fluency as practice: conclusion and a personal prompt library"
+    level: I
+    est_min: 25
+    prereqs: [claude-academy-16]
+    summary: >-
+      The course closes by recapping the 4Ds across the three interaction modes and stressing that
+      fluency grows through deliberate practice. The additional activities turn that into habits:
+      a personal AI fluency plan, a library of template prompts for recurring tasks, and games
+      that train description and discernment. After this rung, take the course quiz on the site.
+    key_points:
+      - "Fluency develops through intentional practice of the four competencies."
+      - "Personal fluency plan: assess, prioritise, act, with dates."
+      - "Prompt and pattern library: template prompts with placeholders for recurring tasks."
+      - "Course quiz on academy.claude.com closes this course."
+    diagram: >-
+      A small library structure: recurring task → template prompt (with placeholders) → known
+      failure modes → discernment checklist, versioned like code.
+    example: >-
+      Turn the best prompts from rungs 12–15 into two Claude Code Skills or slash-command
+      templates for recurring PO work (acceptance criteria, transaction-scenario tables), each with
+      placeholders and a short discernment checklist. Re-score the rung-09 self-assessment.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — AI Fluency: Conclusion"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations/conclusion
+        locator: "AI Fluency: Framework and Foundations, lesson 13 'Conclusion' (text + video), §'Key takeaways'"
+        kind: course
+        quote: "Remember that fluency develops through practice. Each interaction with AI is an opportunity to refine your skills and deepen your understanding."
+        verified: true
+      - title: "Claude Academy — AI Fluency: Additional activities"
+        url: https://academy.claude.com/courses/ai-fluency-framework-foundations/additional-activities
+        locator: "AI Fluency: Framework and Foundations, lesson 14 'Additional activities', §'Build a personal prompt & pattern library'"
+        kind: course
+        quote: "For each task, develop a template prompt that consistently produces good results. Include placeholders or notes for variable information you'll need to add each time"
+        verified: true
+
+  # ─────────────── Course 3 — Building Effective Human-Agent Teams (5 lessons, I) ───────────────
+
+  - id: claude-academy-18
+    title: "From single-player to multiplayer AI: when an agent becomes a teammate"
+    level: I
+    est_min: 25
+    prereqs: [claude-academy-17]
+    summary: >-
+      Single-player AI makes one person faster but silos information; multiplayer AI puts agents
+      and people in a shared space where the agent can be proactive. A multiplayer agent operates
+      as itself — its own identity, credentials and access controls decided by the team — with
+      memory that grows from everyone who works with it and shared context that keeps it current.
+      The architecture of such agents is ai-ml-29 and ai-ml-31.
+    key_points:
+      - "Single-player AI: a 'super suit' that speeds one person and siloes information."
+      - "Multiplayer AI: shared visibility lets agents act proactively and personally."
+      - "Three ingredients: independent identity, shared memory, shared context."
+      - "The team decides the agent's access and tools, not the individual user."
+      - "Pairs with ai-ml-29 (agents as distributed systems) and ai-ml-31 (Claude Code and Agent SDK patterns)."
+    diagram: >-
+      Left: three people each with a private assistant, information arrows trapped in each bubble.
+      Right: the same people plus one agent with its own identity box, a shared memory store and
+      shared channel, arrows flowing both ways.
+    example: >-
+      Tool or teammate? For his Claude Code setup in the Lua monorepo and one MCP server he built,
+      score each on identity, shared memory and shared context (0–2 each). Name the questions his
+      team keeps re-asking each other that a teammate agent could answer.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — Human-Agent Teams: Why multiplayer AI matters"
+        url: https://academy.claude.com/courses/building-effective-human-agent-teams/why-multiplayer-ai-matters
+        locator: "Building Effective Human-Agent Teams, lesson 1 'Why multiplayer AI matters', §'From super suit to shared room'"
+        kind: course
+        quote: "Single-player AI is like putting on a super suit at work: it makes you faster on your own tasks, but information can get siloed easily."
+        verified: true
+      - title: "Claude Academy — Human-Agent Teams: How is a multiplayer agent different from traditional AI tools?"
+        url: https://academy.claude.com/courses/building-effective-human-agent-teams/how-multiplayer-agents-differ
+        locator: "Building Effective Human-Agent Teams, lesson 2 'How is a multiplayer agent different from traditional AI tools?', §'What a multiplayer agent is made of'"
+        kind: course
+        quote: "A multiplayer agent, however, operates as itself. This means you can decide, as a team, what it has access to and what tools it can use."
+        verified: true
+
+  - id: claude-academy-19
+    title: "What a strong human-agent team looks like"
+    level: I
+    est_min: 20
+    prereqs: [claude-academy-18]
+    summary: >-
+      Strong human-agent teams work in public so agents have broad written context, give every
+      member (agents included) a defined role and the tools for it, let humans set the north star
+      the agents work toward, and build trust over time. For an agent, anything not written down
+      and accessible does not exist.
+    key_points:
+      - "Work in public; if it isn't written and accessible, it doesn't exist for an agent."
+      - "Defined roles with matching tools, for agents as for people."
+      - "Humans set the north star; agents that know it can bring useful work toward it."
+      - "Trust is built incrementally."
+    diagram: >-
+      A team roster table rendered as a graph: humans and agents as nodes, each with a role and tool
+      list, all pointing to one north-star node and one shared written-context node.
+    example: >-
+      Draft a roster for one car-wash platform initiative (e.g. the pricing-model feature): humans,
+      one or two agents (spec reviewer, test-case generator), each agent's role, tools and data
+      access, and a measurable north star. Mark the ownership gaps.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — Human-Agent Teams: What a strong human-agent team looks like"
+        url: https://academy.claude.com/courses/building-effective-human-agent-teams/what-a-strong-team-looks-like
+        locator: "Building Effective Human-Agent Teams, lesson 3 'What a strong human-agent team looks like', §'Key takeaways'"
+        kind: course
+        quote: "Work in public and give agents broad context. For an agent, if it isn't written down and accessible, it doesn't exist."
+        verified: true
+
+  - id: claude-academy-20
+    title: "Getting the organisation ready: checklist and first steps"
+    level: I
+    est_min: 25
+    prereqs: [claude-academy-19]
+    summary: >-
+      Five readiness questions — is information open and searchable, is ownership written down
+      (agents included), do teammates and agents have the right tools, are there quality checks,
+      is there a shared north star — followed by a practical start: a small group, a measurable
+      north star set by people, and agent responsibilities widened only after repeated success on
+      a task, with regular retrospectives. Quality checks connect to ai-ml-36 (evals in CI). After
+      this rung, take the course quiz on the site.
+    key_points:
+      - "Readiness: open, searchable information; written ownership; right tools; quality checks; north star."
+      - "Quality checks — a rubric, a test, or a second agent — shorten the time to finalise agent work."
+      - "Start small; people set an ambitious, measurable north star."
+      - "Gradual release: widen an agent's remit only after repeated success on that task."
+      - "Course quiz on academy.claude.com closes this course; pairs with ai-ml-36."
+    diagram: >-
+      A staircase of agent autonomy for one task type: suggest → draft with review → act with
+      spot-check → act alone, with the "several successes in a row" gate and a weekly retro loop
+      between steps.
+    example: >-
+      Design a review checkpoint for an agent in his Lua monorepo: pick one task type (e.g. adding
+      unit tests to a module), define the quality check (rubric, test run, or a second reviewing
+      agent), the success count that unlocks the next autonomy step, and who runs the weekly retro.
+      Answer the five readiness questions for his team in one line each.
+    presentation: standard
+    sources:
+      - title: "Claude Academy — Human-Agent Teams: Organizational checklist"
+        url: https://academy.claude.com/courses/building-effective-human-agent-teams/organizational-checklist
+        locator: "Building Effective Human-Agent Teams, lesson 4 'Organizational checklist', §'Five questions to assess readiness'"
+        kind: course
+        quote: "A rubric, a test, or a second agent reviewing cuts the time it takes to finalize an agent's work."
+        verified: true
+      - title: "Claude Academy — Human-Agent Teams: Some practical ways to get started"
+        url: https://academy.claude.com/courses/building-effective-human-agent-teams/practical-ways-to-get-started
+        locator: "Building Effective Human-Agent Teams, lesson 5 'Some practical ways to get started', §'Getting started checklist'"
+        kind: course
+        quote: "After the agent has handled one kind of task well several times in a row, widen what it may do on that task."
+        verified: true

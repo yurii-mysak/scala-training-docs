@@ -45,6 +45,11 @@ evidence_rule: >-
 
 feeds:
   # ------------------------------------------------------------------ ai-ml
+  - name: Claude Academy
+    url: https://academy.claude.com/
+    domains: [ai-ml]
+    why: "Anthropic's free courses on AI fluency, model capabilities and limits, and human-agent teams; the ladder claude-academy walks the existing courses, this feed catches new ones."
+    how_to_scan: "WebFetch the index page; list course titles; any course not yet in dojo/curriculum/claude-academy.yaml is a fresh-slot candidate (tell the owner it exists so it can be added to the ladder)."
   - name: Anthropic Engineering
     url: https://www.anthropic.com/engineering
     domains: [ai-ml]

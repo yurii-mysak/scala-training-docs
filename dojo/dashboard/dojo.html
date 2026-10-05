@@ -704,7 +704,7 @@ h2 {
               <div><dt><code>skip 1</code></dt><dd>Skip lesson 1.</dd></div>
               <div><dt><code>next 2</code></dt><dd>Two more lessons now, same as Request 2 more.</dd></div>
               <div><dt><code>pause until &lt;date&gt;</code></dt><dd>No deliveries until that date.</dd></div>
-              <div><dt><code>change weight &lt;track&gt; &lt;n&gt;</code></dt><dd>How many of every 16 core lessons come from that track.</dd></div>
+              <div><dt><code>change weight &lt;track&gt; &lt;n&gt;</code></dt><dd>How many core lessons per cycle come from that track (the cycle is the sum of all weights).</dd></div>
               <div><dt><code>add track &lt;name&gt;</code></dt><dd>Start a new ladder.</dd></div>
               <div><dt><code>resend today</code></dt><dd>Re-send today's push notification.</dd></div>
             </dl>
@@ -913,6 +913,7 @@ h2 {
     S.lessons.forEach(function (l) { if (l.status === 'sent') out.push(l); });
     return out;
   }
+  function cycleTotal() { var n = 0; S.tracks.forEach(function (t) { if (t.weight) n += t.weight; }); return n || 16; }
   function canMark() { return S.dbState === 'ready' && S.canWrite !== false && !S.readOnly; }
 
   /* ------------------------------------------------------------ Markdown -> safe DOM */
@@ -1440,7 +1441,7 @@ h2 {
     return h('li', { class: 'track-row' },
       h('div', { class: 'tr-head' },
         h('span', { class: 'tr-name' }, t.name),
-        t.weight !== null ? h('span', { class: 'weight', title: t.weight + ' of every 16 core lessons' }, t.weight + '/16') : null),
+        t.weight !== null ? h('span', { class: 'weight', title: t.weight + ' of every ' + cycleTotal() + ' core lessons' }, t.weight + '/' + cycleTotal()) : null),
       ladder(t.done, t.total),
       h('span', { class: 'tr-count' }, t.done + ' / ' + t.total),
       h('p', { class: 'tr-next' }, next));

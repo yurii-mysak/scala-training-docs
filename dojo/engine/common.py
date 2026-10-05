@@ -25,7 +25,7 @@ import yaml
 LEVELS = {"B": "Beginner", "I": "Intermediate", "A": "Advanced"}
 LEVEL_ORDER = ["B", "I", "A"]
 # Tie-break / display order of tracks (SPEC §1 priorities); unknown tracks come after.
-TRACK_ORDER = ["ai-ml", "fp-scala", "ddia", "architecture", "networking", "rust"]
+TRACK_ORDER = ["ai-ml", "claude-academy", "fp-scala", "ddia", "architecture", "networking", "rust"]
 STATUSES = ("sent", "passed", "review", "skipped")
 DEFAULT_REPO_URL = "https://github.com/yurii-mysak/scala-training-docs"
 # YYYY-MM-DD-N-<slug>.md

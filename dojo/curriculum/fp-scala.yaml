@@ -31,7 +31,7 @@ rungs:
       a side effect is refactored to return the charge as a value, which makes it testable and
       lets charges be batched and coalesced. From that the chapter defines a pure function and
       referential transparency, and introduces the substitution model the rest of the book uses
-      to reason about programs. Extends the existing note
+      to reason about programs. Teach this in full; related KB note for Sources only:
       02-functional-programming/Functional-Programming-Foundations.md ("Pure Functions &
       Referential Transparency") with the book's argument instead of repeating definitions.
     key_points:

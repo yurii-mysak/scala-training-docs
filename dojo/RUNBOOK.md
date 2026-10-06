@@ -103,7 +103,12 @@ profile above; the scaffold path; the full rung dict (core) or the research note
 passages (fresh); the next-rung title (core); and these instructions verbatim:
 
 > Write the lesson body into the scaffold file, keeping the front matter exactly as it is and
-> replacing every `<!-- … -->` hint. Follow `dojo/SPEC.md` §4: sections in order — Why this matters
+> replacing every `<!-- … -->` hint.
+> The lesson must be self-contained (SPEC §4 "Self-contained rule"): explain everything in
+> full, never point at existing repo notes instead of explaining. For DDIA and FP-in-Scala rungs
+> follow SPEC §4 "Book rule": restate the rung's chapter sections in the book's order — Chapter
+> map line, one `###` per section with its § number, the book's own examples, terms and
+> conclusions in your words, the section's exercises as the Lab. Follow `dojo/SPEC.md` §4: sections in order — Why this matters
 > (3 lines) · [Primer, fresh lessons above the reader's level] · The idea (600–1200 words, one or
 > two ```mermaid diagrams: `flowchart LR|TD` or `sequenceDiagram`; quote any label containing
 > parentheses, colons or slashes in double quotes; no HTML inside labels) · Worked example or Lab
@@ -161,7 +166,8 @@ Using the versions from step 1 (re-`list` if you wrote anything since):
    then `python3 dojo/engine/sync_db.py meta` and `ArtifactData` → `update` `meta/state` from
    `dojo/out/db/meta/state.json` with its `if_version`, so the Dojo shows this delivery time.
 2. `git add -A dojo && git commit -m "dojo: state after day <day>" && git push origin main`.
-3. Final response, 3–6 lines: mode, the two titles with tracks/levels/minutes, marks synced,
+3. Final response — it is pushed to the reader's phone by the scheduled task, so the FIRST LINE is
+   `IT Iaido · Day <day>: <title 1> (<m> min) · <title 2> (<m> min) — open the Dojo`; then 2–5 lines: mode, the two titles with tracks/levels/minutes, marks synced,
    lessons filed, anything that failed (git push, database write, diagram) and what you did instead.
 
 Failure policy: never send the pair twice; if the database write fails, retry it once, then send

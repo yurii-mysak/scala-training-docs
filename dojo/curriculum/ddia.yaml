@@ -7,7 +7,7 @@ description: >-
   order: Part I foundations (B to I), Part II distributed data (I to A), Part III derived data (A).
   Dense chapters are split into 2-3 rungs; every rung cites the book by chapter and section title as
   printed, ends with a hands-on check (a Postgres session, quorum arithmetic, a lag or failover
-  trace), and deepens the existing notes in 06-databases-and-distributed-data instead of repeating them.
+  trace), and Teach this in full; related KB note for Sources only:s in 06-databases-and-distributed-data instead of repeating them.
 primary_sources:
   - title: Designing Data-Intensive Applications (Martin Kleppmann, O'Reilly 2017, 1st ed.) — own physical copy
     url: https://dataintensive.net/

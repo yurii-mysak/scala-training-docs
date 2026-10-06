@@ -118,6 +118,19 @@ def check(path: Path, strict: bool = False) -> dict:
             errors.append("Lab shows code output but has no '### Reading the output' section (SPEC §4 Lab rule)")
         if "**Verdict" not in lab:
             errors.append("Lab has no bold **Verdict** after its output (SPEC §4 Lab rule)")
+    # Self-contained rule (SPEC §4): no pointing at repo notes instead of explaining.
+    body_wo_sources = re.sub(r"(?ms)^## Sources\s*$.*?(?=^## |\Z)", "", body)
+    defer = re.search(r"(?i)(repo already has|existing note|already covered in|as covered in|see (the )?(note|section) \d\d|"
+                      r"\b\d\d-[a-z-]+/[A-Za-z_-]+\.md)", body_wo_sources)
+    if defer:
+        errors.append(f"lesson defers to a repo note instead of explaining ('{defer.group(0)}'); restate it (SPEC §4 Self-contained rule)")
+    # Book rule (SPEC §4): chapter map + § subheadings for book tracks.
+    if fm.get("slot") == "core" and fm.get("track") in book_tracks:
+        idea = section_text(body, "The idea")
+        if not re.search(r"(?mi)^>\s*Chapter map:", idea):
+            errors.append("book lesson: 'The idea' must open with a '> Chapter map: …' line (SPEC §4 Book rule)")
+        if len(re.findall(r"(?m)^### .*§\s*\d+\.\d+", idea)) < 1:
+            errors.append("book lesson: each '###' in 'The idea' must carry the book's § number (SPEC §4 Book rule)")
     stats = {"idea_words": idea_words, "mermaid_blocks": mermaid, "self_check": len(items),
              "source_urls": len(urls), "quotes": len(quote_blocks), "est_min": est}
     ok = not errors and (not strict or not warnings)

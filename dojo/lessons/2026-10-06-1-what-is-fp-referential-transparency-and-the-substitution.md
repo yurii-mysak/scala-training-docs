@@ -8,7 +8,7 @@ domain: fp-scala
 rung: fp-scala-01
 level: B
 title: 'What is FP: referential transparency and the substitution model'
-est_min: 15
+est_min: 30
 files_to: 02-functional-programming
 status: sent
 sent_at: 2026-10-06T05:54:58Z
@@ -18,52 +18,92 @@ review_due: null
 sources:
 - title: Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)
   url: https://www.manning.com/books/functional-programming-in-scala-second-edition
+- title: 'FP in Scala 2nd ed., ch. 1 table of contents (Manning liveBook)'
+  url: https://livebook.manning.com/book/functional-programming-in-scala-second-edition/chapter-1
+- title: 'fpinscala wiki: Chapter 1 notes'
+  url: https://github.com/fpinscala/fpinscala/wiki/Chapter-1:-What-is-functional-programming%3F
 - title: 'Scala 3 Book: Pure Functions'
   url: https://docs.scala-lang.org/scala3/book/fp-pure-functions.html
 ---
 # What is FP: referential transparency and the substitution model
 
-> Functional Programming in Scala (red book) · Beginner · ~15 min · rung 1 of 26 · needs: —
+> Functional Programming in Scala (red book) · Beginner · ~30 min · rung 1 of 26 · needs: —
 
 ## Why this matters
-You already write Scala and already avoid `var`. What chapter 1 of the red book gives you is the *argument* behind the habit, in a form you can use in review: a function that does something besides returning a value cannot be tested, reused, or reasoned about locally, and the fix is mechanical — return the effect as a value and perform it at the edge.
-That is also the one tool the rest of this 26-rung track leans on: the substitution model, which is how you check your own refactorings instead of hoping.
-The repo already has a definitions note (`02-functional-programming/Functional-Programming-Foundations.md`, "Pure Functions & Referential Transparency"); this rung supplies the reasoning that note skips.
+Chapter 1 gives the argument behind habits you already have: a function that does more than return a value cannot be tested, reused or reasoned about locally, and the fix is to return the effect as a value and perform it at the edge.
+It also introduces the substitution model, the check every later chapter uses to prove a refactoring kept the program's meaning.
 
 ## The idea
 
-### The Cafe, first version (§1.1)
-The book opens with a coffee shop (Chiusano, Bjarnason & Pilquist, *FP in Scala* 2nd ed., §1.1). `buyCoffee` takes a credit card, makes a cup, and charges the card:
+> Chapter map: Functional Programming in Scala (2nd ed.), ch. 1 "What is functional programming?" — §1.1 Understanding the benefits of functional programming (§1.1.1 A program with side effects, §1.1.2 A functional solution: Removing the side effects), §1.2 Exactly what is a (pure) function?, §1.3 Referential transparency, purity, and the substitution model, §1.4 Conclusion, then an unnumbered Summary.
+> Section titles as listed in Manning liveBook, https://livebook.manning.com/book/functional-programming-in-scala-second-edition/chapter-1
+
+1st edition: same §1.2 and §1.3; §1.1 is titled "The benefits of FP: a simple example", §1.4 is "Summary", and the code is in Scala 2 syntax.
+
+### §1.1 Understanding the benefits of functional programming
+The chapter opens with the premise: FP means building programs only from **pure functions**, functions with no **side effects**. A side effect is anything a function does besides returning its result: reassigning a variable, modifying a data structure in place, setting a field on an object, throwing an exception or halting with an error, printing or reading the console, reading or writing a file, drawing on the screen (ch. 1 intro). The obvious objection is that real programs need all of these. The book's answer is that FP restricts *how* you write programs, not *what* programs you can express. The rest of the book shows how. This chapter shows why, using one example.
+
+#### §1.1.1 A program with side effects
+A coffee shop, `Cafe`, sells a cup and charges a credit card:
 
 ```scala
-def buyCoffee(cc: CreditCard): Coffee =
-  val cup = Coffee()
-  cc.charge(cup.price)   // a side effect
-  cup
+class Cafe:
+  def buyCoffee(cc: CreditCard): Coffee =
+    val cup = Coffee()
+    cc.charge(cup.price)   // side effect: actually charges the card
+    cup
 ```
 
-The signature says `CreditCard => Coffee`. The body does more than that: it talks to a payment system. **A side effect is anything a function does besides returning its result** — mutating a variable or a field, writing to a file or socket, reading hidden state, throwing, calling `println`.
+The signature promises `CreditCard => Coffee`. The body also contacts the card company, authorises the transaction, charges the card and stores a record. None of that shows up in the return value. The book names three problems:
 
-Two concrete costs, both from §1.1:
-
-- **Testing.** To test `buyCoffee` you would have to hit a real payment processor, or stub `CreditCard` with a mock that records calls and then assert on the recording. The interesting question — did it charge the right amount? — is not answerable from the return value, because the return value does not mention the charge.
-- **Reuse.** Buying twelve coffees for a round is not `buyCoffee` twelve times: that is twelve payment calls with twelve fees. The logic you want to reuse is welded to the effect, so you cannot batch it. The book's first attempt at a fix, passing a `Payments` interface in, makes the test slightly less painful and the batching problem no better.
-
-### Push the effect out
-The book's actual fix changes the return type instead. `buyCoffee` returns the cup *and* a description of the charge:
+- **Testing.** You do not want a test to contact a real card company, and the return value says nothing about the charge.
+- **Design.** `CreditCard` should not know how to reach the card company or store records.
+- **The first fix.** Pass the dependency in:
 
 ```scala
+class Cafe:
+  def buyCoffee(cc: CreditCard, p: Payments): Coffee =
+    val cup = Coffee()
+    p.charge(cc, cup.price)
+    cup
+```
+
+This is better, because `Payments` can be an interface with a mock in tests. It is still not good. `Payments` has to be an interface even when one concrete class would do. The mock must keep internal state that the test inspects after the call. And `p.charge` is still a side effect. **Reuse** is still broken too. If Alice orders 12 coffees, calling `buyCoffee` 12 times means 12 charges and 12 processing fees. Avoiding that means a new `buyCoffees` with its own logic, or a batching `Payments` that has to guess when to send. Either way you cannot simply reuse `buyCoffee` (§1.1.1).
+
+#### §1.1.2 A functional solution: Removing the side effects
+The fix is to **return the charge as a value** instead of performing it. This separates *creating* a charge from *processing* (interpreting) it:
+
+```scala
+class Cafe:
+  def buyCoffee(cc: CreditCard): (Coffee, Charge) =
+    val cup = Coffee()
+    (cup, Charge(cc, cup.price))
+
 case class Charge(cc: CreditCard, amount: Double):
   def combine(other: Charge): Charge =
     if cc == other.cc then Charge(cc, amount + other.amount)
-    else throw Exception("can't combine charges to different cards")
-
-def buyCoffee(cc: CreditCard): (Coffee, Charge) =
-  val cup = Coffee()
-  (cup, Charge(cc, cup.price))
+    else throw Exception("Can't combine charges with different cards")
 ```
 
-Now `buyCoffees(cc, n)` is a fold over `n` charges, and `coalesce` groups a day's charges by card and reduces each group with `combine` — so a list of 50 charges across 20 cards becomes 20 payment calls. The code that talks to the payment system is one layer, at the outer edge, and everything inside it is ordinary data. The Scala 3 Book gives the same shape as advice:
+`combine` merges two charges to the same card. It throws on different cards, and the book notes that chapter 4 replaces exceptions with something better. Buying many cups now reuses `buyCoffee` directly:
+
+```scala
+  def buyCoffees(cc: CreditCard, n: Int): (List[Coffee], Charge) =
+    val purchases: List[(Coffee, Charge)] = List.fill(n)(buyCoffee(cc))
+    val (coffees, charges) = purchases.unzip
+    (coffees, charges.reduce((c1, c2) => c1.combine(c2)))
+```
+
+Twelve cups give one `Charge`. A test compares returned values, with no mock and no `Payments` interface. `Cafe` no longer knows how charges are processed. Someone still has to process them, but that code lives elsewhere. Because `Charge` is now a first-class value, you can write logic over it. `coalesce` merges a day's charges into one per card:
+
+```scala
+def coalesce(charges: List[Charge]): List[Charge] =
+  charges.groupBy(_.cc).values.map(_.reduce(_.combine(_))).toList
+```
+
+It passes functions as values to `groupBy`, `map` and `reduce`, which chapter 2 explains. The conclusion of §1.1 is that the effect was not removed but **moved**. The decision (which cups, which card, how much) is now data. The one place that talks to the payment system sits at the edge. The book applies this discipline at every level of a program.
+
+Beyond the book: the Scala 3 Book gives the same shape as advice:
 
 > "Write the core of your application using pure functions, and then write an impure "wrapper" around that core to interact with the outside world."
 >
@@ -71,155 +111,205 @@ Now `buyCoffees(cc, n)` is a fold over `n` charges, and `coalesce` groups a day'
 
 ```mermaid
 flowchart LR
-    subgraph before["Before: the effect is inside"]
+    subgraph before["§1.1.1: the effect is inside"]
         direction TB
         A1["buyCoffee(cc)"] --> C1["Coffee"]
-        A1 -->|"side effect: cc.charge"| P1["Payments (external)"]
+        A1 -->|"side effect: cc.charge"| P1["card company"]
     end
-    subgraph after["After: the charge is a value"]
+    subgraph after["§1.1.2: the charge is a value"]
         direction TB
         A2["buyCoffee(cc)"] --> V2["(Coffee, Charge)"]
         V2 --> L2["List of Charge"]
         L2 --> CO["coalesce: groupBy card, reduce with combine"]
         CO --> E2["edge layer"]
-        E2 -->|"one call per card"| P2["Payments (external)"]
+        E2 -->|"one call per card"| P2["card company"]
     end
     before ~~~ after
 ```
 
-Note what moved: nothing was deleted. Somebody still has to call the payment system. The effect was pushed to one place, and the part you want to test and reuse — which cups, which card, how much — became a value you can inspect, compare and combine.
+### §1.2 Exactly what is a (pure) function?
+A function `f: A => B` relates every value `a: A` to exactly one `b: B`, and `b` is determined **only** by `a`. Changes in internal or external state play no part in computing `f(a)`, and `f` does nothing observable except return `b` (§1.2). Examples: `intToString: Int => String` is a pure function. So is `+` on integers. So is `length` on a `String`, which gives the same answer for the same string every time.
 
-### Pure, and referentially transparent (§1.2–1.3)
-§1.2 defines a **pure function** as one whose return value is determined only by its arguments — `f: A => B` computes a `B` from an `A` and does nothing else. The Scala 3 Book states the same three conditions:
+The section then gives an informal definition. An expression is **referentially transparent (RT)** if it can be replaced by its result anywhere in a program without changing what the program means. `2 + 3` can be replaced by `5` everywhere. A function is **pure** if calling it with RT arguments is also RT (§1.2).
+
+Beyond the book: the Scala 3 Book states the same idea as three conditions:
 
 > "A function `f` is pure if, given the same input `x`, it always returns the same output `f(x)`"; "The function's output depends *only* on its input variables and its implementation"; "It only computes the output and does not modify the world around it".
 >
 > — Scala contributors, *Scala 3 Book — Pure Functions*, undated, https://docs.scala-lang.org/scala3/book/fp-pure-functions.html
 
-§1.3 then makes it precise, and the order matters: **referential transparency is a property of expressions, purity is defined in terms of it.** An expression `e` is referentially transparent if, for every program `p`, replacing every occurrence of `e` in `p` with its evaluated result leaves the meaning of `p` unchanged. A function `f` is pure if the expression `f(x)` is referentially transparent for every referentially transparent `x`.
+### §1.3 Referential transparency, purity, and the substitution model
+§1.3 states both definitions precisely. The order matters, because purity is defined *in terms of* RT:
 
-So "pure" is not a vibe about mutation. It is a testable claim: substitute and see whether the program still means the same thing.
+- An expression `e` is **referentially transparent** if, for all programs `p`, every occurrence of `e` in `p` can be replaced by the result of evaluating `e` without changing the meaning of `p`.
+- A function `f` is **pure** if the expression `f(x)` is referentially transparent for all referentially transparent `x`.
 
-### The substitution model
-Substituting equals for equals, repeatedly, until you reach a value — that is the **substitution model**, and it is just the equational reasoning you did in school algebra. It works for any referentially transparent expression and lets you understand a piece of code by looking only at it, with no mental model of the heap or of what ran before.
+Apply this to the first `buyCoffee`. Whatever `p` is, `p(buyCoffee(aliceCreditCard))` and `p(Coffee())` do not mean the same thing. The first charges Alice's card and the second does not. So the call is not RT and `buyCoffee` is not pure. The §1.1.2 version returns `(Coffee, Charge)` and does nothing else, so replacing the call by that pair changes nothing.
 
-§1.3 shows where it breaks, with two lines that look alike:
+RT gives you the **substitution model**: you evaluate a program by replacing equals with equals until you reach a value, the same equational reasoning used in school algebra. The book's pair of examples:
 
 ```scala
-val x  = "Hello, World"          // String: immutable
-val rx = x.reverse               // substitute x and nothing changes
+val x = "Hello, World"
+val r1 = x.reverse     // dlroW ,olleH
+val r2 = x.reverse     // dlroW ,olleH
+// substitute x:  "Hello, World".reverse  twice — same results
 
-val y  = new StringBuilder("Hello")
-val ry = y.append(", World")     // substitute y and the answers diverge
+// a fresh REPL session, as in the book
+val x = new StringBuilder("Hello")
+val y = x.append(", World")
+val r1 = y.toString    // Hello, World
+val r2 = y.toString    // Hello, World
+// substitute y:  x.append(", World").toString  twice
+//                r1 = Hello, World   r2 = Hello, World, World
 ```
 
-Replace `x` by `"Hello, World"` anywhere and every result stays the same. Replace the *name* `y`'s definition into the two places it is used and the second `append` runs on an already-appended builder, so you get `"Hello, World, World"`. One of these you can refactor by inlining a `val`; the other has a bug waiting for whoever inlines it. The lab below runs exactly this.
+Substituting `x` in the `String` case preserves every result, so `reverse` is pure. Substituting `y` in the `StringBuilder` case changes `r2`. `append` mutates `x`, so the two "identical" expressions run against different states of the same object. `append` is not pure (§1.3).
 
-### Why it pays off on Monday
-- **Local reasoning.** The meaning of a pure expression is the expression. You do not need to know what the caller did first, which is the whole difficulty of reading someone else's Akka actor.
-- **Modularity.** A `Charge` can be combined, grouped, logged, replayed and diffed because it is data. An already-executed charge cannot.
-- **Safe refactoring.** Extracting a `val`, inlining a helper, hoisting a computation out of a loop, reordering two independent statements — all of these are only safe when the expressions involved are referentially transparent. The substitution model is how you check before you touch the code.
+The section's conclusion is about what purity buys. With the substitution model, reasoning is **local**: to understand an expression you need its definition and its arguments, not the history of state changes before it. Pure functions are also **modular**. A pure function is a black box: input arrives only through arguments and output is only returned. That separates the logic of the computation from how the input is obtained and what happens to the result. This is why pure code is easier to test, reuse, parallelise, generalise and reason about (§1.3).
+
+Beyond the book: the companion wiki notes that this definition is deliberately simple. Whether something counts as a side effect depends on who is observing:
+
+> "Our definition of referential transparency in the chapter is a little bit simplistic, but it serves our purposes for the time being." "For example, the fact that memory allocations occur as a side effect of data construction is not something we usually care to track or are even able to observe on the JVM."
+>
+> — fpinscala contributors, *Chapter 1: What is functional programming?* (wiki), undated, https://github.com/fpinscala/fpinscala/wiki/Chapter-1:-What-is-functional-programming%3F
+
+### §1.4 Conclusion
+FP is programming with pure functions. The chapter showed *what* that means: RT expressions and the substitution model. It showed *why* it pays off: the Cafe example, where effects moved to the edge made code testable and composable. *How* to write real programs this way (loops, data structures, errors, I/O) is the rest of the book. Chapter 2 starts with recursion and higher-order functions. The chapter's unnumbered Summary repeats the main points:
+
+- FP builds programs from pure functions, which have no side effects.
+- A side effect is anything a function does besides returning a result.
+- RT means an expression can be replaced by its result without changing the program's meaning. Purity is defined through RT.
+- The substitution model lets you reason locally. Pure functions are modular: easier to test, reuse and combine.
+- Programs with effects are written by pushing the effects outward, as `buyCoffee` did with `Charge`.
 
 ## Lab
-**The question:** does returning the charge as a value actually change anything measurable, and can you see the substitution model break? The script prints the number of payment calls for the same six-coffee order under both designs, then runs the §1.3 substitution test.
+**The question:** if you replay the chapter's own Cafe refactorings and its substitution tests, what does each step change? Specifically: what can you test, how many card-network calls does the same order make, and where exactly does substitution break?
 
-Time: 5–10 minutes.
+Time: about 10 minutes. Chapter 1 has no numbered exercises (in the companion repo they start at chapter 2), so the lab replays the chapter's own example. `CafeV1`, `CafeV2` and `Cafe` are the three versions from §1.1. `Network` is a fake card company that counts calls.
 
 ### Step 1 — save the script
-
-Save this as `ch01.sc`. It is Scala 3; `scala-cli` needs no project.
+Save as `ch01.sc` (Scala 3; `scala-cli` needs no project).
 
 ```scala
 //> using scala 3.3.4
 
-// IT Iaido · fp-scala-01 · replays the two worked examples of
-// Functional Programming in Scala, 2nd ed., ch. 1 (§1.1 and §1.3).
+// FP in Scala, 2nd ed., ch. 1: the Cafe refactorings (§1.1) and the substitution test (§1.3).
 
-case class CreditCard(number: String)
 case class Coffee(price: Double = 2.75)
+
+// A fake card network: the only mutable state in the file, so calls can be counted.
+object Network:
+  var calls = 0
+  def post(card: String, amount: Double): Unit =
+    calls += 1
+    println(s"    [network] charge card=$card amount=$amount")
+
+case class CreditCard(number: String):
+  def charge(amount: Double): Unit = Network.post(number, amount)
+
+trait Payments:
+  def charge(cc: CreditCard, amount: Double): Unit
+
+class MockPayments extends Payments:          // a test double that records calls
+  var recorded = List.empty[(CreditCard, Double)]
+  def charge(cc: CreditCard, amount: Double): Unit = recorded = recorded :+ (cc, amount)
 
 case class Charge(cc: CreditCard, amount: Double):
   def combine(other: Charge): Charge =
-    require(cc == other.cc, "cannot combine charges to different cards")
-    Charge(cc, amount + other.amount)
+    if cc == other.cc then Charge(cc, amount + other.amount)
+    else throw Exception("Can't combine charges with different cards")
 
-object Payments:                        // the only impure thing in the file
-  var calls = 0
-  def charge(cc: CreditCard, amount: Double): Unit =
-    calls += 1
-    println(s"    [network] POST /charge card=${cc.number} amount=$amount")
+object CafeV1:                                // §1.1.1: the side effect is inside
+  def buyCoffee(cc: CreditCard): Coffee =
+    val cup = Coffee()
+    cc.charge(cup.price)
+    cup
+
+object CafeV2:                                // §1.1.1: a Payments parameter
+  def buyCoffee(cc: CreditCard, p: Payments): Coffee =
+    val cup = Coffee()
+    p.charge(cc, cup.price)
+    cup
+
+object Cafe:                                  // §1.1.2: the charge is a value
+  def buyCoffee(cc: CreditCard): (Coffee, Charge) =
+    val cup = Coffee()
+    (cup, Charge(cc, cup.price))
+
+  def buyCoffees(cc: CreditCard, n: Int): (List[Coffee], Charge) =
+    val purchases: List[(Coffee, Charge)] = List.fill(n)(buyCoffee(cc))
+    val (coffees, charges) = purchases.unzip
+    (coffees, charges.reduce((c1, c2) => c1.combine(c2)))
+
+def coalesce(charges: List[Charge]): List[Charge] =
+  charges.groupBy(_.cc).values.map(_.reduce(_.combine(_))).toList
 
 val alice = CreditCard("1111")
 val bob   = CreditCard("2222")
 
-// ---------- Step 1: the effect is inside buyCoffee (§1.1) ----------
-def buyCoffeeImpure(cc: CreditCard): Coffee =
-  val cup = Coffee()
-  Payments.charge(cc, cup.price)
-  cup
+println("A. CafeV1: buyCoffee charges the card itself")
+Network.calls = 0
+val cupsA = List(alice, alice, alice, bob, bob, alice).map(CafeV1.buyCoffee)
+println(s"  cups: ${cupsA.size}   network calls: ${Network.calls}")
 
-println("Step 1 - buyCoffee charges the card itself")
-Payments.calls = 0
-val cups1 = List.fill(3)(buyCoffeeImpure(alice)) ++
-            List.fill(2)(buyCoffeeImpure(bob))   ++
-            List(buyCoffeeImpure(alice))
-println(s"  cups: ${cups1.size}   payment calls: ${Payments.calls}")
+println("B. CafeV2: Payments passed in, tested with a mock")
+val mock = MockPayments()
+val cupsB = List.fill(12)(CafeV2.buyCoffee(alice, mock))
+println(s"  cups: ${cupsB.size}   recorded charges: ${mock.recorded.size}   first: ${mock.recorded.head}")
 
-// ---------- Step 2: buyCoffee returns (Coffee, Charge) (§1.1) ----------
-def buyCoffee(cc: CreditCard): (Coffee, Charge) =
-  val cup = Coffee()
-  (cup, Charge(cc, cup.price))
+println("C. Cafe: buyCoffee returns (Coffee, Charge)")
+Network.calls = 0
+val one = Cafe.buyCoffee(alice)
+println(s"  buyCoffee(alice)      = $one")
+println(s"  equals expected value : ${one == (Coffee(), Charge(alice, 2.75))}")
+val (cupsC, chargeC) = Cafe.buyCoffees(alice, 12)
+println(s"  buyCoffees(alice, 12) = ${cupsC.size} cups, $chargeC")
+println(s"  network calls: ${Network.calls}")
 
-def buyCoffees(cc: CreditCard, n: Int): (List[Coffee], Charge) =
-  val purchases: List[(Coffee, Charge)] = List.fill(n)(buyCoffee(cc))
-  val (coffees, charges) = purchases.unzip
-  (coffees, charges.reduce(_ combine _))
-
-def coalesce(charges: List[Charge]): List[Charge] =
-  charges.groupBy(_.cc).toList.sortBy(_._1.number).map { case (_, cs) => cs.reduce(_ combine _) }
-
-println()
-println("Step 2 - buyCoffee returns (Coffee, Charge)")
-Payments.calls = 0
-List.fill(3)(buyCoffee(alice)).foreach { case (_, ch) => println(s"  per-cup charge: $ch") }
-val (aliceCups, aliceCharge) = buyCoffees(alice, 3)
-val (bobCups,   bobCharge)   = buyCoffees(bob, 2)
-val (oneCup,    oneCharge)   = buyCoffee(alice)
-println(s"  buyCoffees(1111, 3) -> $aliceCharge")
-println(s"  buyCoffees(2222, 2) -> $bobCharge")
-println(s"  buyCoffee(1111)     -> $oneCharge")
-val charges = List(aliceCharge, bobCharge, oneCharge)
-println(s"  payment calls so far: ${Payments.calls}")
-println("  grouped by card:")
-charges.groupBy(_.cc).toList.sortBy(_._1.number).foreach { case (card, cs) =>
-  println(s"    ${card.number} -> ${cs.map(_.amount).mkString(", ")}")
-}
-val settled = coalesce(charges)
+println("D. coalesce: the order from A as charges, settled at the edge")
+val charges = List(alice, alice, alice, bob, bob, alice).map(cc => Cafe.buyCoffee(cc)._2)
+println(s"  charges: ${charges.size}")
+val settled = coalesce(charges).sortBy(_.cc.number)
 settled.foreach(c => println(s"  coalesced: $c"))
-settled.foreach(c => Payments.charge(c.cc, c.amount))     // the edge, once per card
-println(s"  cups: ${aliceCups.size + bobCups.size + 1}   payment calls: ${Payments.calls}")
+Network.calls = 0
+settled.foreach(c => c.cc.charge(c.amount))   // the one impure step
+println(s"  cups: ${charges.size}   network calls: ${Network.calls}")
 
-// ---------- Step 3: the substitution model (§1.3) ----------
-println()
-println("Step 3 - the substitution model")
-val x   = "Hello, World"
-val r1  = x.reverse
-val r2  = x.reverse
-println(s"  String, x bound            : r1 = $r1 | r2 = $r2 | r1 == r2: ${r1 == r2}")
-val r1s = "Hello, World".reverse        // x replaced by its value
-val r2s = "Hello, World".reverse
-println(s"  String, x substituted      : r1 = $r1s | r2 = $r2s | r1 == r2: ${r1s == r2s}")
+println("E. Substitution test on buyCoffee: replace the call by its result")
+def p(c: Coffee): Double = c.price            // a tiny "program" that uses a coffee
+Network.calls = 0
+val e1 = p(CafeV1.buyCoffee(alice))
+val callsWithCall = Network.calls
+Network.calls = 0
+val e2 = p(Coffee())
+println(s"  CafeV1: p(buyCoffee(alice)) = $e1, calls = $callsWithCall | p(Coffee()) = $e2, calls = ${Network.calls}")
+val f1 = Cafe.buyCoffee(alice)
+val f2 = (Coffee(), Charge(alice, 2.75))
+println(s"  Cafe  : buyCoffee(alice) = $f1 | its result written out = $f2 | same: ${f1 == f2}")
 
-val sb  = new StringBuilder("Hello")
-val y   = sb.append(", World")
-val r1b = y.toString
-val r2b = y.toString
-println(s"  StringBuilder, y bound     : r1 = $r1b | r2 = $r2b | r1 == r2: ${r1b == r2b}")
-
-val sb2 = new StringBuilder("Hello")
-val r1c = sb2.append(", World").toString   // y replaced by its definition
-val r2c = sb2.append(", World").toString
-println(s"  StringBuilder, y substituted: r1 = $r1c | r2 = $r2c | r1 == r2: ${r1c == r2c}")
+println("F. String vs StringBuilder (section 1.3)")
+locally {
+  val x = "Hello, World"
+  val r1 = x.reverse
+  val r2 = x.reverse
+  println(s"  String, x named          : r1 = $r1 | r2 = $r2 | equal: ${r1 == r2}")
+  val s1 = "Hello, World".reverse
+  val s2 = "Hello, World".reverse
+  println(s"  String, x substituted    : r1 = $s1 | r2 = $s2 | equal: ${s1 == s2}")
+}
+locally {
+  val x = new StringBuilder("Hello")
+  val y = x.append(", World")
+  val r1 = y.toString
+  val r2 = y.toString
+  println(s"  StringBuilder, y named   : r1 = $r1 | r2 = $r2 | equal: ${r1 == r2}")
+}
+locally {
+  val x = new StringBuilder("Hello")
+  val r1 = x.append(", World").toString
+  val r2 = x.append(", World").toString
+  println(s"  StringBuilder, y inlined : r1 = $r1 | r2 = $r2 | equal: ${r1 == r2}")
+}
 ```
 
 ### Step 2 — run it
@@ -228,89 +318,99 @@ println(s"  StringBuilder, y substituted: r1 = $r1c | r2 = $r2c | r1 == r2: ${r1
 scala-cli run ch01.sc
 ```
 
-Expected output:
+Real output. It was captured by compiling exactly this code with the Scala 3.3.4 compiler, wrapped in an object the way `scala-cli` wraps a `.sc` file, and running it on 2026-10-06:
 
 ```text
-Step 1 - buyCoffee charges the card itself
-    [network] POST /charge card=1111 amount=2.75
-    [network] POST /charge card=1111 amount=2.75
-    [network] POST /charge card=1111 amount=2.75
-    [network] POST /charge card=2222 amount=2.75
-    [network] POST /charge card=2222 amount=2.75
-    [network] POST /charge card=1111 amount=2.75
-  cups: 6   payment calls: 6
-
-Step 2 - buyCoffee returns (Coffee, Charge)
-  per-cup charge: Charge(CreditCard(1111),2.75)
-  per-cup charge: Charge(CreditCard(1111),2.75)
-  per-cup charge: Charge(CreditCard(1111),2.75)
-  buyCoffees(1111, 3) -> Charge(CreditCard(1111),8.25)
-  buyCoffees(2222, 2) -> Charge(CreditCard(2222),5.5)
-  buyCoffee(1111)     -> Charge(CreditCard(1111),2.75)
-  payment calls so far: 0
-  grouped by card:
-    1111 -> 8.25, 2.75
-    2222 -> 5.5
+A. CafeV1: buyCoffee charges the card itself
+    [network] charge card=1111 amount=2.75
+    [network] charge card=1111 amount=2.75
+    [network] charge card=1111 amount=2.75
+    [network] charge card=2222 amount=2.75
+    [network] charge card=2222 amount=2.75
+    [network] charge card=1111 amount=2.75
+  cups: 6   network calls: 6
+B. CafeV2: Payments passed in, tested with a mock
+  cups: 12   recorded charges: 12   first: (CreditCard(1111),2.75)
+C. Cafe: buyCoffee returns (Coffee, Charge)
+  buyCoffee(alice)      = (Coffee(2.75),Charge(CreditCard(1111),2.75))
+  equals expected value : true
+  buyCoffees(alice, 12) = 12 cups, Charge(CreditCard(1111),33.0)
+  network calls: 0
+D. coalesce: the order from A as charges, settled at the edge
+  charges: 6
   coalesced: Charge(CreditCard(1111),11.0)
   coalesced: Charge(CreditCard(2222),5.5)
-    [network] POST /charge card=1111 amount=11.0
-    [network] POST /charge card=2222 amount=5.5
-  cups: 6   payment calls: 2
-
-Step 3 - the substitution model
-  String, x bound            : r1 = dlroW ,olleH | r2 = dlroW ,olleH | r1 == r2: true
-  String, x substituted      : r1 = dlroW ,olleH | r2 = dlroW ,olleH | r1 == r2: true
-  StringBuilder, y bound     : r1 = Hello, World | r2 = Hello, World | r1 == r2: true
-  StringBuilder, y substituted: r1 = Hello, World | r2 = Hello, World, World | r1 == r2: false
+    [network] charge card=1111 amount=11.0
+    [network] charge card=2222 amount=5.5
+  cups: 6   network calls: 2
+E. Substitution test on buyCoffee: replace the call by its result
+    [network] charge card=1111 amount=2.75
+  CafeV1: p(buyCoffee(alice)) = 2.75, calls = 1 | p(Coffee()) = 2.75, calls = 0
+  Cafe  : buyCoffee(alice) = (Coffee(2.75),Charge(CreditCard(1111),2.75)) | its result written out = (Coffee(2.75),Charge(CreditCard(1111),2.75)) | same: true
+F. String vs StringBuilder (section 1.3)
+  String, x named          : r1 = dlroW ,olleH | r2 = dlroW ,olleH | equal: true
+  String, x substituted    : r1 = dlroW ,olleH | r2 = dlroW ,olleH | equal: true
+  StringBuilder, y named   : r1 = Hello, World | r2 = Hello, World | equal: true
+  StringBuilder, y inlined : r1 = Hello, World | r2 = Hello, World, World | equal: false
 ```
-
-This output was reproduced from a line-for-line translation of `ch01.sc` (same structure, `StringBuilder` modelled as a small mutating class), because the course sandbox has no access to Maven Central and therefore cannot download a Scala compiler. The values are arithmetic and string operations with no float rounding, so `scala-cli run ch01.sc` on your machine will confirm them — tell me if any line differs.
 
 ### Reading the output
 
-**`[network] POST /charge` lines** — one per call to the payment system. Fewer is better: each one is a round trip and, in the book's framing, a transaction fee.
-**`cups`** — coffees served. This must stay the same in both designs, otherwise the refactoring changed the product, not the plumbing.
-**`payment calls`** — the metric being compared. Lower is better *at equal cups*.
-**`Charge(CreditCard(nnnn),amount)`** — a charge as plain data: which card, how much. It is a value, not an action; printing it costs nothing.
-**`r1 == r2: true|false`** — whether substituting the name by its definition preserved the meaning. `true` is what referential transparency buys you.
+- **`[network] charge …`**: one line per call to the card company. Fewer is better, because each call is a round trip and a processing fee (§1.1.1).
+- **`cups`**: coffees served. It must be the same across designs, or the refactoring changed the product, not the plumbing.
+- **`network calls` / `recorded charges`**: the metric being compared, at equal cups.
+- **`Charge(CreditCard(nnnn),amount)`**: a charge as plain data. Printing it costs nothing.
+- **`equal` / `same`**: whether substituting an expression preserved the result. `true` is what RT gives you.
 
-| design | cups | payment calls | calls per cup |
-|---|---:|---:|---:|
-| Step 1 — effect inside `buyCoffee` | 6 | 6 | 1.00 |
-| Step 2 — charge returned, coalesced at the edge | 6 | 2 | 0.33 |
+**Parts A–D (§1.1).** The same six-cup order (Alice ×3, Bob ×2, Alice ×1), plus Alice's 12-cup order from the book:
 
-Trace the arithmetic for card `1111`. Three cups at 2.75 give `2.75 + 2.75 = 5.50`, then `5.50 + 2.75 = 8.25` — that is `buyCoffees(1111, 3)`, one `Charge` built by two `combine` steps, zero network calls. The later single cup adds another `Charge(1111, 2.75)`. `coalesce` groups both under card `1111` (`8.25, 2.75` in the grouped print) and reduces them: `8.25 + 2.75 = 11.00`. Card `2222` has one group, `2.75 + 2.75 = 5.50`. Six cups, total `11.00 + 5.50 = 16.50` — the same money as the six 2.75 charges in Step 1 — delivered in 2 calls instead of 6.
+| part | design | cups | card-network calls | how you test it |
+|---|---|---:|---:|---|
+| A | `CafeV1`: `cc.charge` inside | 6 | 6 | only by counting real calls |
+| B | `CafeV2`: `Payments` passed in | 12 | 12 recorded on the mock | mock with internal state |
+| C | `Cafe`: returns `(Coffee, Charge)` | 12 | 0 | `one == (Coffee(), Charge(alice, 2.75))` → `true` |
+| D | `Cafe` + `coalesce`, edge pays | 6 | 2 | compare `Charge` values |
 
-**Verdict (Steps 1–2):** identical cups and identical money, 6 payment calls down to 2, and the only line that touches the network is the last `foreach`. The batching was not an optimisation bolted on afterwards; it became *possible* the moment the charge was a value. Note also that Step 2 calls `buyCoffee(alice)` three times just to print the per-cup charges, before the real work — and that is free, because nothing was charged. In Step 1 that debugging print would have cost three fees.
+Trace the arithmetic. In C, `buyCoffees(alice, 12)` reduces 12 charges of 2.75 with `combine`: `12 × 2.75 = 33.0`, which is one `Charge`. In D, card `1111` has 3 + 1 = 4 cups, `4 × 2.75 = 11.0`. Card `2222` has `2 × 2.75 = 5.5`. The total `11.0 + 5.5 = 16.5` equals A's six charges, `6 × 2.75 = 16.5`. Same cups, same money, 6 calls down to 2.
 
-Now Step 3.
+**Verdict (A–D):** moving `Payments` in (B) made testing possible but kept one charge per cup. Returning `Charge` (C) made the test a plain value comparison and made batching (D) a five-line function. Batching was not bolted on afterwards. It became possible once the charge was a value.
+
+**Part E (§1.3, the book's test on `buyCoffee`).** For `CafeV1`, `p(buyCoffee(alice))` and `p(Coffee())` both return `2.75`, but the first made 1 network call and the second made 0. The program's meaning changed, so the call is not RT. For `Cafe`, the call and its result written out are equal (`same: true`), and nothing else happened.
+
+**Verdict (E):** the return value alone does not tell you whether an expression is RT. You have to check whether anything else happened. `CafeV1.buyCoffee` fails that check and `Cafe.buyCoffee` passes it.
+
+**Part F (§1.3, `String` vs `StringBuilder`).**
 
 | expression | r1 | r2 | equal? |
 |---|---|---|---:|
-| `String`, `x` bound | `dlroW ,olleH` | `dlroW ,olleH` | true |
+| `String`, `x` named | `dlroW ,olleH` | `dlroW ,olleH` | true |
 | `String`, `x` substituted by `"Hello, World"` | `dlroW ,olleH` | `dlroW ,olleH` | true |
-| `StringBuilder`, `y` bound | `Hello, World` | `Hello, World` | true |
-| `StringBuilder`, `y` substituted by `sb.append(", World")` | `Hello, World` | `Hello, World, World` | false |
+| `StringBuilder`, `y` named | `Hello, World` | `Hello, World` | true |
+| `StringBuilder`, `y` inlined as `x.append(", World")` | `Hello, World` | `Hello, World, World` | false |
 
-Trace the last row. `sb` starts as `Hello` (5 chars). The first `sb.append(", World")` mutates it to `Hello, World` (12 chars) and returns the *same* object, so `r1` is `Hello, World`. The second `sb.append(", World")` appends to that 12-char buffer, giving 19 chars, so `r2` is `Hello, World, World`. In the row above, `y` named the result once, both `toString` calls read the same buffer after one append, and the answers matched — which is exactly how such a bug hides until someone inlines the `val`.
+Trace the last row. `x` starts as `Hello` (5 chars). The first `x.append(", World")` mutates it to `Hello, World` (5 + 7 = 12 chars) and returns the same object, so `r1` is `Hello, World`. The second `append` adds to that 12-char buffer, giving 12 + 7 = 19 chars, so `r2` is `Hello, World, World`. In the row above, `y` named the result once. Both `toString` calls read the buffer after a single append, so the answers matched. That is how such a bug hides until someone inlines the `val`.
 
-**Verdict (Step 3):** `x.reverse` is referentially transparent and survives substitution; `sb.append(", World")` is not, and the substitution changes the program's meaning. The two code shapes are visually identical, so the property, not the shape, is what you have to check.
+**Verdict (F):** `x.reverse` is RT and survives substitution. `x.append(", World")` is not RT, and inlining it changes the program. The two code shapes look identical, so you have to check the property, not the shape.
 
 ### Cause → consequence
 
-1. **Cause.** `buyCoffee` performed the charge instead of describing it, so its only observable output was outside its return type.
-2. **Mechanism.** Returning `(Coffee, Charge)` makes the effect a value. Values can be put in a `List`, grouped by card, and reduced with `combine`; an executed network call cannot.
-3. **Consequence.** The same six-coffee order settles in 2 payment calls instead of 6, and the business logic is testable by comparing `Charge` values — no mock, no payment sandbox.
-4. **In practice.** This is the test for your own code: can I call this function twice in a row, in a test or a log line, without consequences? If not, the effect is in the wrong layer. And before you inline a `val`, hoist an expression out of a loop, or reorder two statements, ask whether the expression is referentially transparent — the `StringBuilder` row is what a "harmless" inline looks like when it is not.
+1. **Cause.** `buyCoffee` performed the charge instead of describing it, so part of its result was outside its return type.
+2. **Mechanism.** Returning `(Coffee, Charge)` makes the effect a value. Values can be listed, grouped by card and reduced with `combine`. A call that has already run cannot.
+3. **Consequence.** The same six-cup order settles in 2 network calls instead of 6, and the logic is tested by comparing `Charge` values, with no mock.
+4. **In practice.** For any function in your services, ask whether you can call it twice in a row, in a test or a log line, with no consequences. If not, the effect is in the wrong layer. Before you inline a `val`, hoist an expression out of a loop or reorder two statements, check that the expressions are RT. The `StringBuilder` row shows what a "harmless" inline does when they are not.
 
 ## Self-check
 1. `def register(u: User): UserId` writes a row to Postgres and returns the new id. Is it pure? What breaks, and what would the signature look like after pushing the effect out? <details><summary>Answer</summary>Not pure: it does something besides returning a value (it writes to a database), so `register(u)` is not referentially transparent — calling it twice is not the same as calling it once and reusing the result. What breaks: you cannot test it without a database, and you cannot batch or retry the writes as data. Pushed out, it returns a description instead, e.g. `def register(u: User): (UserId, InsertUser)` or `def register(u: User): Command`, and one edge layer executes the commands — which is also what lets you batch several inserts into one statement, exactly like `coalesce`.</details>
 2. State referential transparency and purity in the book's order, and say which is defined in terms of which. <details><summary>Answer</summary>Referential transparency is a property of an *expression*: `e` is referentially transparent if, for all programs `p`, replacing every occurrence of `e` in `p` by its evaluated result does not change the meaning of `p`. Purity is then defined on top of it: a function `f` is pure if the expression `f(x)` is referentially transparent for all referentially transparent `x` (*FP in Scala* 2nd ed., §1.3). So purity is derived from referential transparency, not the other way round.</details>
-3. `coalesce` is implemented with `groupBy` and `reduce(_ combine _)`. What assumption about `combine` makes that correct, and what happens if a list mixes charges from two cards? <details><summary>Answer</summary>`reduce` applies `combine` in an unspecified association, so `combine` must be associative for the result to be well defined — it is, since it adds `Double` amounts for one fixed card. It is also commutative here, which is why ordering inside a group does not matter. Mixing cards is prevented by construction: `groupBy(_.cc)` means every group shares a card, so the `require(cc == other.cc)` inside `combine` can never fail from `coalesce`. Called directly on a mixed list, `combine` throws — the partiality is the price of keeping `Charge` a simple pair rather than a map from card to amount.</details>
+3. `coalesce` is implemented with `groupBy` and `reduce(_.combine(_))`. What assumption about `combine` makes that correct, and what happens if a list mixes charges from two cards? <details><summary>Answer</summary>`reduce` applies `combine` in an unspecified association, so `combine` must be associative for the result to be well defined — it is, since it adds `Double` amounts for one fixed card. It is also commutative here, which is why ordering inside a group does not matter. Mixing cards is prevented by construction: `groupBy(_.cc)` means every group shares a card, so the `if cc == other.cc … else throw` inside `combine` can never reach the `throw` from `coalesce`. Called directly on a mixed list, `combine` throws — the partiality is the price of keeping `Charge` a simple pair rather than a map from card to amount.</details>
 
 ## Sources
-- [Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)](https://www.manning.com/books/functional-programming-in-scala-second-edition) — Manning — ch. 1 "What is functional programming?": §1.1 supplied the Cafe / `buyCoffee` example, the testing and reuse costs, and `Charge` / `coalesce`; §1.2 "Exactly what is a (pure) function?" the definition of a pure function; §1.3 "Referential transparency, purity, and the substitution model" the definition of referential transparency, the substitution model, and the `String` vs `StringBuilder.append` example the lab replays (book cited inline by section; accessed 2026-10-06)
-- [Scala 3 Book: Pure Functions](https://docs.scala-lang.org/scala3/book/fp-pure-functions.html) — Scala contributors, Scala 3 Book › Functional Programming › Pure Functions — the quoted three-condition definition of a pure function and the quoted "pure core, impure wrapper" advice, which is the same push-the-effect-to-the-edge move as the book's refactoring (accessed 2026-10-06)
+- [Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)](https://www.manning.com/books/functional-programming-in-scala-second-edition) — Manning — ch. 1 "What is functional programming?": the intro supplied the premise and the list of side effects. §1.1.1 "A program with side effects" supplied `Cafe`/`buyCoffee`, the `Payments` refactoring and the testing, design and reuse costs. §1.1.2 "A functional solution: Removing the side effects" supplied `Charge`/`combine`/`buyCoffees`/`coalesce`. §1.2 "Exactly what is a (pure) function?" supplied the definition of a function and the informal RT definition. §1.3 "Referential transparency, purity, and the substitution model" supplied the formal definitions, the `buyCoffee` RT test, the `String`/`StringBuilder` example, and local reasoning and modularity. §1.4 "Conclusion" and the Summary supplied the wrap-up. The book is cited inline by section (accessed 2026-10-06).
+- [FP in Scala 2nd ed., ch. 1 (Manning liveBook)](https://livebook.manning.com/book/functional-programming-in-scala-second-edition/chapter-1) — Manning — the exact 2nd-edition section titles and numbering used in the chapter map (accessed 2026-10-06)
+- [FP in Scala 1st ed., ch. 1 (Manning liveBook)](https://livebook.manning.com/book/functional-programming-in-scala/chapter-1) — Manning — the 1st-edition numbering noted under the chapter map (accessed 2026-10-06)
+- [fpinscala companion repo](https://github.com/fpinscala/fpinscala) — Chiusano, Bjarnason, Pilquist and contributors — the `second-edition` branch's exercise layout, which starts at chapter 2. That confirms chapter 1 has no numbered exercises (accessed 2026-10-06)
+- [fpinscala wiki: Chapter 1 notes](https://github.com/fpinscala/fpinscala/wiki/Chapter-1:-What-is-functional-programming%3F) — fpinscala contributors — the quoted note that the chapter's RT definition is simplified and that side effects depend on the observer (accessed 2026-10-06)
+- [Scala 3 Book: Pure Functions](https://docs.scala-lang.org/scala3/book/fp-pure-functions.html) — Scala contributors, Scala 3 Book › Functional Programming › Pure Functions — the quoted three-condition definition of a pure function and the quoted "pure core, impure wrapper" advice (accessed 2026-10-06)
 
 ## Next on this track
 Next on Functional Programming in Scala (red book): **Getting started: tail recursion, higher-order and polymorphic functions** (rung 2 of 26, Beginner).

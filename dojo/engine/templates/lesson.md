@@ -20,7 +20,7 @@
 
 {{/primer}}
 ## The idea
-<!-- WRITER: {{presentation_hint}} Exactly one or two mermaid code blocks (a fenced block whose info string is "mermaid"); no other diagram format. Subheadings (###) are allowed. 600-1200 words.
+<!-- WRITER: SELF-CONTAINED: explain everything in full; never point at existing repo notes instead of explaining (they may only be listed at the end of Sources under 'Related in your knowledge base'). BOOK TRACKS (ddia, fp-scala): restate the rung's chapter sections in the book's order — first line '> Chapter map: <book> ch. N — §N.1 <name>, §N.2 <name>', then one ### per section with its § number, the book's own running example, terms, argument and conclusion in your words; label anything extra 'Beyond the book:'. {{presentation_hint}} Exactly one or two mermaid code blocks (a fenced block whose info string is "mermaid"); no other diagram format. Subheadings (###) are allowed. 600-1200 words.
 EVIDENCE RULE (SPEC section 4):
  - Claims from a book/course/page the reader can open: cite inline, with chapter / section / timestamp, e.g. (Kleppmann, DDIA ch. 3, "Hash Indexes"), (RFC 9000 section 7.2), (3Blue1Brown, "But what is a neural network?", 4:10).
  - Claims from a blog post, paper, release note, talk or news: a VERBATIM quote of 1-3 sentences in a blockquote, citation directly under it: > "..." - Author or organisation, Title, date, URL. Fetch the page and copy the quote; never paraphrase a quote as if it were verbatim and never invent one.

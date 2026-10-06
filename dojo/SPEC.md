@@ -139,6 +139,34 @@ One sentence naming the next rung.
 Fresh lessons add a `## Primer` section right after "Why this matters" when the item sits
 above the reader's current level in that domain.
 
+### Self-contained rule (hard requirement, every lesson)
+
+A lesson fully teaches its topic on its own. It never substitutes a pointer for an explanation:
+no "the repo already has a note on X", "see section 02 for the definitions", "as covered in the
+existing note". Every term the lesson relies on is defined where it is first used, every step
+of an argument is written out, every example is worked in the text. Existing knowledge-base
+notes may be listed only at the very end of `## Sources`, under "Related in your knowledge base".
+`engine/check_lesson.py` rejects deferring phrases outside `## Sources`.
+
+### Book rule (hard requirement, DDIA and FP in Scala tracks)
+
+For a rung built on one of the reader's books, the lesson **restates the chapter section(s)
+of that rung**, in order, so that reading the lesson is close to reading that part of the book:
+- `## The idea` opens with a **Chapter map** line naming the chapter and the sections covered
+  (`> Chapter map: FP in Scala ch. 1 — §1.1 The benefits of FP: a simple example, §1.2 Exactly
+  what is a (pure) function?, §1.3 Referential transparency, purity and the substitution model`).
+- One `###` subheading per book section, in the book's order, each carrying its § number.
+- Under each: the section's argument, its running example (same names, same code shape), its
+  definitions and terms, and its conclusion, restated in the writer's own words, with short
+  quotes only. Nothing important from the section is skipped; additions that go beyond the book
+  are labelled "Beyond the book:".
+- Exercises from that section become the Lab (with the book's exercise numbers).
+- Length follows the material: a rung may run to 30 minutes; if a section cannot be restated
+  well in that time, the curriculum splits it into two rungs rather than compressing.
+The writer does not have the book's text: it restates from its knowledge of the chapter and the
+public companion material (fpinscala repo, dataintensive.net, the authors' talks), and every
+section heading carries its § number so the reader can check it against his copy.
+
 ### Lab rule (hard requirement, every lesson with code or numbers)
 
 The reader must be able to follow the lab from input to verdict without reverse-engineering it:
@@ -252,7 +280,9 @@ mirrors it into the repo (front matter, log, filing).
 
 The reader asked for push notifications only (no email). The job's delivery is:
 1. the two lesson documents written to the Dojo database (`lessons/{id}` with full `md`), and
-2. one `PushNotification` (≤ 200 characters): `IT Iaido · Day N: <title 1> (<m> min) · <title 2>
+2. a push notification: the scheduled task has push notifications on and pushes the run's final
+   response, whose first line is the notification text (a `PushNotification` call is made too,
+   best effort — it has no device to reach from a scheduled cloud session) (≤ 200 characters): `IT Iaido · Day N: <title 1> (<m> min) · <title 2>
    (<m> min) — open the Dojo`.
 `engine/render_email.py` still renders an HTML version (`out/email.json`) for an explicit
 "resend today by email" request; it is not part of the daily run.

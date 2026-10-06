@@ -1,24 +1,6 @@
----
-id: 2026-10-05-2
-date: 2026-10-05
-day: 1
-slot: fresh
-track: fresh
-domain: ai-ml
-rung: null
-level: I
-title: 'Decision models: when an LLM answers with probabilities, not text'
-est_min: 30
-files_to: 24-ai-ml-foundations
-status: passed
-sent_at: 2026-10-05T07:51:42Z
-marked_at: 2026-10-05T19:48:22Z
-filed_to: 24-ai-ml-foundations/decision-models-when-an-llm-answers-with-probabilities-not.md
-review_due: null
-primer_needed: true
-sources: []
----
 # Decision models: when an LLM answers with probabilities, not text
+
+> Source: IT Iaido lesson 2026-10-05-2 · Fresh · AI / ML foundations · Intermediate · passed on 2026-10-05
 
 > Fresh · AI / ML foundations · Intermediate · ~30 min · from today's feeds
 

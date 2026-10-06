@@ -179,6 +179,14 @@ Lessons marked *passed* are filed into the numbered sections below (new ones app
 
 ---
 
+
+## AI & Machine Learning
+
+### [24 — AI / ML Foundations](24-ai-ml-foundations/)
+| Level | Topics |
+|-------|--------|
+| B | [What machine learning actually optimises](24-ai-ml-foundations/what-machine-learning-actually-optimises.md) |
+| I | [Decision models: when an LLM answers with probabilities, not text](24-ai-ml-foundations/decision-models-when-an-llm-answers-with-probabilities-not.md) |
 ## Domain-Specific
 
 ### [16 — AdTech](16-adtech/)

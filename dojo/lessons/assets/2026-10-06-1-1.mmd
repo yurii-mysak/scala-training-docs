@@ -1,0 +1,15 @@
+flowchart LR
+    subgraph before["Before: the effect is inside"]
+        direction TB
+        A1["buyCoffee(cc)"] --> C1["Coffee"]
+        A1 -->|"side effect: cc.charge"| P1["Payments (external)"]
+    end
+    subgraph after["After: the charge is a value"]
+        direction TB
+        A2["buyCoffee(cc)"] --> V2["(Coffee, Charge)"]
+        V2 --> L2["List of Charge"]
+        L2 --> CO["coalesce: groupBy card, reduce with combine"]
+        CO --> E2["edge layer"]
+        E2 -->|"one call per card"| P2["Payments (external)"]
+    end
+    before ~~~ after

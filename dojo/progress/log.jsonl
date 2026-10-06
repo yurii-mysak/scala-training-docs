@@ -1,3 +1,9 @@
 {"ts": "2026-10-05T07:47:09Z", "event": "sent", "lesson": "2026-10-05-1", "by": "job", "note": "core · ai-ml-01"}
 {"ts": "2026-10-05T07:51:42Z", "event": "sent", "lesson": "2026-10-05-2", "by": "job", "note": "fresh · ai-ml"}
 {"ts": "2026-10-05T08:05:50Z", "event": "sent", "lesson": null, "by": "job", "note": "day 1: 2026-10-05-1, 2026-10-05-2 (sent from the build session; email blocked by Gmail scope)"}
+{"ts": "2026-10-06T05:54:35Z", "event": "passed", "lesson": "2026-10-05-1", "by": "dashboard", "note": "was sent"}
+{"ts": "2026-10-06T05:54:35Z", "event": "passed", "lesson": "2026-10-05-2", "by": "dashboard", "note": "was sent"}
+{"ts": "2026-10-06T05:54:43Z", "event": "filed", "lesson": "2026-10-05-1", "by": "job", "note": "24-ai-ml-foundations/what-machine-learning-actually-optimises.md"}
+{"ts": "2026-10-06T05:54:43Z", "event": "filed", "lesson": "2026-10-05-2", "by": "job", "note": "24-ai-ml-foundations/decision-models-when-an-llm-answers-with-probabilities-not.md"}
+{"ts": "2026-10-06T05:54:58Z", "event": "sent", "lesson": "2026-10-06-1", "by": "job", "note": "core · fp-scala-01"}
+{"ts": "2026-10-06T06:13:05Z", "event": "sent", "lesson": "2026-10-06-2", "by": "job", "note": "fresh · architecture"}

@@ -1,0 +1,10 @@
+flowchart TD
+  U["users"] --> CDN["CDN"]
+  CDN -->|"asks DNS where the region is"| R53["Route 53 health check, needs TLS 1.2"]
+  ING["ingress LB, now TLS 1.3 only"] -->|"handshake cannot complete"| R53
+  R53 -->|"endpoint unhealthy, region withdrawn"| CDN
+  CDN -->|"no traffic"| ING
+  ING --> APP["4 healthy instances, all green"]
+  APP --> TEL["internal telemetry: watches the data plane only"]
+  CDN -->|"reroutes thousands of km"| FAR["failover region, cold"]
+  FAR --> LAT["latency spike, scale-up under unplanned load"]

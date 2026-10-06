@@ -1,29 +1,6 @@
----
-id: 2026-10-05-1
-date: 2026-10-05
-day: 1
-slot: core
-track: ai-ml
-domain: ai-ml
-rung: ai-ml-01
-level: B
-title: What machine learning actually optimises
-est_min: 25
-files_to: 24-ai-ml-foundations
-status: passed
-sent_at: 2026-10-05T07:47:09Z
-marked_at: 2026-10-05T20:54:56Z
-filed_to: 24-ai-ml-foundations/what-machine-learning-actually-optimises.md
-review_due: null
-sources:
-- title: DOU — what to study to become an ML/CV engineer in 2026 (The Fourth Law team)
-  url: https://dou.ua/forums/topic/62000/
-- title: Kaggle Learn — Intro to Machine Learning
-  url: https://www.kaggle.com/learn/intro-to-machine-learning
-- title: Google Machine Learning Crash Course
-  url: https://developers.google.com/machine-learning/crash-course
----
 # What machine learning actually optimises
+
+> Source: IT Iaido lesson 2026-10-05-1 · AI / ML foundations · Beginner · passed on 2026-10-05
 
 > AI / ML foundations · Beginner · ~25 min · rung 1 of 38 · needs: —
 
@@ -228,6 +205,3 @@ Read it as `[a, b]`. Without the mansion, the best squared-error line is essenti
 - [Kaggle Learn — Intro to Machine Learning](https://www.kaggle.com/learn/intro-to-machine-learning) — Kaggle, undated — the hands-on course for this phase; lesson 1 "How Models Work" (https://www.kaggle.com/code/dansbecker/how-models-work) is the source of the fitting / training / training-data definitions quoted above (accessed 2026-10-05)
 - [Kaggle/learntools — source notebook of "How Models Work"](https://raw.githubusercontent.com/Kaggle/learntools/master/notebooks/machine_learning/raw/tut1.ipynb) — Kaggle, GitHub — the lesson text the Kaggle quote was checked against, because the Kaggle page renders in the browser and its text cannot be fetched directly (accessed 2026-10-05)
 - [Google Machine Learning Crash Course — Linear regression: Loss](https://developers.google.com/machine-learning/crash-course/linear-regression/loss) — Google, last updated 2026-01-05 — definition of loss, MAE (L1) and MSE (L2), and the point that MSE moves the model toward outliers while MAE does not (accessed 2026-10-05)
-
-## Next on this track
-Next on AI / ML foundations: **Your first model: pandas in, predictions out** (rung 2 of 38, Beginner).

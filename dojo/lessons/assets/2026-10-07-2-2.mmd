@@ -1,0 +1,9 @@
+flowchart TD
+  T["spend reaches the limit"] --> K{"what does the cap do?"}
+  K -->|"refuse calls"| R["errors returned, resources keep running"]
+  K -->|"pause project"| Q["resources stopped, data preserved"]
+  Q --> W{"someone acts within 90 days?"}
+  W -->|"yes"| U["resume, data intact"]
+  W -->|"no"| D["project data permanently deleted"]
+  R --> B["bill bounded, availability fault only"]
+  U --> B

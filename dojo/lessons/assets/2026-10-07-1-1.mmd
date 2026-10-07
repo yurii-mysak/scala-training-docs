@@ -1,0 +1,19 @@
+flowchart LR
+    subgraph r["Approach 1: query on read"]
+        direction TB
+        U1["user opens home timeline"] --> Q1["join tweets, follows, users at read time"]
+        Q1 --> T1["tweets table"]
+        Q1 --> F1["follows table"]
+        Q1 --> O1["timeline: cheap writes, 300k/s expensive reads"]
+    end
+    subgraph w["Approach 2: fan-out on write"]
+        direction TB
+        P2["user posts a tweet: 4.6k/s average"] --> FO["fan-out worker looks up followers"]
+        FO -->|"approx. 345k writes/s"| C1["follower A timeline cache"]
+        FO --> C2["follower B timeline cache"]
+        FO --> C3["follower N timeline cache"]
+        U2["user opens home timeline"] --> RD["read one cache, no join"]
+        C1 --> RD
+        CEL["celebrity, over 30M followers: not fanned out"] -.->|"hybrid: merged on read"| RD
+    end
+    r ~~~ w

@@ -1,0 +1,10 @@
+flowchart LR
+  A["agent loop: plan, act, observe"] --> P["paid API call"]
+  P --> M["usage meter, batched"]
+  M --> S{"over the budget?"}
+  S -->|"soft cap"| E["warning email queued"]
+  E --> H["human reads it hours later"]
+  H -->|"manual stop, overshoot already billed"| A
+  S -->|"hard cap, evaluated inline"| X["request refused, error returned"]
+  X -->|"loop sees an error and stops"| A
+  P -->|"result"| A

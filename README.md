@@ -66,7 +66,7 @@ Lessons marked *passed* are filed into the numbered sections below (new ones app
 ### [02 — Functional Programming](02-functional-programming/)
 | Level | Topics |
 |-------|--------|
-| B | [FP Foundations](02-functional-programming/Functional-Programming-Foundations.md) |
+| B | [FP Foundations](02-functional-programming/Functional-Programming-Foundations.md), [What is FP: referential transparency and the substitution model](02-functional-programming/what-is-fp-referential-transparency-and-the-substitution.md) |
 | I | [Functional Data Structures](02-functional-programming/Functional-Data-Structures.md), [Functional Design Patterns](02-functional-programming/Functional-Design-Patterns.md), [Side Effects & IO](02-functional-programming/SideEffects_IO.md), [Purely Functional State](02-functional-programming/Purely-Functional-State.md) |
 | A | [Purely Functional Concurrency](02-functional-programming/Purely-Functional-Concurrency.md) |
 
@@ -176,6 +176,11 @@ Lessons marked *passed* are filed into the numbered sections below (new ones app
 | B | [Architecture & Dev Process](15-system-design/Architecture-Dev-Process.md) |
 | I | [gRPC & Protobuf](15-system-design/grpc_protobuf_schema_design.md), [Event Sourcing, CQRS & Sagas](15-system-design/event_sourcing_cqrs_sagas_guide.md) |
 | A | [Payment Systems Design](15-system-design/payments_interview_prep_expanded.md) |
+
+### [25 — Software Architecture & Design](25-software-architecture/)
+| Level | Topics |
+|-------|--------|
+| I | [High availability is not resilience — the TLS upgrade that hid behind green dashboards](25-software-architecture/high-availability-is-not-resilience-the-tls-upgrade-that.md) |
 
 ---
 

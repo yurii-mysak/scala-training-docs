@@ -1,26 +1,6 @@
----
-id: 2026-10-06-2
-date: 2026-10-06
-day: 2
-slot: fresh
-track: fresh
-domain: architecture
-rung: null
-level: I
-title: High availability is not resilience — the TLS upgrade that hid behind green dashboards
-est_min: 20
-files_to: 25-software-architecture
-status: passed
-sent_at: 2026-10-06T06:13:05Z
-marked_at: 2026-10-06T21:04:38Z
-filed_to: 25-software-architecture/high-availability-is-not-resilience-the-tls-upgrade-that.md
-review_due: null
-primer_needed: true
-sources:
-- title: 'High Availability Is Not Resilience: Why Cloud Systems Fail When It Matters Most'
-  url: https://www.infoq.com/articles/high-availability-not-resilience-cloud/
----
 # High availability is not resilience — the TLS upgrade that hid behind green dashboards
+
+> Source: IT Iaido lesson 2026-10-06-2 · Fresh · Software architecture & design · Intermediate · passed on 2026-10-07
 
 > Fresh · Software architecture & design · Intermediate · ~20 min · from today's feeds
 
@@ -296,6 +276,3 @@ Arithmetic for the 300 s TTL row: 3 × 30 = 90 detect, + 60 propagate, + 300 TTL
 
 ## Sources
 - [High Availability Is Not Resilience: Why Cloud Systems Fail When It Matters Most](https://www.infoq.com/articles/high-availability-not-resilience-cloud/) — Alexey Golev, InfoQ, 2026-10-01 — the whole lesson: the HA/resilience definition, the three gap patterns (correlated failures, untested degradation, rotted recovery paths), the TLS 1.3 / Route 53 incident and its forty-minute isolation time, the control-plane framing, and the DNS-versus-ARC trade-off and tiering recommendation; every quoted passage above was copied from this page (accessed 2026-10-06; fetched via https://infoq.com/articles/high-availability-not-resilience-cloud)
-
-## Next on this track
-Fresh lessons sit outside the ladder; next on Software architecture & design: **Coupling and cohesion** (rung 1 of 20, Beginner).

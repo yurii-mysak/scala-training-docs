@@ -7,6 +7,7 @@ Pure functions, immutable data structures, effect management, and functional sta
 | # | Topic | File | Interview Focus |
 |---|-------|------|-----------------|
 | 1 | FP foundations | [Functional-Programming-Foundations.md](Functional-Programming-Foundations.md) | Pure functions, referential transparency, evaluation strategies, tail recursion |
+| 7 | What is FP: referential transparency and the substitution model | [what-is-fp-referential-transparency-and-the-substitution.md](what-is-fp-referential-transparency-and-the-substitution.md) | A side effect is anything a function does besides returning its result; the Cafe example… |
 
 ## Intermediate
 

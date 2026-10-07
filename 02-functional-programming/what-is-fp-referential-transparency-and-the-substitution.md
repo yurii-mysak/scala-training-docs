@@ -1,31 +1,6 @@
----
-id: 2026-10-06-1
-date: 2026-10-06
-day: 2
-slot: core
-track: fp-scala
-domain: fp-scala
-rung: fp-scala-01
-level: B
-title: 'What is FP: referential transparency and the substitution model'
-est_min: 30
-files_to: 02-functional-programming
-status: passed
-sent_at: 2026-10-06T05:54:58Z
-marked_at: 2026-10-06T20:36:28Z
-filed_to: 02-functional-programming/what-is-fp-referential-transparency-and-the-substitution.md
-review_due: null
-sources:
-- title: Functional Programming in Scala, 2nd ed. (Chiusano, Bjarnason, Pilquist)
-  url: https://www.manning.com/books/functional-programming-in-scala-second-edition
-- title: FP in Scala 2nd ed., ch. 1 table of contents (Manning liveBook)
-  url: https://livebook.manning.com/book/functional-programming-in-scala-second-edition/chapter-1
-- title: 'fpinscala wiki: Chapter 1 notes'
-  url: https://github.com/fpinscala/fpinscala/wiki/Chapter-1:-What-is-functional-programming%3F
-- title: 'Scala 3 Book: Pure Functions'
-  url: https://docs.scala-lang.org/scala3/book/fp-pure-functions.html
----
 # What is FP: referential transparency and the substitution model
+
+> Source: IT Iaido lesson 2026-10-06-1 · Functional Programming in Scala (red book) · Beginner · passed on 2026-10-06
 
 > Functional Programming in Scala (red book) · Beginner · ~30 min · rung 1 of 26 · needs: —
 
@@ -411,6 +386,3 @@ Trace the last row. `x` starts as `Hello` (5 chars). The first `x.append(", Worl
 - [fpinscala companion repo](https://github.com/fpinscala/fpinscala) — Chiusano, Bjarnason, Pilquist and contributors — the `second-edition` branch's exercise layout, which starts at chapter 2. That confirms chapter 1 has no numbered exercises (accessed 2026-10-06)
 - [fpinscala wiki: Chapter 1 notes](https://github.com/fpinscala/fpinscala/wiki/Chapter-1:-What-is-functional-programming%3F) — fpinscala contributors — the quoted note that the chapter's RT definition is simplified and that side effects depend on the observer (accessed 2026-10-06)
 - [Scala 3 Book: Pure Functions](https://docs.scala-lang.org/scala3/book/fp-pure-functions.html) — Scala contributors, Scala 3 Book › Functional Programming › Pure Functions — the quoted three-condition definition of a pure function and the quoted "pure core, impure wrapper" advice (accessed 2026-10-06)
-
-## Next on this track
-Next on Functional Programming in Scala (red book): **Getting started: tail recursion, higher-order and polymorphic functions** (rung 2 of 26, Beginner).

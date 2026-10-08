@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant S as Stub resolver in your JVM
+    participant D as Front-end dispatcher such as DNSdist
+    participant R1 as Recursive back-end 1
+    participant R2 as Recursive back-end 2
+    participant A as Authoritative nameserver
+    S->>D: query unique.example type A
+    D->>R1: dispatch attempt 1
+    R1->>A: query 1 after cache miss
+    D->>R2: dispatch attempt 2 with no answer yet
+    R2->>A: query 2 same name same type
+    A--xR1: slow or no response
+    R1->>A: query 3 retry after timeout
+    A-->>R2: answer
+    R2-->>D: answer
+    D-->>S: answer

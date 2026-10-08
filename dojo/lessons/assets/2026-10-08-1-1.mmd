@@ -1,0 +1,19 @@
+flowchart TD
+  subgraph before["Before: one module, five reasons to change"]
+    WS1["WashService.completeWash: prices, formats, charges"]
+    SDK1["Acme terminal SDK"]
+    WS1 --> SDK1
+  end
+  subgraph after["After: one reason each"]
+    WS2["WashService: orchestrates only"]
+    PR["Pricing: what a wash costs"]
+    RC["Receipt: what the paper looks like"]
+    PG["PaymentGateway: trait you own"]
+    AG["AcmeGateway: implements it"]
+    SDK2["Acme terminal SDK"]
+    WS2 --> PR
+    WS2 --> RC
+    WS2 --> PG
+    AG --> PG
+    AG --> SDK2
+  end

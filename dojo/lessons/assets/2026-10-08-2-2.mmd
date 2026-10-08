@@ -1,0 +1,7 @@
+flowchart LR
+    A["One nameserver: 3.43 queries/test"] --> B["58% of tests need one query"]
+    A --> C["408,891,797 total repeats"]
+    D["Two nameservers: 2.57 queries/test"] --> E["71% of tests need one query"]
+    D --> F["112,191,597 total repeats"]
+    C --> G["More non-answers and timeouts, so more retries"]
+    F --> H["Second server answers sooner, retry loop ends earlier"]

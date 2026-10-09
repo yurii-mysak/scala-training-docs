@@ -1,27 +1,6 @@
----
-id: 2026-10-07-1
-date: 2026-10-07
-day: 3
-slot: core
-track: ddia
-domain: ddia
-rung: ddia-01
-level: B
-title: Reliability, scalability, maintainability — the three concerns
-est_min: 20
-files_to: 06-databases-and-distributed-data
-status: passed
-sent_at: 2026-10-07T05:54:27Z
-marked_at: 2026-10-08T21:06:55Z
-filed_to: 06-databases-and-distributed-data/reliability-scalability-maintainability-the-three-concerns.md
-review_due: null
-sources:
-- title: Designing Data-Intensive Applications (Kleppmann, 1st ed.)
-  url: https://dataintensive.net/
-- title: The Tail at Scale (Dean and Barroso, CACM 2013)
-  url: https://research.google/pubs/the-tail-at-scale/
----
 # Reliability, scalability, maintainability — the three concerns
+
+> Source: IT Iaido lesson 2026-10-07-1 · Designing Data-Intensive Applications · Beginner · passed on 2026-10-09
 
 > Designing Data-Intensive Applications · Beginner · ~20 min · rung 1 of 26 · needs: —
 
@@ -282,6 +261,3 @@ Trace the arithmetic, the same shape as DDIA's 4.6k posts/sec × 75 followers �
 - [Chapter 1 contents, O'Reilly online edition](https://oreilly.com/library/view/designing-data-intensive-applications/9781491903063/ch01.html) — O'Reilly Media — the exact section and subsection headings of ch. 1 used in the chapter map, since the book does not number them (accessed 2026-10-07).
 - [The Tail at Scale (Dean and Barroso, CACM 2013)](https://research.google/pubs/the-tail-at-scale/) — Jeffrey Dean and Luiz André Barroso, Communications of the ACM 56(2), February 2013 — the verbatim quoted sentence on 100 parallel servers and 63% of requests exceeding one second, from the section "Component-Level Variability Amplified By Scale", which the lab's k = 100 row reproduces as 63.3968%. The research.google landing page carries only the abstract, so the quote was copied from the full-text copy at https://pdos.csail.mit.edu/6.824/papers/tail-dean.pdf (both accessed 2026-10-07).
 - Related in your knowledge base: `15-system-design/napkin-math.md` for the latency and capacity arithmetic this rung's load parameters feed into; `19-observability-and-oncall/slos-and-error-budgets.md` for turning p95/p99 into SLOs; `06-databases-and-distributed-data/README.md`, where this lesson is filed once it passes.
-
-## Next on this track
-Next on Designing Data-Intensive Applications: **Relational vs document data models** (rung 2 of 26, Beginner).

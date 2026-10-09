@@ -1,0 +1,25 @@
+sequenceDiagram
+    autonumber
+    participant C as Client
+    participant S as Server
+    Note over S: LISTEN
+    C->>S: "[S] SYN seq=x + mss, wscale, sackOK"
+    Note over C: SYN-SENT
+    S->>C: "[S.] SYN-ACK seq=y, ack=x+1 + mss, wscale, sackOK"
+    Note over S: SYN-RECEIVED
+    C->>S: "[.] ACK seq=x+1, ack=y+1"
+    Note over C,S: "ESTABLISHED on both sides — one full RTT already spent"
+    C->>S: "[P.] PSH-ACK seq=x+1, 80 bytes of request"
+    S->>C: "[.] ACK ack=x+81"
+    S->>C: "[P.] PSH-ACK seq=y+1, 1200 bytes of response"
+    C->>S: "[.] ACK ack=y+1201"
+    C->>S: "[F.] FIN-ACK seq=x+81"
+    Note over C: FIN-WAIT-1
+    S->>C: "[.] ACK ack=x+82"
+    Note over C: FIN-WAIT-2
+    Note over S: CLOSE-WAIT
+    S->>C: "[F.] FIN-ACK seq=y+1201"
+    Note over S: LAST-ACK
+    C->>S: "[.] ACK ack=y+1202"
+    Note over C: "TIME_WAIT — 2xMSL, then CLOSED"
+    Note over S: CLOSED

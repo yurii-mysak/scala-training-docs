@@ -12,6 +12,7 @@ Relational and NoSQL databases, transactions, indexing, storage engines, distrib
 | 2 | Key-value stores | [KeyValue_Stores.md](KeyValue_Stores.md) | Redis, Memcached, use cases |
 | 3 | Wide-column vs document | [WideColumn_vs_Document.md](WideColumn_vs_Document.md) | Cassandra vs MongoDB model comparison |
 | 4 | Data modeling | [Databases-Data-Modeling.md](Databases-Data-Modeling.md) | Normalization, denormalization, schema design |
+| 22 | Reliability, scalability, maintainability — the three concerns | [reliability-scalability-maintainability-the-three-concerns.md](reliability-scalability-maintainability-the-three-concerns.md) | A fault is one component deviating from spec, a failure is the system as a whole stopping… |
 
 ## Intermediate
 

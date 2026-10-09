@@ -1,0 +1,10 @@
+flowchart TD
+  IN["raw bytes of your text"] --> N["Stage 1 normalise"]
+  N --> P["Stage 2 pre-tokenise into pre-tokens"]
+  P --> M["Stage 3 model: apply BPE merge ranks, emit ids"]
+  M --> O["Stage 4 post-process: special tokens, offsets, masks"]
+  O --> IDS["list of token ids, byte-identical to v0.23"]
+  N --- NA["v1: shared reusable workspace, no per-call allocation"]
+  P --- PA["v1: bitstream splitter, nicknamed bitcannon, replaces the regex"]
+  M --- MA["v1: merge loop rewritten to run over a whole batch of pre-tokens, plus a per-thread word cache"]
+  O --- OA["v1: unchanged output, unchanged API"]

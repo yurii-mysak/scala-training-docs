@@ -1,0 +1,10 @@
+sequenceDiagram
+    participant D as Data loader thread
+    participant T as One shared Tokenizer
+    participant G as GPU
+    D->>T: encode_batch over 3000 documents
+    T->>T: fan work out across eight worker threads
+    T-->>D: ids for all 3000, original order preserved
+    D->>G: tensor of ids
+    G->>G: forward pass
+    Note over T,G: when stage 2 and 3 are slower than the forward pass, the GPU waits

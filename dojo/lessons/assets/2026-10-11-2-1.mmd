@@ -1,0 +1,6 @@
+flowchart LR
+  K["key = request URL"] --> H["hash(key) to a 32-bit number"]
+  H --> R["walk clockwise on the ring"]
+  R --> P["first point you meet"]
+  P --> S["the server that point belongs to"]
+  S --> C["cache hit or fetch from origin"]

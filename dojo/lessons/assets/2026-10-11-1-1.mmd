@@ -1,0 +1,10 @@
+flowchart LR
+  A["melb_data.csv"] -->|"pd.read_csv"| B["DataFrame"]
+  B -->|"head(), describe(), dropna()"| C["y = Price column, X = 5 feature columns"]
+  C -->|"1. define"| D["DecisionTreeRegressor(random_state=1)"]
+  D -->|"2. fit"| E["model.fit(X, y)"]
+  E -->|"3. predict"| F["model.predict(X_new)"]
+  F --> G["one predicted number per row"]
+  G -.->|"4. evaluate"| H["error on rows the model never saw: next lesson"]
+  classDef later fill:#f0f0f0,stroke:#bbbbbb,color:#999999
+  class H later

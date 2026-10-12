@@ -139,6 +139,8 @@ def check(path: Path, strict: bool = False) -> dict:
         l = lang.lower()
         if l in banned:
             errors.append(f"code block in '{lang}': program code must be Scala or Rust (SPEC §4 Language rule)")
+        elif l == "" and re.search(r"(?m)^\s*(import (numpy|pandas|torch)|from \w+ import |def \w+\(.*\):\s*$|print\(|function \w+\(|const \w+ =)", code):
+            errors.append("untagged code block looks like Python/JavaScript: program code must be Scala or Rust, and tag the fence (SPEC §4 Language rule)")
         elif l in ("bash", "sh", "shell", "console", "zsh") and re.search(r"(?m)(^|[\s;&|$>])(python3?|pip3?|node|npm|npx|jupyter|java)\b", code):
             errors.append(f"shell block calls Python/Node/Java: program code must be Scala or Rust (SPEC §4 Language rule)")
         elif l in ("scala", "rust"):

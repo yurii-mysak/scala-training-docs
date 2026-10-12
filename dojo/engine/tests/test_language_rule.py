@@ -24,6 +24,10 @@ class CheckerTests(unittest.TestCase):
     def test_python_block_is_rejected(self):
         self.assertTrue(lang_errors("```python\nprint(1)\n```\n"))
 
+    def test_untagged_python_is_rejected(self):
+        self.assertTrue(lang_errors("```\nimport numpy as np\nprint(np.ones(2))\n```\n"))
+        self.assertEqual(lang_errors("```\nline A:  MAE = 5.0\n```\n"), [])
+
     def test_shell_calling_python_is_rejected(self):
         self.assertTrue(lang_errors("```bash\npython3 lab.py\n```\n"))
 

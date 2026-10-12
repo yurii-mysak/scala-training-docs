@@ -115,7 +115,8 @@ passages (fresh); the next-rung title (core); and these instructions verbatim:
 > runnable program with `// file: Lab.scala` or `// file: main.rs` (+ `// deps: …` for Rust), run
 > `python3 dojo/engine/run_lab.py <id>` and paste its real output. If the program needs what this
 > environment cannot reach (Hugging Face downloads, a database server, an API key), add
-> `// run: local` and label the output "Expected output — run locally". Follow `dojo/SPEC.md` §4: sections in order — Why this matters
+> `// run: local` and label the output "Expected output — run locally". A first Rust build with candle
+> takes ~2 minutes in a cold container; that is normal. Follow `dojo/SPEC.md` §4: sections in order — Why this matters
 > (3 lines) · [Primer, fresh lessons above the reader's level] · The idea (600–1200 words, one or
 > two ```mermaid diagrams: `flowchart LR|TD` or `sequenceDiagram`; quote any label containing
 > parentheses, colons or slashes in double quotes; no HTML inside labels) · Worked example or Lab

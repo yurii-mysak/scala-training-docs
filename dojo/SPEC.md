@@ -167,6 +167,31 @@ The writer does not have the book's text: it restates from its knowledge of the 
 public companion material (fpinscala repo, dataintensive.net, the authors' talks), and every
 section heading carries its § number so the reader can check it against his copy.
 
+### Language rule (hard requirement, every lesson)
+
+All program code in a lesson — worked examples, labs, snippets — is **Scala 3 or Rust**. No
+Python, JavaScript, Java, Go or any other language, even when the source material uses one
+(Kaggle, PyTorch, scikit-learn tutorials stay as reading; the lesson does the work in Scala/Rust
+and says so).
+- **Scala by default**: a Scala 3.3 script, standard library only (the cloud cannot download
+  Maven dependencies), `@main def lab(): Unit = ...`, run with `scala Lab.scala`. Maths and
+  classical ML are written by hand on `Vector[Double]`; HTTP via `java.net.http`.
+- **Rust** for the Rust track and wherever a crate is genuinely needed: tensors, autograd and
+  neural nets (`candle-core`, `candle-nn`), arrays (`ndarray`), async networking (`tokio`),
+  HTTP clients (`reqwest`), embedded SQLite (`rusqlite` with `bundled`).
+- **Not program code, allowed**: shell commands that invoke a tool to observe something
+  (`curl -v`, `dig`, `openssl s_client`, `tcpdump`, `cargo run`, `scala Lab.scala`), SQL, and
+  data/config (JSON, YAML, TOML).
+- **Runnable programs** start with a marker line: `// file: Lab.scala` or `// file: main.rs`,
+  then for Rust optionally `// deps: ndarray@0.16, rand@0.8` (features as `crate@ver+feat`).
+  `engine/run_lab.py <id>` runs every marked program and prints its real output; the writer
+  pastes that output into the lesson. A program that needs what the cloud cannot reach (a
+  model download from Hugging Face, a running database, an API key) adds `// run: local`, and
+  the lesson labels its output "Expected output — run locally" and explains how to run it on
+  the Mac (`scala Lab.scala`, `cargo run`).
+`engine/check_lesson.py` rejects code blocks in other languages, shell blocks that call Python
+or Node, and a program with a `main` that lacks the `// file:` marker.
+
 ### Lab rule (hard requirement, every lesson with code or numbers)
 
 The reader must be able to follow the lab from input to verdict without reverse-engineering it:
@@ -178,7 +203,8 @@ The reader must be able to follow the lab from input to verdict without reverse-
    arithmetic traced for at least one case, digits shown; a bold **Verdict** after each block.
 4. **Cause → consequence** — a short numbered chain: cause, mechanism, consequence, what it
    means in practice for the reader's work.
-5. The writer runs the code and pastes the real output; numbers in the text must match it.
+5. The writer runs the code with `engine/run_lab.py` and pastes the real output; numbers in the
+   text must match it.
 `engine/check_lesson.py` rejects a lab that shows output without a `Reading the output`
 section or without a **Verdict**.
 

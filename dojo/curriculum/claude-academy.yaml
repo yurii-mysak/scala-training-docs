@@ -51,10 +51,10 @@ rungs:
       score) and generative (LLM chat, code agent); the generative branch fans out into the four
       property axes, each drawn as a slider from "capability zone" to "limitation zone".
     example: >-
-      List the AI touch-points in the car-wash POS platform and his own day (fraud/anomaly checks,
-      plate recognition, Claude Code in the Lua monorepo, MCP servers, chat drafting of specs).
-      Tag each as generative or not, and for each generative one write which of the four axes it
-      most depends on. Keep the list: rung 07 revisits it.
+      Tools: pencil — no program code. List the AI touch-points in the car-wash POS platform and his
+      own day (fraud/anomaly checks, plate recognition, Claude Code in the Lua monorepo, MCP
+      servers, chat drafting of specs). Tag each as generative or not, and for each generative one
+      write which of the four axes it most depends on. Keep the list: rung 07 revisits it.
     presentation: minimal
     sources:
       - title: "Claude Academy — AI Capabilities and Limitations: Intro to AI Capabilities and Limitations"
@@ -90,10 +90,11 @@ rungs:
       A pipeline: raw web/books → pretraining → "document completer" box → fine-tuning (instruction
       data, feedback) → "assistant" box, with four labelled fingerprints hanging off the assistant.
     example: >-
-      In Claude, paste a deliberately flawed design choice from a car-wash feature (e.g. "we will
-      store wash-package redemptions only in the client cache") and ask "this is a good design,
-      right?". Then ask neutrally "list the risks of this design". Compare: did the first answer
-      agree too readily? Note which fingerprint showed up and the phrasing that removed it.
+      Tools: Claude — no program code. In Claude, paste a deliberately flawed design choice from a
+      car-wash feature (e.g. "we will store wash-package redemptions only in the client cache") and
+      ask "this is a good design, right?". Then ask neutrally "list the risks of this design".
+      Compare: did the first answer agree too readily? Note which fingerprint showed up and the
+      phrasing that removed it.
     presentation: minimal
     sources:
       - title: "Claude Academy — AI Capabilities and Limitations: How AI Gets Its Character"
@@ -125,11 +126,11 @@ rungs:
       actors) to "sparse, novel" (an internal POS protocol), with a fabrication-risk curve rising
       to the right and a second curve rising with claim specificity.
     example: >-
-      Verification Test in his own domain: ask Claude three questions about car-wash POS
-      operations at increasing specificity — general (how wash-club memberships work), medium
-      (typical redemption flow), and exact (a named industry standard, a version number, a URL).
-      Check each against what he knows or can look up; mark where the first fabricated specific
-      appears.
+      Tools: Claude — no program code. Verification Test in his own domain: ask Claude three
+      questions about car-wash POS operations at increasing specificity — general (how wash-club
+      memberships work), medium (typical redemption flow), and exact (a named industry standard, a
+      version number, a URL). Check each against what he knows or can look up; mark where the first
+      fabricated specific appears.
     presentation: minimal
     sources:
       - title: "Claude Academy — AI Capabilities and Limitations: Next Token Prediction"
@@ -166,10 +167,10 @@ rungs:
       density gradient for coverage), facts after it and private company facts sit outside, with
       arrows from search / RAG / MCP tools carrying them into the context window.
     example: >-
-      Outsider Test: ask Claude, without tools, three things — a public fact about Scala 3 or Akka
-      licensing, a fact about a recent library release, and a fact private to his company (the
-      PilotTransaction journal format). Classify each answer as known / stale / unknowable. Then
-      write which MCP server or document would fix each gap.
+      Tools: Claude — no program code. Outsider Test: ask Claude, without tools, three things — a
+      public fact about Scala 3 or Akka licensing, a fact about a recent library release, and a fact
+      private to his company (the PilotTransaction journal format). Classify each answer as known /
+      stale / unknowable. Then write which MCP server or document would fix each gap.
     presentation: standard
     sources:
       - title: "Claude Academy — AI Capabilities and Limitations: Knowledge"
@@ -207,10 +208,11 @@ rungs:
       line at the capacity edge labelled "silent truncation", and an external CLAUDE.md / memory
       store feeding the start of each new session.
     example: >-
-      Probe a context-limit failure in Claude Code: in a long session on the Lua monorepo, state a
-      constraint early ("never touch files under vendor/"), work for a while until auto-compaction
-      or a large file read, then ask for a change near vendor/. Did the constraint survive? Move it
-      into CLAUDE.md and repeat. Write down which placement held.
+      Tools: Claude Code — no program code. Probe a context-limit failure in Claude Code: in a long
+      session on the Lua monorepo, state a constraint early ("never touch files under vendor/"),
+      work for a while until auto-compaction or a large file read, then ask for a change near
+      vendor/. Did the constraint survive? Move it into CLAUDE.md and repeat. Write down which
+      placement held.
     presentation: standard
     sources:
       - title: "Claude Academy — AI Capabilities and Limitations: Working Memory"
@@ -248,11 +250,11 @@ rungs:
       concrete/short, "drift" at long, "letter over spirit" at abstract; arrows show mitigations
       pulling tasks back toward the controlled corner.
     example: >-
-      Ask Claude to generate 30 test cases for a wash-package redemption endpoint with the rule
-      "each case must have a unique precondition". Check how far down the list the rule still
-      holds (drift) and whether any cases satisfy the wording but are useless (letter over spirit).
-      Then rewrite the prompt stating the goal (coverage of distinct failure paths) and require a
-      JSON schema; compare.
+      Tools: Claude — no program code. Ask Claude to generate 30 test cases for a wash-package
+      redemption endpoint with the rule "each case must have a unique precondition". Check how far
+      down the list the rule still holds (drift) and whether any cases satisfy the wording but are
+      useless (letter over spirit). Then rewrite the prompt stating the goal (coverage of distinct
+      failure paths) and require a JSON schema; compare.
     presentation: standard
     sources:
       - title: "Claude Academy — AI Capabilities and Limitations: Steerability"
@@ -289,10 +291,11 @@ rungs:
       A 4×4 matrix of the properties (next-token, knowledge, working memory, steerability) with a
       few cells filled by an example failure and the fix it implies.
     example: >-
-      Take one real AI disappointment from the last month (a Claude Code change that broke a Lua
-      module, a wrong FPL stat, a hallucinated API flag). Write a three-line post-mortem: which two
-      properties met, what evidence shows it, which fix from the menu would have prevented it.
-      Revisit the rung-01 list and place each item on the four continuums.
+      Tools: pencil — no program code. Take one real AI disappointment from the last month (a Claude
+      Code change that broke a Lua module, a wrong FPL stat, a hallucinated API flag). Write a
+      three-line post-mortem: which two properties met, what evidence shows it, which fix from the
+      menu would have prevented it. Revisit the rung-01 list and place each item on the four
+      continuums.
     presentation: standard
     sources:
       - title: "Claude Academy — AI Capabilities and Limitations: When Properties Collide"
@@ -331,10 +334,10 @@ rungs:
       "specifies every step" to "sets goals and guardrails", and one example per column from his
       work (lint fix, spec co-writing, a Claude Code agent with skills and MCP tools).
     example: >-
-      Sort ten of his recent AI interactions (Claude Code sessions, spec drafting for the car-wash
-      platform, MCP server work, FPL agent runs) into automation / augmentation / agency. For two
-      of them, write whether the mode was the right one and what would change if moved one column
-      to the right.
+      Tools: pencil — no program code. Sort ten of his recent AI interactions (Claude Code sessions,
+      spec drafting for the car-wash platform, MCP server work, FPL agent runs) into automation /
+      augmentation / agency. For two of them, write whether the mode was the right one and what
+      would change if moved one column to the right.
     presentation: standard
     sources:
       - title: "Claude Academy — AI Fluency: Introduction to AI Fluency"
@@ -371,9 +374,9 @@ rungs:
       A 4×3 grid: rows are the four Ds, columns are automation / augmentation / agency; each cell
       holds one question the reader should ask in that situation.
     example: >-
-      Self-assess 1–5 on each D for his Claude Code work in the Lua monorepo, with one piece of
-      evidence per score (e.g. Discernment: "I review diffs but not test coverage"). Pick the
-      weakest D as the focus for rungs 11–16.
+      Tools: pencil — no program code. Self-assess 1–5 on each D for his Claude Code work in the Lua
+      monorepo, with one piece of evidence per score (e.g. Discernment: "I review diffs but not test
+      coverage"). Pick the weakest D as the focus for rungs 11–16.
     presentation: standard
     sources:
       - title: "Claude Academy — AI Fluency: The 4D Framework"
@@ -405,9 +408,10 @@ rungs:
       A cross-reference table drawn as a flow: each limitation named in this lesson → the
       Capabilities-course property it belongs to → the ai-ml rung that explains its mechanism.
     example: >-
-      Write a one-page "AI on the car-wash platform: what it can and cannot do" note for his
-      non-technical stakeholders, using only the lesson's capability/limitation list and one
-      concrete platform example per item. Ask Claude to critique it for overclaiming.
+      Tools: Claude, editor — no program code. Write a one-page "AI on the car-wash platform: what
+      it can and cannot do" note for his non-technical stakeholders, using only the lesson's
+      capability/limitation list and one concrete platform example per item. Ask Claude to critique
+      it for overclaiming.
     presentation: standard
     sources:
       - title: "Claude Academy — AI Fluency: Framework and Foundations (course page)"
@@ -441,10 +445,10 @@ rungs:
       A project broken into a task tree; each leaf coloured human / together / AI, with a short
       reason label (judgement needed, domain knowledge, mechanical, verifiable).
     example: >-
-      Course project: pick one real car-wash POS spec task (e.g. a new redemption-with-upsell
-      scenario for the transaction journal). With Claude, write the success criteria, break it
-      into 6–10 tasks, and mark each human / together / AI with one-line reasons. This plan is
-      reused in rungs 12–17.
+      Tools: Claude — no program code. Course project: pick one real car-wash POS spec task (e.g. a
+      new redemption-with-upsell scenario for the transaction journal). With Claude, write the
+      success criteria, break it into 6–10 tasks, and mark each human / together / AI with one-line
+      reasons. This plan is reused in rungs 12–17.
     presentation: standard
     sources:
       - title: "Claude Academy — AI Fluency: A closer look at Delegation"
@@ -480,9 +484,9 @@ rungs:
       One prompt split into three coloured blocks — product, process, performance — with arrows
       to the parts of the output each one shapes.
     example: >-
-      Bad Prompt Makeover on his own work: take a real one-line prompt he gave Claude Code last
-      week, rewrite it with explicit product, process and performance parts (for the rung-11
-      project task), run both, and diff the outputs.
+      Tools: Claude Code — no program code. Bad Prompt Makeover on his own work: take a real
+      one-line prompt he gave Claude Code last week, rewrite it with explicit product, process and
+      performance parts (for the rung-11 project task), run both, and diff the outputs.
     presentation: standard
     sources:
       - title: "Claude Academy — AI Fluency: A closer look at Description"
@@ -513,10 +517,10 @@ rungs:
       A prompt template skeleton with six labelled slots (context, examples, constraints, steps,
       think-first, role) and a loop arrow labelled "iterate on results".
     example: >-
-      Build a reusable Claude Code prompt (or Skill draft) for "write acceptance criteria for a
-      POS feature" that uses all six techniques, including one real example from an earlier
-      car-wash spec. Run it on the rung-11 project task and note which technique changed the
-      output most.
+      Tools: Claude Code — no program code. Build a reusable Claude Code prompt (or Skill draft) for
+      "write acceptance criteria for a POS feature" that uses all six techniques, including one real
+      example from an earlier car-wash spec. Run it on the rung-11 project task and note which
+      technique changed the output most.
     presentation: standard
     sources:
       - title: "Claude Academy — AI Fluency: Effective prompting techniques"
@@ -547,9 +551,9 @@ rungs:
       Description and Discernment as mirrored columns (product / process / performance), joined by
       arrows: each description element creates a check the evaluator applies.
     example: >-
-      Take the acceptance criteria produced in rung 13 and review them as a QA lead would: write a
-      product/process/performance checklist, score the output against it, and list three defects
-      with the evidence for each.
+      Tools: editor (writing) — no program code. Take the acceptance criteria produced in rung 13
+      and review them as a QA lead would: write a product/process/performance checklist, score the
+      output against it, and list three defects with the evidence for each.
     presentation: standard
     sources:
       - title: "Claude Academy — AI Fluency: A closer look at Discernment"
@@ -580,10 +584,10 @@ rungs:
       "keep / modify / discard" owned by the human and a feedback arrow to the rung-11 delegation
       plan.
     example: >-
-      Run three loop iterations on one task from the rung-11 project (e.g. drafting the
-      transaction-journal scenarios for a redemption with upsell). Log each iteration: what was
-      changed in the description, what discernment caught, minutes spent. End by moving any task
-      whose delegation label turned out wrong.
+      Tools: Claude — no program code. Run three loop iterations on one task from the rung-11
+      project (e.g. drafting the transaction-journal scenarios for a redemption with upsell). Log
+      each iteration: what was changed in the description, what discernment caught, minutes spent.
+      End by moving any task whose delegation label turned out wrong.
     presentation: standard
     sources:
       - title: "Claude Academy — AI Fluency: The Description-Discernment loop"
@@ -615,9 +619,10 @@ rungs:
       (disclosure), after (verification and sign-off) — with the accountable human named at each
       stage.
     example: >-
-      Write a five-line diligence policy for Claude Code use in the Lua monorepo team: what data may
-      be pasted or exposed to tools (secrets, customer/payment data), how AI-authored commits are
-      marked, who reviews before merge, and who owns a defect. Check it against the rung-11 project.
+      Tools: editor (writing) — no program code. Write a five-line diligence policy for Claude Code
+      use in the Lua monorepo team: what data may be pasted or exposed to tools (secrets,
+      customer/payment data), how AI-authored commits are marked, who reviews before merge, and who
+      owns a defect. Check it against the rung-11 project.
     presentation: standard
     sources:
       - title: "Claude Academy — AI Fluency: Framework and Foundations (course page)"
@@ -651,9 +656,10 @@ rungs:
       A small library structure: recurring task → template prompt (with placeholders) → known
       failure modes → discernment checklist, versioned like code.
     example: >-
-      Turn the best prompts from rungs 12–15 into two Claude Code Skills or slash-command
-      templates for recurring PO work (acceptance criteria, transaction-scenario tables), each with
-      placeholders and a short discernment checklist. Re-score the rung-09 self-assessment.
+      Tools: Claude Code — no program code. Turn the best prompts from rungs 12–15 into two Claude
+      Code Skills or slash-command templates for recurring PO work (acceptance criteria,
+      transaction-scenario tables), each with placeholders and a short discernment checklist.
+      Re-score the rung-09 self-assessment.
     presentation: standard
     sources:
       - title: "Claude Academy — AI Fluency: Conclusion"
@@ -693,9 +699,10 @@ rungs:
       Right: the same people plus one agent with its own identity box, a shared memory store and
       shared channel, arrows flowing both ways.
     example: >-
-      Tool or teammate? For his Claude Code setup in the Lua monorepo and one MCP server he built,
-      score each on identity, shared memory and shared context (0–2 each). Name the questions his
-      team keeps re-asking each other that a teammate agent could answer.
+      Tools: pencil — no program code. Tool or teammate? For his Claude Code setup in the Lua
+      monorepo and one MCP server he built, score each on identity, shared memory and shared context
+      (0–2 each). Name the questions his team keeps re-asking each other that a teammate agent could
+      answer.
     presentation: standard
     sources:
       - title: "Claude Academy — Human-Agent Teams: Why multiplayer AI matters"
@@ -730,9 +737,9 @@ rungs:
       A team roster table rendered as a graph: humans and agents as nodes, each with a role and tool
       list, all pointing to one north-star node and one shared written-context node.
     example: >-
-      Draft a roster for one car-wash platform initiative (e.g. the pricing-model feature): humans,
-      one or two agents (spec reviewer, test-case generator), each agent's role, tools and data
-      access, and a measurable north star. Mark the ownership gaps.
+      Tools: pencil — no program code. Draft a roster for one car-wash platform initiative (e.g. the
+      pricing-model feature): humans, one or two agents (spec reviewer, test-case generator), each
+      agent's role, tools and data access, and a measurable north star. Mark the ownership gaps.
     presentation: standard
     sources:
       - title: "Claude Academy — Human-Agent Teams: What a strong human-agent team looks like"
@@ -765,10 +772,11 @@ rungs:
       spot-check → act alone, with the "several successes in a row" gate and a weekly retro loop
       between steps.
     example: >-
-      Design a review checkpoint for an agent in his Lua monorepo: pick one task type (e.g. adding
-      unit tests to a module), define the quality check (rubric, test run, or a second reviewing
-      agent), the success count that unlocks the next autonomy step, and who runs the weekly retro.
-      Answer the five readiness questions for his team in one line each.
+      Tools: editor (writing) — no program code. Design a review checkpoint for an agent in his Lua
+      monorepo: pick one task type (e.g. adding unit tests to a module), define the quality check
+      (rubric, test run, or a second reviewing agent), the success count that unlocks the next
+      autonomy step, and who runs the weekly retro. Answer the five readiness questions for his team
+      in one line each.
     presentation: standard
     sources:
       - title: "Claude Academy — Human-Agent Teams: Organizational checklist"

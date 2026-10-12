@@ -57,13 +57,13 @@ rungs:
       annotated on the lifelines: client SYN-SENT, ESTABLISHED, FIN-WAIT-1/2, TIME_WAIT; server
       LISTEN, SYN-RECEIVED, ESTABLISHED, CLOSE-WAIT, LAST-ACK.
     example: >-
-      Lab on a Mac (5–10 min). Find your interface with `route get default | grep interface`
-      (usually en0). Terminal 1: `sudo tcpdump -i en0 -nn -S 'host example.com and tcp port 80'`.
-      Terminal 2: `curl -s -o /dev/null http://example.com/`. Label the three handshake packets,
-      the options in the SYN (mss, wscale, sackOK, TS), the request and response segments and the
-      FIN exchange; note which side sent the first FIN. Then `netstat -an -p tcp | grep TIME_WAIT`
-      to find the leftover state. Optional: add `-w handshake.pcap`, open it in Wireshark and use
-      Statistics -> Flow Graph.
+      Tools: tcpdump, curl, netstat (Wireshark optional) — no program code. Lab on a Mac (5–10 min).
+      Find your interface with `route get default | grep interface` (usually en0). Terminal 1: `sudo
+      tcpdump -i en0 -nn -S 'host example.com and tcp port 80'`. Terminal 2: `curl -s -o /dev/null
+      http://example.com/`. Label the three handshake packets, the options in the SYN (mss, wscale,
+      sackOK, TS), the request and response segments and the FIN exchange; note which side sent the
+      first FIN. Then `netstat -an -p tcp | grep TIME_WAIT` to find the leftover state. Optional:
+      add `-w handshake.pcap`, open it in Wireshark and use Statistics -> Flow Graph.
     presentation: minimal
     sources:
       - title: High Performance Browser Networking, ch. 2 "Building Blocks of TCP"
@@ -105,12 +105,16 @@ rungs:
       multiple of the RTT, so the far server's total grows by the RTT difference times the number
       of round trips.
     example: >-
-      Lab (5–10 min). `ping -c 10 1.1.1.1` (anycast, nearby) and `ping -c 10` a host on another
-      continent; compute the fibre floor as 2 × distance / 200 000 km/s and compare it with the
-      measured RTT. Then run
-      `curl -s -o /dev/null -w 'dns %{time_namelookup} tcp %{time_connect} tls %{time_appconnect} ttfb %{time_starttransfer} total %{time_total}\n' https://example.com`
-      and express each phase as a number of RTTs. Finish with macOS `networkQuality -v` to compare
-      idle and loaded latency.
+      Rust (cargo, std only) plus tools ping, curl: lab (10 min). `ping -c 10 1.1.1.1` (anycast,
+      nearby) and `ping -c 10` a host on another continent; compute the fibre floor as 2 × distance
+      / 200 000 km/s and compare it with the measured RTT. Then write a Rust TCP echo server
+      (std::net::TcpListener, a thread per connection) and a client with set_nodelay(true) that
+      sends 100 small messages, timing each with Instant::now(), and prints min/p50/p99 RTT on
+      loopback; add a connect-only mode that times TcpStream::connect to both ping targets on port
+      443 (connect returns after one RTT) and compare with ping. Finish with `curl -s -o /dev/null
+      -w 'dns %{time_namelookup} tcp %{time_connect} tls %{time_appconnect} ttfb
+      %{time_starttransfer} total %{time_total}\n' https://example.com` and express each phase as a
+      number of RTTs.
     presentation: minimal
     sources:
       - title: High Performance Browser Networking, ch. 1 "Primer on Latency and Bandwidth"
@@ -146,12 +150,13 @@ rungs:
       recovery curve; a second, flatter line shows BBR pacing near the estimated bottleneck
       bandwidth with periodic probing bumps.
     example: >-
-      Pencil-and-terminal exercise. With MSS 1460 bytes and an initial window of 10 segments,
-      compute how many RTTs a 100 KB JSON response needs in slow start (10 + 20 + 40 segments is
-      about 102 KB, so 3 RTTs) and convert that to milliseconds using the RTTs measured in rung 2
-      for a near and a far server. Optional on any Linux box or container:
-      `sysctl net.ipv4.tcp_congestion_control` and `ss -ti` during a `curl` download to watch
-      cwnd and rtt change.
+      Scala 3 script (stdlib) plus tools sysctl, ss: with MSS 1460 bytes and an initial window of 10
+      segments, compute by hand how many RTTs a 100 KB JSON response needs in slow start (10 + 20 +
+      40 segments is about 102 KB, so 3 RTTs). Then write a 15-line slow-start simulator (cwnd
+      doubles every RTT, no loss) that prints RTTs and milliseconds for 10 KB, 100 KB, 1 MB and 10
+      MB at initial windows of 4 and 10, using the RTTs measured in rung 2 for a near and a far
+      server. Optional on any Linux box or container: `sysctl net.ipv4.tcp_congestion_control` and
+      `ss -ti` during a `curl` download to watch cwnd and rtt change.
     presentation: minimal
     sources:
       - title: High Performance Browser Networking, ch. 2 "Building Blocks of TCP"
@@ -191,12 +196,14 @@ rungs:
       out, one back), with an annotation for a lost UDP reply that only the application's timeout
       can detect.
     example: >-
-      Lab (5–10 min). `sudo tcpdump -i en0 -nn 'port 53'` while running
-      `dig example.com @1.1.1.1` (one UDP datagram each way), then `dig +tcp example.com @1.1.1.1`
-      (a handshake first, then the same query over TCP). On loopback: `nc -u -l 9999` in one
-      terminal and `nc -u 127.0.0.1 9999` in another, type a few lines, kill the listener and keep
-      typing; watch `sudo tcpdump -i lo0 -nn 'udp port 9999 or icmp'` to see that only an ICMP
-      port-unreachable, if anything, tells the sender.
+      Rust (cargo, std only) plus tools tcpdump, dig, nc: lab (10 min). `sudo tcpdump -i en0 -nn
+      'port 53'` while running `dig example.com @1.1.1.1` (one UDP datagram each way), then `dig
+      +tcp example.com @1.1.1.1` (a handshake first, then the same query over TCP). On loopback:
+      start `nc -u -l 9999`, then run a 15-line Rust sender that binds a std::net::UdpSocket,
+      connect()s it to 127.0.0.1:9999 and sends a numbered datagram every 500 ms, printing each send
+      result. Kill the listener while watching `sudo tcpdump -i lo0 -nn 'udp port 9999 or icmp'`:
+      the sender learns nothing until an ICMP port-unreachable arrives and makes the next send fail
+      with ConnectionRefused.
     presentation: standard
     sources:
       - title: High Performance Browser Networking, ch. 3 "Building Blocks of UDP"
@@ -239,14 +246,14 @@ rungs:
       (client side after 1 RTT), with a dashed alternative lane for PSK resumption carrying 0-RTT
       early data.
     example: >-
-      Lab (10 min). macOS ships LibreSSL, so install OpenSSL 3 (`brew install openssl@3`) and use
-      its binary. Run
-      `openssl s_client -connect www.cloudflare.com:443 -servername www.cloudflare.com -tls1_3 -alpn h2,http/1.1 -brief </dev/null`
-      and read the protocol, cipher, ALPN and peer certificate lines. Then
-      `openssl s_client -connect www.cloudflare.com:443 -servername www.cloudflare.com -showcerts </dev/null`,
-      save the first certificate and inspect it with
-      `openssl x509 -noout -subject -issuer -dates -ext subjectAltName`. Optional: test resumption
-      with `-sess_out s.pem` on one run and `-sess_in s.pem` on the next and look for "Reused".
+      Tools: openssl — no program code. Lab (10 min). macOS ships LibreSSL, so install OpenSSL 3
+      (`brew install openssl@3`) and use its binary. Run `openssl s_client -connect
+      www.cloudflare.com:443 -servername www.cloudflare.com -tls1_3 -alpn h2,http/1.1 -brief
+      </dev/null` and read the protocol, cipher, ALPN and peer certificate lines. Then `openssl
+      s_client -connect www.cloudflare.com:443 -servername www.cloudflare.com -showcerts
+      </dev/null`, save the first certificate and inspect it with `openssl x509 -noout -subject
+      -issuer -dates -ext subjectAltName`. Optional: test resumption with `-sess_out s.pem` on one
+      run and `-sess_in s.pem` on the next and look for "Reused".
     presentation: standard
     sources:
       - title: What happens in a TLS handshake? (Cloudflare Learning Center)
@@ -288,12 +295,12 @@ rungs:
       for streams 1, 3 and 5; a red cross on one TCP segment shows all three streams waiting in
       the HTTP/2 lane.
     example: >-
-      Lab (10 min). `curl -v --http2 -o /dev/null https://nghttp2.org/` and find the ALPN line and
-      the stream information; compare `curl -s -o /dev/null -w '%{http_version}\n'` with
-      `--http1.1` and `--http2`. Then `brew install nghttp2` and run `nghttp -nv https://nghttp2.org/`
-      to see SETTINGS, HEADERS and DATA frames with their stream ids, and
-      `h2load -n 20 -c 1 -m 10 https://nghttp2.org/` to read the header "space savings" that HPACK
-      achieved.
+      Tools: curl, nghttp, h2load — no program code. Lab (10 min). `curl -v --http2 -o /dev/null
+      https://nghttp2.org/` and find the ALPN line and the stream information; compare `curl -s -o
+      /dev/null -w '%{http_version}\n'` with `--http1.1` and `--http2`. Then `brew install nghttp2`
+      and run `nghttp -nv https://nghttp2.org/` to see SETTINGS, HEADERS and DATA frames with their
+      stream ids, and `h2load -n 20 -c 1 -m 10 https://nghttp2.org/` to read the header "space
+      savings" that HPACK achieved.
     presentation: standard
     sources:
       - title: High Performance Browser Networking, ch. 12 "HTTP/2"
@@ -335,14 +342,14 @@ rungs:
       first flight), with an inset of a phone moving from Wi-Fi to LTE while the QUIC connection ID
       stays the same.
     example: >-
-      Lab (10 min). `curl -sI https://www.cloudflare.com | grep -i alt-svc` to see the h3
-      advertisement and `dig www.cloudflare.com HTTPS +short` (or `TYPE65` on an older dig) to see
-      the HTTPS record with its alpn list. If `curl -V` lists HTTP3, compare
-      `curl -s -o /dev/null -w '%{http_version} %{time_connect} %{time_appconnect}\n' --http3 https://www.cloudflare.com`
-      with the same command using `--http2`; otherwise open Chrome DevTools -> Network, enable the
-      Protocol column and reload to see h3. Finally capture
-      `sudo tcpdump -i en0 -nn -c 20 'udp port 443'` while loading the page and note how little of
-      it is readable.
+      Tools: curl, dig, Chrome DevTools, tcpdump — no program code. Lab (10 min). `curl -sI
+      https://www.cloudflare.com | grep -i alt-svc` to see the h3 advertisement and `dig
+      www.cloudflare.com HTTPS +short` (or `TYPE65` on an older dig) to see the HTTPS record with
+      its alpn list. If `curl -V` lists HTTP3, compare `curl -s -o /dev/null -w '%{http_version}
+      %{time_connect} %{time_appconnect}\n' --http3 https://www.cloudflare.com` with the same
+      command using `--http2`; otherwise open Chrome DevTools -> Network, enable the Protocol column
+      and reload to see h3. Finally capture `sudo tcpdump -i en0 -nn -c 20 'udp port 443'` while
+      loading the page and note how little of it is readable.
     presentation: standard
     sources:
       - title: "RFC 9000: QUIC, a UDP-Based Multiplexed and Secure Transport"
@@ -382,12 +389,12 @@ rungs:
       TTL badges on each cached answer, and a DNSSEC side chain: root DS -> com DNSKEY -> com DS ->
       example.com DNSKEY -> RRSIG over the A record.
     example: >-
-      Lab (10 min). `dig +trace www.wikipedia.org` and annotate each referral; run
-      `dig www.wikipedia.org @1.1.1.1` twice and watch the TTL count down in the resolver cache.
-      DNSSEC: `dig +dnssec cloudflare.com @1.1.1.1` (look for the ad flag and RRSIG records), then
-      `dig dnssec-failed.org @1.1.1.1` (SERVFAIL) vs `dig +cd dnssec-failed.org @1.1.1.1` (checking
-      disabled, answer returned). DoH by hand:
-      `curl -s -H 'accept: application/dns-json' 'https://cloudflare-dns.com/dns-query?name=example.com&type=AAAA'`.
+      Tools: dig, curl — no program code. Lab (10 min). `dig +trace www.wikipedia.org` and annotate
+      each referral; run `dig www.wikipedia.org @1.1.1.1` twice and watch the TTL count down in the
+      resolver cache. DNSSEC: `dig +dnssec cloudflare.com @1.1.1.1` (look for the ad flag and RRSIG
+      records), then `dig dnssec-failed.org @1.1.1.1` (SERVFAIL) vs `dig +cd dnssec-failed.org
+      @1.1.1.1` (checking disabled, answer returned). DoH by hand: `curl -s -H 'accept:
+      application/dns-json' 'https://cloudflare-dns.com/dns-query?name=example.com&type=AAAA'`.
     presentation: standard
     sources:
       - title: DNS over TLS vs. DNS over HTTPS (Cloudflare Learning Center)
@@ -428,13 +435,14 @@ rungs:
       individual requests across pods; a health checker probes the pods and one pod is marked
       draining.
     example: >-
-      Lab (10 min) with HAProxy on a Mac (`brew install haproxy`). Start two backends with
-      `python3 -m http.server 8001` and `python3 -m http.server 8002`, and run HAProxy with a short
-      config using `mode http`, `balance roundrobin`, `option httpchk GET /` and both servers with
-      `check`. Loop `curl -s -o /dev/null -w '%{http_code}\n' localhost:8080`, kill one backend and
-      watch it get ejected. Then switch to `mode tcp` and fetch three URLs in one keep-alive `curl`
-      call to see all three land on the same backend. Map what you saw to your own Kubernetes or
-      Akka HTTP shutdown settings.
+      Scala 3 script (stdlib) plus tools haproxy, curl: lab (10 min) with HAProxy on a Mac (`brew
+      install haproxy`). Write a backend script that starts two JDK
+      com.sun.net.httpserver.HttpServer instances on 8001 and 8002, each answering with its own
+      port, and stops 8002 when you press Enter. Run HAProxy with a short config using `mode http`,
+      `balance roundrobin`, `option httpchk GET /` and both servers with `check`. Loop `curl -s -w '
+      %{http_code}\n' localhost:8080`, press Enter and watch 8002 get ejected. Then switch to `mode
+      tcp` and fetch three URLs in one keep-alive `curl` call to see all three land on the same
+      backend. Map what you saw to your own Kubernetes or Akka HTTP shutdown settings.
     presentation: standard
     sources:
       - title: Site Reliability Engineering, ch. 20 "Load Balancing in the Datacenter"
@@ -474,11 +482,12 @@ rungs:
       each lands on a different PoP; one PoP serves a cache hit, another misses and fetches from a
       single origin over a long-lived connection.
     example: >-
-      Lab (5–10 min). `curl -s https://www.cloudflare.com/cdn-cgi/trace` and read the colo= line
-      (the PoP that served you); `dig @1.1.1.1 CH TXT id.server +short` to see which resolver
-      location answered; `brew install mtr` and `sudo mtr -rwc 10 1.1.1.1` to see how few hops
-      away it is. Then `curl -sI` a static asset on a CDN-backed site twice and compare
-      `cf-cache-status`, `age` and `cache-control` between the two responses.
+      Tools: curl, dig, mtr — no program code. Lab (5–10 min). `curl -s
+      https://www.cloudflare.com/cdn-cgi/trace` and read the colo= line (the PoP that served you);
+      `dig @1.1.1.1 CH TXT id.server +short` to see which resolver location answered; `brew install
+      mtr` and `sudo mtr -rwc 10 1.1.1.1` to see how few hops away it is. Then `curl -sI` a static
+      asset on a CDN-backed site twice and compare `cf-cache-status`, `age` and `cache-control`
+      between the two responses.
     presentation: standard
     sources:
       - title: What is a CDN? (Cloudflare Learning Center)
@@ -519,12 +528,14 @@ rungs:
       and polling, each leaf annotated with what it is on the wire (long HTTP response, upgraded
       TCP connection, HTTP/2 streams, repeated requests).
     example: >-
-      Lab (10 min). Write a 15-line Python SSE server on localhost (http.server, Content-Type
-      text/event-stream, writes `data: tick N` plus a blank line every second and flushes) and
-      consume it with `curl -N localhost:8000/events`; note that it is just a long HTTP response.
-      Then open Chrome DevTools -> Network -> WS on any site that uses WebSockets and inspect the
-      101 Switching Protocols response and the frames. Finish by filling the decision table for
-      three cases: an order-status page, a chat, and an event feed between two Scala services.
+      Scala 3 script (stdlib) plus curl and Chrome DevTools: lab (10 min). Write a 15-line SSE
+      server on localhost with the JDK's com.sun.net.httpserver.HttpServer (Content-Type
+      text/event-stream, sendResponseHeaders(200, 0) for a streamed body, then write `data: tick N`
+      plus a blank line every second and flush) and consume it with `curl -N localhost:8000/events`;
+      note that it is just a long HTTP response. Then open Chrome DevTools -> Network -> WS on any
+      site that uses WebSockets and inspect the 101 Switching Protocols response and the frames.
+      Finish by filling the decision table for three cases: an order-status page, a chat, and an
+      event feed between two Scala services.
     presentation: standard
     sources:
       - title: High Performance Browser Networking, ch. 16 "Server-Sent Events (SSE)"
@@ -571,13 +582,13 @@ rungs:
       network -> eBPF -> app, with a per-node Envoy used only for L7 policy. Each path is annotated
       with its number of user-space proxy hops.
     example: >-
-      Paper lab (15 min) plus an optional cluster. For one internal call between two services you
-      know, list the features you rely on today (timeouts, retries, TLS, metrics) and where each
-      lives (code, library, proxy). Count the proxy hops for each of the three models and estimate
-      the memory overhead for 50 pods using figures from the cited docs (cite them). Optional with
-      Docker: create a kind cluster with the default CNI disabled (Cilium's kind quick-start),
-      `cilium install`, `cilium hubble enable`, deploy two pods and run `hubble observe --follow`
-      while one curls the other.
+      Tools: pencil; optionally kind, cilium, hubble — no program code. Paper lab (15 min) plus an
+      optional cluster. For one internal call between two services you know, list the features you
+      rely on today (timeouts, retries, TLS, metrics) and where each lives (code, library, proxy).
+      Count the proxy hops for each of the three models and estimate the memory overhead for 50 pods
+      using figures from the cited docs (cite them). Optional with Docker: create a kind cluster
+      with the default CNI disabled (Cilium's kind quick-start), `cilium install`, `cilium hubble
+      enable`, deploy two pods and run `hubble observe --follow` while one curls the other.
     presentation: deep
     sources:
       - title: Cilium documentation, "Introduction to Cilium & Hubble"
@@ -618,13 +629,13 @@ rungs:
       control plane distributing keys and policy, direct encrypted peer-to-peer paths, and a relay
       used only when hole punching fails.
     example: >-
-      Lab (10–15 min). `brew install wireguard-tools`; generate a key pair with
-      `wg genkey | tee priv.key | wg pubkey > pub.key` and write a two-peer `wg0.conf` by hand,
-      explaining every line (Address, ListenPort, PrivateKey, [Peer] PublicKey, AllowedIPs,
-      Endpoint, PersistentKeepalive). If Tailscale is installed, run `tailscale netcheck` to see
-      your NAT behaviour and relay latencies and `tailscale ping <peer>` to watch a path go from
-      relayed to direct. Close with a one-paragraph access design for an internal admin tool using
-      these ideas.
+      Tools: wg, tailscale — no program code. Lab (10–15 min). `brew install wireguard-tools`;
+      generate a key pair with `wg genkey | tee priv.key | wg pubkey > pub.key` and write a two-peer
+      `wg0.conf` by hand, explaining every line (Address, ListenPort, PrivateKey, [Peer] PublicKey,
+      AllowedIPs, Endpoint, PersistentKeepalive). If Tailscale is installed, run `tailscale
+      netcheck` to see your NAT behaviour and relay latencies and `tailscale ping <peer>` to watch a
+      path go from relayed to direct. Close with a one-paragraph access design for an internal admin
+      tool using these ideas.
     presentation: deep
     sources:
       - title: WireGuard
@@ -666,12 +677,13 @@ rungs:
       -> server. Alongside, a dual-stack laptop races IPv6 and IPv4 connections with Happy Eyeballs
       and IPv6 wins.
     example: >-
-      Lab (10 min). `curl -6 -s https://ifconfig.co` and `curl -4 -s https://ifconfig.co` (or open
-      test-ipv6.com) to see whether you have IPv6 at all; `dig AAAA` a few sites you use daily and
-      note which have none; `dig AAAA ipv4only.arpa +short` (any answer means your resolver does
-      DNS64, RFC 7050); `curl -v -o /dev/null https://www.google.com 2>&1 | grep -iE 'trying|connected'`
-      to see the address attempts; `ndp -an` to list IPv6 neighbours. Then grep one of your own
-      services' configs and log pipelines for IPv4-only assumptions.
+      Tools: curl, dig, ndp, grep — no program code. Lab (10 min). `curl -6 -s https://ifconfig.co`
+      and `curl -4 -s https://ifconfig.co` (or open test-ipv6.com) to see whether you have IPv6 at
+      all; `dig AAAA` a few sites you use daily and note which have none; `dig AAAA ipv4only.arpa
+      +short` (any answer means your resolver does DNS64, RFC 7050); `curl -v -o /dev/null
+      https://www.google.com 2>&1 | grep -iE 'trying|connected'` to see the address attempts; `ndp
+      -an` to list IPv6 neighbours. Then grep one of your own services' configs and log pipelines
+      for IPv4-only assumptions.
     presentation: deep
     sources:
       - title: "RFC 8305: Happy Eyeballs Version 2: Better Connectivity Using Concurrency"
@@ -714,14 +726,15 @@ rungs:
       level, bcc/bpftrace and Hubble hooking kernel functions; arrows show which symptom each one
       answers (slow DNS, retransmits, queueing, slow server).
     example: >-
-      Lab (15 min). Latency histogram on the Mac: run 100 iterations of
-      `curl -s -o /dev/null -w '%{time_namelookup} %{time_connect} %{time_appconnect} %{time_starttransfer}\n' https://example.com`
-      into a file and compute p50/p90/p99 per column with a 10-line Python script. pcap:
-      `sudo tcpdump -i en0 -w slow.pcap 'host <download-host>'` during a large download, open it
-      in Wireshark, apply `tcp.analysis.flags` and open Statistics -> TCP Stream Graphs -> Round
-      Trip Time. eBPF (needs Linux: a VM, a cloud box or a Kubernetes node):
-      `sudo bpftrace -e 'kprobe:tcp_retransmit_skb { @[comm] = count(); }'` and bcc's tcpretrans
-      while generating traffic.
+      Scala 3 script (stdlib) plus tools curl, tcpdump, Wireshark, bpftrace: lab (15 min). Latency
+      histogram on the Mac: run 100 iterations of `curl -s -o /dev/null -w '%{time_namelookup}
+      %{time_connect} %{time_appconnect} %{time_starttransfer}\n' https://example.com` into a file
+      and compute p50/p90/p99 per column, plus a text histogram of time_starttransfer, with a
+      15-line Scala script (scala.io.Source). pcap: `sudo tcpdump -i en0 -w slow.pcap 'host
+      <download-host>'` during a large download, open it in Wireshark, apply `tcp.analysis.flags`
+      and open Statistics -> TCP Stream Graphs -> Round Trip Time. eBPF (needs Linux: a VM, a cloud
+      box or a Kubernetes node): `sudo bpftrace -e 'kprobe:tcp_retransmit_skb { @[comm] = count();
+      }'` and bcc's tcpretrans while generating traffic.
     presentation: deep
     sources:
       - title: Linux eBPF Tracing Tools (Brendan Gregg)
@@ -764,12 +777,13 @@ rungs:
       connect, TLS, TTFB and transfer, each leading to the tool to use and the likely causes, and
       ending in "escalate with evidence" boxes.
     example: >-
-      Run the runbook against deliberately broken setups. Locally: a small HTTP server with an
-      artificial sleep in its handler behind HAProxy from rung 9, so TTFB grows while connect
-      stays flat. On the path: add 100 ms delay and 2% loss with macOS Network Link Conditioner
-      (Additional Tools for Xcode) or `dnctl`/`pfctl` dummynet, and watch which phases move in
-      `curl -w` and what `mtr` and tcpdump show. Deliverable: Networking-Slow-Request-Runbook.md
-      with the decision tree and commands, filed into 10-networking when passed.
+      Scala 3 script (stdlib) plus tools curl, mtr, tcpdump, haproxy: run the runbook against
+      deliberately broken setups. Locally: add a Thread.sleep(800) to the handler of the rung-9
+      Scala backend behind HAProxy, so TTFB grows while connect stays flat. On the path: add 100 ms
+      delay and 2% loss with macOS Network Link Conditioner (Additional Tools for Xcode) or
+      `dnctl`/`pfctl` dummynet, and watch which phases move in `curl -w` and what `mtr` and tcpdump
+      show. Deliverable: Networking-Slow-Request-Runbook.md with the decision tree and commands,
+      filed into 10-networking when passed.
     presentation: deep
     sources:
       - title: curl man page

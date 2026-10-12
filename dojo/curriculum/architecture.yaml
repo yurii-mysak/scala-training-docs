@@ -57,11 +57,12 @@ rungs:
       to the payment terminal SDK, split into Pricing, Receipt and a PaymentGateway trait, with arrows
       showing which module depends on which.
     example: >-
-      Take a 30-line Scala WashService.completeWash method that prices a wash with a hard-coded match
-      on package-name strings, formats a receipt string and calls the terminal SDK directly. List every
-      reason it could change (new package, receipt layout, new terminal vendor). Extract Pricing and
-      Receipt, put the terminal behind a trait, and count reasons-to-change per module after the split;
-      name the connascence of meaning (magic package strings) you removed.
+      Scala 3 script (stdlib): write a 30-line WashService.completeWash method that prices a wash
+      with a hard-coded match on package-name strings, formats a receipt string and calls a fake
+      terminal SDK object directly. List every reason it could change (new package, receipt layout,
+      new terminal vendor). Extract Pricing and Receipt, put the terminal behind a trait, and count
+      reasons-to-change per module after the split; name the connascence of meaning (magic package
+      strings) you removed.
     presentation: minimal
     sources:
       - title: Connascence
@@ -97,11 +98,12 @@ rungs:
       after, Pricing depends on a PriceRepo trait in the domain package and PostgresPriceRepo
       implements it, with a dashed control-flow arrow still going from domain to DB.
     example: >-
-      In a tiny Scala project (or on paper) write package domain with trait PriceRepo and
-      class Pricing(repo: PriceRepo), and package infra with class PostgresPriceRepo extends
-      domain.PriceRepo; wire them in Main. Draw the import graph and check no arrow points from
-      domain to infra. Then grep the imports of one real module you own and find one dependency that
-      points the wrong way.
+      Scala 3 script (stdlib) plus grep: in one file with `package domain:`, `package infra:` and
+      `package app:` sections, write trait PriceRepo and class Pricing(repo: PriceRepo) in domain,
+      class PostgresPriceRepo extends domain.PriceRepo (an in-memory stand-in is fine) in infra, and
+      wire them in the @main in app. Draw the import graph and check no arrow points from domain to
+      infra. Then grep the imports of one real module you own and find one dependency that points
+      the wrong way.
     presentation: minimal
     sources:
       - title: The Clean Architecture (Robert C. Martin, 2012)
@@ -135,10 +137,10 @@ rungs:
       LoyaltyTierDiscount added without touching Checkout (OCP), and a broken subtype that throws for
       small totals (an LSP violation) marked in red.
     example: >-
-      Write a 20-line Scala Checkout that applies discounts through a match on a string type. Refactor
-      it to a DiscountPolicy trait and add a loyalty-tier policy without touching Checkout (OCP). Then
-      write a policy that throws for totals under 10 and show which existing caller breaks (LSP).
-      Finally name the actor each class answers to (SRP).
+      Scala 3 script (stdlib): write a 20-line Checkout that applies discounts through a match on a
+      string type. Refactor it to a DiscountPolicy trait and add a loyalty-tier policy without
+      touching Checkout (OCP). Then write a policy that throws for totals under 10 and show which
+      existing caller breaks (LSP). Finally name the actor each class answers to (SRP).
     presentation: minimal
     sources:
       - title: The Principles of OOD (Robert C. Martin)
@@ -171,10 +173,10 @@ rungs:
       A fat PaymentTerminal interface (authorize, capture, refund, printReceipt, updateFirmware) split
       into role interfaces used by three clients — Checkout, Refunds and Maintenance.
     example: >-
-      Take a six-method PaymentTerminal trait and the three clients that use it; write the role
-      interfaces each client actually needs, and a test double for Checkout that now implements two
-      methods instead of six. Then invert one dependency: move an Authorizer trait into the checkout
-      module and make the vendor SDK adapter implement it.
+      Scala 3 script (stdlib): take a six-method PaymentTerminal trait and the three clients that
+      use it; write the role interfaces each client actually needs, and a test double for Checkout
+      that now implements two methods instead of six. Then invert one dependency: move an Authorizer
+      trait into the checkout package and make the vendor SDK adapter implement it.
     presentation: standard
     sources:
       - title: RoleInterface (Martin Fowler, bliki)
@@ -215,11 +217,11 @@ rungs:
       vs modules by hidden decision — showing the change "store lines differently in memory" rippling
       through the first and staying inside one module in the second.
     example: >-
-      Read the KWIC example in Parnas's paper (its two modularisations). Then, in Scala, subclass
-      java.util.HashSet as CountingSet, override add and addAll to count insertions, call addAll with
-      three elements and observe a count of six, because the parent's addAll calls add internally (the
-      classic fragile-base-class demo). Rewrite it as a wrapper that delegates to a Set and confirm
-      the count is three.
+      Scala 3 script (stdlib): read the KWIC example in Parnas's paper (its two modularisations).
+      Then subclass java.util.HashSet as CountingSet, override add and addAll to count insertions,
+      call addAll with three elements and observe a count of six, because the parent's addAll calls
+      add internally (the classic fragile-base-class demo). Rewrite it as a wrapper that delegates
+      to a Set and confirm the count is three.
     presentation: standard
     sources:
       - title: On the Criteria To Be Used in Decomposing Systems into Modules (D. L. Parnas, CACM 1972)
@@ -256,10 +258,10 @@ rungs:
       harness) on the left, driven ports (payment terminal, wash tunnel controller, cloud sync,
       Postgres) on the right, each with its adapter outside the hexagon.
     example: >-
-      Take one use case, "start a wash for a member", and list its ports, marking which are driving
-      and which are driven. Write the use-case function signature in Scala so it depends only on ports
-      (MemberRepo, TunnelController, Clock), then a ten-line set of in-memory adapters and one unit
-      test that runs the use case with no database or hardware.
+      Scala 3 script (stdlib): take one use case, "start a wash for a member", and list its ports,
+      marking which are driving and which are driven. Write the use-case function so it depends only
+      on ports (MemberRepo, TunnelController, Clock), then a ten-line set of in-memory adapters and
+      an assert-based test in the @main that runs the use case with no database or hardware.
     presentation: standard
     sources:
       - title: PresentationDomainDataLayering (Martin Fowler, bliki)
@@ -298,10 +300,11 @@ rungs:
       Equipment, Reporting — with relationship labels such as an anticorruption layer toward the
       payment processor and a published language from Wash Operations to Reporting.
     example: >-
-      List ten terms the car-wash team uses every day (wash, package, member, plan, redemption,
-      transaction, site, lane, tunnel, upsell). For each, write which context owns it and where the
-      same word means something different elsewhere. Draw the context map, mark one anticorruption
-      layer, and note one place where the code's names disagree with the business language.
+      Tools: pencil — no program code. List ten terms the car-wash team uses every day (wash,
+      package, member, plan, redemption, transaction, site, lane, tunnel, upsell). For each, write
+      which context owns it and where the same word means something different elsewhere. Draw the
+      context map, mark one anticorruption layer, and note one place where the code's names disagree
+      with the business language.
     presentation: standard
     sources:
       - title: UbiquitousLanguage (Martin Fowler, bliki)
@@ -341,11 +344,11 @@ rungs:
       invariants listed inside the boundary, and a WashTransaction aggregate outside that refers to it
       only by membershipId.
     example: >-
-      Model a car-wash Membership in Scala: value objects (Plate, PlanId, Money) as case classes, and
-      an aggregate root with redeemWash(plate, at) and changePlan(planId) returning
-      Either[DomainError, (Membership, List[Event])]. Enforce two invariants (a maximum number of plates
-      per plan; at most one included wash per day). Decide whether WashTransaction belongs in the same
-      aggregate and justify it in two sentences.
+      Scala 3 script (stdlib): model a car-wash Membership with value objects (Plate, PlanId, Money)
+      as case classes, and an aggregate root with redeemWash(plate, at) and changePlan(planId)
+      returning Either[DomainError, (Membership, List[Event])]. Enforce two invariants (a maximum
+      number of plates per plan; at most one included wash per day) and assert both from the @main.
+      Decide whether WashTransaction belongs in the same aggregate and justify it in two sentences.
     presentation: standard
     sources:
       - title: DDD_Aggregate (Martin Fowler, bliki)
@@ -385,10 +388,11 @@ rungs:
       cloud API, member mobile app, payment provider and reporting database — written in Mermaid C4
       syntax.
     example: >-
-      Draw the system-context and container diagrams (levels 1 and 2) for the car-wash platform in
-      Mermaid (C4Context and C4Container) or Structurizr DSL. Then review them against the notation
-      guidance on c4model.com and fix every miss — missing technology labels, unlabelled or
-      two-headed arrows, no key.
+      Tools: Mermaid or Structurizr DSL (diagrams as text) — no program code. Draw the
+      system-context and container diagrams (levels 1 and 2) for the car-wash platform in Mermaid
+      (C4Context and C4Container) or Structurizr DSL. Then review them against the notation guidance
+      on c4model.com and fix every miss — missing technology labels, unlabelled or two-headed
+      arrows, no key.
     presentation: standard
     sources:
       - title: The C4 model for visualising software architecture
@@ -417,10 +421,11 @@ rungs:
       State diagram of an ADR's life — proposed, accepted, then deprecated or superseded by a later
       ADR — with the pull-request review step on the way to accepted.
     example: >-
-      Write a one-page retroactive ADR for a decision already made in a system you know (for example
-      "Akka Cluster Sharding for per-site state" or "Postgres rather than Cassandra for transactions")
-      in MADR format: context and problem, decision drivers, two or three considered options with pros
-      and cons, outcome, consequences. Time-box it to ten minutes and note which section was hardest.
+      Tools: editor (MADR template) — no program code. Write a one-page retroactive ADR for a
+      decision already made in a system you know (for example "Akka Cluster Sharding for per-site
+      state" or "Postgres rather than Cassandra for transactions") in MADR format: context and
+      problem, decision drivers, two or three considered options with pros and cons, outcome,
+      consequences. Time-box it to ten minutes and note which section was hardest.
     presentation: standard
     sources:
       - title: Architectural Decision Records (adr.github.io)
@@ -461,11 +466,12 @@ rungs:
       washes/{wash}) with methods on each node, and a POST /washes carrying an Idempotency-Key header
       through a client retry.
     example: >-
-      Design six endpoints for "start a wash, list a member's washes, cancel a wash": paths, methods,
-      request and response bodies, status codes. Add an Idempotency-Key to POST /washes and write the
-      server rule in pseudo-code (store key with response; same key and same body replays the stored
-      response; same key with a different body is rejected). List two changes you could ship without a
-      version bump and one that needs v2.
+      Scala 3 script (stdlib): on paper, design six endpoints for "start a wash, list a member's
+      washes, cancel a wash": paths, methods, request and response bodies, status codes. Then
+      implement the server rule for an Idempotency-Key on POST /washes in about 20 lines: a Map from
+      key to (request-body hash, stored response); same key and same body replays the stored
+      response, same key with a different body is rejected (422). Exercise all three cases from the
+      @main. List two changes you could ship without a version bump and one that needs v2.
     presentation: standard
     sources:
       - title: Google Cloud API Design Guide — Resource-oriented design
@@ -505,11 +511,11 @@ rungs:
       Fowler's premium sketch — productivity against base complexity, with the monolith and
       microservice curves crossing — and a marker for where the car-wash platform probably sits today.
     example: >-
-      Score the car-wash platform's main modules (for example Wash Operations, Memberships, Payments,
-      Reporting, Site Equipment) from 1 to 5 on four split forces (team ownership, scaling difference,
-      change cadence, failure isolation) in a small table. Pick the module with the strongest case for
-      extraction, name the data it would have to own, and list the synchronous calls that would start
-      crossing a network boundary.
+      Tools: pencil — no program code. Score the car-wash platform's main modules (for example Wash
+      Operations, Memberships, Payments, Reporting, Site Equipment) from 1 to 5 on four split forces
+      (team ownership, scaling difference, change cadence, failure isolation) in a small table. Pick
+      the module with the strongest case for extraction, name the data it would have to own, and
+      list the synchronous calls that would start crossing a network boundary.
     presentation: standard
     sources:
       - title: Microservices (James Lewis and Martin Fowler, 2014)
@@ -551,11 +557,13 @@ rungs:
       transaction; a relay publishes to Kafka; Billing and Notifications consume idempotently, one of
       them ignoring a redelivered duplicate.
     example: >-
-      For the flow "member upgrades plan, billing prorates, the site gate then allows the premium
-      package", classify each message as a notification, a state transfer or a command. Write the
-      outbox table DDL (id, aggregate_id, type, payload jsonb, created_at, published_at) and the
-      relay's SELECT ... FOR UPDATE SKIP LOCKED polling loop in pseudo-code, and state the maximum
-      staleness the site gate can tolerate.
+      Rust (cargo, crates: postgres) plus SQL: for the flow "member upgrades plan, billing prorates,
+      the site gate then allows the premium package", classify each message as a notification, a
+      state transfer or a command. Create the outbox table in psql on a local Docker Postgres (id,
+      aggregate_id, type, payload jsonb, created_at, published_at), then write a Rust relay loop
+      that in one transaction selects up to ten unpublished rows with SELECT ... FOR UPDATE SKIP
+      LOCKED, prints them as published and sets published_at; run two relays at once and confirm no
+      row is printed twice. State the maximum staleness the site gate can tolerate.
     presentation: standard
     sources:
       - title: What do you mean by "Event-Driven"? (Martin Fowler, 2017)
@@ -594,11 +602,12 @@ rungs:
       Timeline of 100 clients retrying after a short outage — without jitter (synchronised spikes at
       each backoff step) and with full jitter (load spread out) — with a retry-budget ceiling drawn.
     example: >-
-      In 15 lines of Scala or Python implement retry(f, maxAttempts = 4, base = 100 ms, cap = 2 s)
-      with full jitter (sleep a random time between 0 and min(cap, base times 2^attempt)). Simulate 100
-      clients against a server that recovers after one second and count requests per 100 ms bucket
-      with and without jitter. Then decide which of three POS calls (authorise payment, fetch member,
-      open the tunnel gate) may be retried, and with which key.
+      Scala 3 script (stdlib): in 15 lines implement retry(f, maxAttempts = 4, base = 100 ms, cap =
+      2 s) with full jitter (sleep a random time between 0 and min(cap, base times 2^attempt)).
+      Simulate 100 clients against a server that recovers after one second, on a virtual clock so it
+      runs instantly, and count requests per 100 ms bucket with and without jitter. Then decide
+      which of three POS calls (authorise payment, fetch member, open the tunnel gate) may be
+      retried, and with which key.
     presentation: standard
     sources:
       - title: Timeouts, retries, and backoff with jitter (Amazon Builders' Library)
@@ -640,11 +649,13 @@ rungs:
       half-open back to closed on success or open on failure) next to a bulkhead picture with separate
       pools for payments and reporting.
     example: >-
-      For the car-wash site controller list three external dependencies (payment processor, cloud
-      membership API, licence-plate recognition). For each choose breaker thresholds, a bulkhead (pool
-      size or queue) and the degraded behaviour while open (for example offline authorisation up to a
-      limit, a cached member list, manual plate entry), as a small table. Optionally wrap a fake call
-      that fails 60% of the time in akka.pattern.CircuitBreaker and log the state transitions.
+      Scala 3 script (stdlib): for the car-wash site controller list three external dependencies
+      (payment processor, cloud membership API, licence-plate recognition). For each choose breaker
+      thresholds, a bulkhead (pool size or queue) and the degraded behaviour while open (for example
+      offline authorisation up to a limit, a cached member list, manual plate entry), as a small
+      table. Then write a 25-line circuit breaker (Closed, Open, HalfOpen; failure threshold, reset
+      timeout) around a fake call that fails 60% of the time, log the state transitions, and compare
+      its parameters with akka.pattern.CircuitBreaker's maxFailures, callTimeout and resetTimeout.
     presentation: standard
     sources:
       - title: CircuitBreaker (Martin Fowler, bliki)
@@ -685,11 +696,12 @@ rungs:
       A utility tree — the root "Utility" branching into Availability, Performance, Modifiability,
       Security and Cost, each with one or two concrete car-wash scenarios rated (value, difficulty).
     example: >-
-      Write five quality-attribute scenarios for the car-wash POS in six-part form, arrange them in a
-      utility tree, and run ATAM-lite on one decision (for example "the site controller authorises
-      members offline when the cloud is unreachable"): name one sensitivity point, one trade-off point
-      (availability vs revenue or fraud risk) and one risk. Turn one scenario into a fitness function
-      you could automate — metric, threshold, where it runs.
+      Tools: pencil — no program code. Write five quality-attribute scenarios for the car-wash POS
+      in six-part form, arrange them in a utility tree, and run ATAM-lite on one decision (for
+      example "the site controller authorises members offline when the cloud is unreachable"): name
+      one sensitivity point, one trade-off point (availability vs revenue or fraud risk) and one
+      risk. Turn one scenario into a fitness function you could automate — metric, threshold, where
+      it runs.
     presentation: deep
     sources:
       - title: ATAM — Method for Architecture Evaluation (Kazman, Klein, Clements; SEI technical report, 2000)
@@ -730,11 +742,12 @@ rungs:
       component serving one route; the legacy system shrunk to the remaining routes and finally
       removed.
     example: >-
-      Write two fitness functions for a JVM codebase you know: (1) an ArchUnit rule (runnable from
-      Scala through JUnit) that fails if any class in a ..domain.. package depends on ..infra.. or on
-      akka.http; (2) a CI check that fails when p95 latency in the latest load-test report exceeds a
-      threshold. Then sketch a three-step strangler-fig plan for moving one legacy POS feature behind a
-      facade.
+      Scala 3 script (stdlib): write two fitness functions for a JVM codebase you know, each exiting
+      non-zero on violation so CI can run it: (1) walk the source tree with java.nio.file.Files.walk
+      and fail if any file in a ..domain.. package imports from ..infra.. or akka.http (the rule
+      ArchUnit would express through JUnit); (2) read the latest load-test report (one latency per
+      line) and fail when p95 exceeds a threshold. Then sketch a three-step strangler-fig plan for
+      moving one legacy POS feature behind a facade.
     presentation: deep
     sources:
       - title: Architectural fitness function (Thoughtworks Technology Radar)
@@ -775,10 +788,11 @@ rungs:
       service teams consuming golden paths on one side and the platform team producing them on the
       other.
     example: >-
-      After reading the chosen posts, write a half-page "what would transfer" note for your own
-      organisation: the first golden path you would define (for example a new Scala service with
-      logging, metrics and CI), the metadata every service must declare (owner, on-call, dependencies),
-      and one fleet-wide change you would automate. Name the earlier rung each idea connects to.
+      Tools: editor (writing) — no program code. After reading the chosen posts, write a half-page
+      "what would transfer" note for your own organisation: the first golden path you would define
+      (for example a new Scala service with logging, metrics and CI), the metadata every service
+      must declare (owner, on-call, dependencies), and one fleet-wide change you would automate.
+      Name the earlier rung each idea connects to.
     presentation: deep
     sources:
       - title: Spotify Engineering blog
@@ -814,11 +828,11 @@ rungs:
       old pipeline and its storage, the new managed pipeline and processing — with the parallel-run
       verification path highlighted.
     example: >-
-      From the chosen posts extract the system's top three quality-attribute scenarios and its main
-      trade-off point, and write a five-line ADR summary (context, decision, consequences) as Spotify
-      might have written it. Then apply the same lens to the car-wash platform: which site events must
-      never be lost (transactions) and which may be sampled (telemetry), and what each implies for
-      delivery guarantees.
+      Tools: editor (writing) — no program code. From the chosen posts extract the system's top
+      three quality-attribute scenarios and its main trade-off point, and write a five-line ADR
+      summary (context, decision, consequences) as Spotify might have written it. Then apply the
+      same lens to the car-wash platform: which site events must never be lost (transactions) and
+      which may be sampled (telemetry), and what each implies for delivery guarantees.
     presentation: deep
     sources:
       - title: Spotify Engineering blog
@@ -853,12 +867,13 @@ rungs:
       A C4 container or component diagram of the part of the POS the decision touches, with the
       differences between the options highlighted.
     example: >-
-      Write the ADR in MADR format for one real open decision — candidates include how site
-      transactions are journaled and reconciled with the cloud, where per-vehicle tier pricing is
-      computed, or how a payment-terminal vendor is abstracted. Include context, at least three
-      decision drivers as scenarios, two or three options with pros and cons, the decision,
-      consequences, one fitness function and a C4 diagram. Time-box it to 30 minutes; it is filed as
-      the capstone and is ready to open as a pull request for team review.
+      Tools: editor (MADR template), Mermaid — no program code. Write the ADR in MADR format for one
+      real open decision — candidates include how site transactions are journaled and reconciled
+      with the cloud, where per-vehicle tier pricing is computed, or how a payment-terminal vendor
+      is abstracted. Include context, at least three decision drivers as scenarios, two or three
+      options with pros and cons, the decision, consequences, one fitness function and a C4 diagram.
+      Time-box it to 30 minutes; it is filed as the capstone and is ready to open as a pull request
+      for team review.
     presentation: deep
     sources:
       - title: MADR — Markdown Any Decision Records

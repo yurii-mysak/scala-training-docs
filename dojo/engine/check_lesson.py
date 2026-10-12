@@ -131,6 +131,23 @@ def check(path: Path, strict: bool = False) -> dict:
             errors.append("book lesson: 'The idea' must open with a '> Chapter map: …' line (SPEC §4 Book rule)")
         if len(re.findall(r"(?m)^### .*§\s*\d+\.\d+", idea)) < 1:
             errors.append("book lesson: each '###' in 'The idea' must carry the book's § number (SPEC §4 Book rule)")
+    # Language rule (SPEC §4): program code is Scala or Rust only.
+    fences = re.findall(r"(?ms)^```([A-Za-z0-9_+-]*)[ \t]*\n(.*?)^```", body)
+    banned = {"python", "py", "python3", "ipython", "pycon", "javascript", "js", "typescript", "ts", "java",
+              "go", "golang", "kotlin", "kt", "ruby", "rb", "r", "julia", "c", "cpp", "c++", "csharp", "cs", "php", "lua"}
+    for lang, code in fences:
+        l = lang.lower()
+        if l in banned:
+            errors.append(f"code block in '{lang}': program code must be Scala or Rust (SPEC §4 Language rule)")
+        elif l in ("bash", "sh", "shell", "console", "zsh") and re.search(r"(?m)(^|[\s;&|$>])(python3?|pip3?|node|npm|npx|jupyter|java)\b", code):
+            errors.append(f"shell block calls Python/Node/Java: program code must be Scala or Rust (SPEC §4 Language rule)")
+        elif l in ("scala", "rust"):
+            first = code.splitlines()[0] if code.strip() else ""
+            has_main = re.search(r"@main\b|def main\s*\(|fn main\s*\(", code)
+            if has_main and not re.match(r"^\s*//\s*file:\s*\S+", first):
+                errors.append(f"{l} program with a main must start with '// file: <name>' so run_lab.py can run it (SPEC §4 Language rule)")
+            if re.search(r"(?m)^\s*//\s*run:\s*local\b", code) and "run locally" not in body.lower():
+                errors.append("a '// run: local' program needs its output labelled 'Expected output — run locally' (SPEC §4 Language rule)")
     stats = {"idea_words": idea_words, "mermaid_blocks": mermaid, "self_check": len(items),
              "source_urls": len(urls), "quotes": len(quote_blocks), "est_min": est}
     ok = not errors and (not strict or not warnings)

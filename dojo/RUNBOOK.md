@@ -29,6 +29,7 @@ Constants
    `git config user.name "IT Iaido job"` and `git config user.email "yura.mysak@gmail.com"`.
 3. Dependencies: `python3 -c "import yaml, markdown"`; if missing,
    `pip install --break-system-packages pyyaml markdown`. `which mmdc || npm i -g @mermaid-js/mermaid-cli`.
+   Lab toolchains: `bash dojo/engine/toolchain.sh` (Scala 3 from the GitHub release; Rust via cargo).
 4. Decide the MODE:
    - **on-demand** if an extra user message in this run contains `on-demand` (the Dojo's
      "Request 2 more" button or Claude in the project fired you).
@@ -108,7 +109,13 @@ passages (fresh); the next-rung title (core); and these instructions verbatim:
 > full, never point at existing repo notes instead of explaining. For DDIA and FP-in-Scala rungs
 > follow SPEC §4 "Book rule": restate the rung's chapter sections in the book's order — Chapter
 > map line, one `###` per section with its § number, the book's own examples, terms and
-> conclusions in your words, the section's exercises as the Lab. Follow `dojo/SPEC.md` §4: sections in order — Why this matters
+> conclusions in your words, the section's exercises as the Lab.
+> ALL program code is Scala 3 or Rust (SPEC §4 "Language rule"): Scala 3.3 scripts with the
+> standard library only by default; Rust (cargo + crates.io) where a crate is needed. Start every
+> runnable program with `// file: Lab.scala` or `// file: main.rs` (+ `// deps: …` for Rust), run
+> `python3 dojo/engine/run_lab.py <id>` and paste its real output. If the program needs what this
+> environment cannot reach (Hugging Face downloads, a database server, an API key), add
+> `// run: local` and label the output "Expected output — run locally". Follow `dojo/SPEC.md` §4: sections in order — Why this matters
 > (3 lines) · [Primer, fresh lessons above the reader's level] · The idea (600–1200 words, one or
 > two ```mermaid diagrams: `flowchart LR|TD` or `sequenceDiagram`; quote any label containing
 > parentheses, colons or slashes in double quotes; no HTML inside labels) · Worked example or Lab
@@ -129,7 +136,9 @@ passages (fresh); the next-rung title (core); and these instructions verbatim:
 > `python3 dojo/engine/check_lesson.py <id>` and fix every error it reports before you finish.
 > Do not run git. Report in ≤80 words: word count, diagrams, sources quoted.
 
-When both return: run `python3 dojo/engine/check_lesson.py <id>` yourself on both. If errors
+When both return: run `python3 dojo/engine/check_lesson.py <id>` and
+`python3 dojo/engine/run_lab.py <id>` yourself on both; a failing program blocks publishing until
+fixed. If errors
 remain, fix them directly (you may use `WebFetch` to recover a quote). Then
 `python3 dojo/engine/mermaid.py <id>` for both; if a diagram fails to render, simplify its Mermaid
 source until it renders (the error text names the line).

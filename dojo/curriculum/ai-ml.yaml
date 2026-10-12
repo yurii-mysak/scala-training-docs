@@ -9,13 +9,15 @@ description: >-
   team: Kaggle Learn for the hands-on mechanics, 3Blue1Brown and Khan Academy for linear algebra,
   StatQuest for statistics, so every later idea has its maths in place before it is needed.
   Phase 2 (rungs 12–19) builds neural networks from a single neuron upward, doing backpropagation
-  by hand before PyTorch's autograd does it, with CS231n lectures 1–7 as the reference for
-  training and convolutional networks. Phase 3 (rungs 20–29) runs embeddings → attention →
-  Transformer → tokens → training stages → inference → prompting, then bridges into the
+  by hand (in Scala) before candle's autograd (Rust) does it, with CS231n lectures 1–7 as the
+  reference for training and convolutional networks. Phase 3 (rungs 20–29) runs embeddings →
+  attention → Transformer → tokens → training stages → inference → prompting, then bridges into the
   interview-level material already in 20-llm-agent-systems (evaluation, RAG, agents) instead of
   repeating it. Phase 4 (rungs 30–38) is the engineering frontier — MCP and agent harnesses,
   calibration as the prerequisite for decision models (Jev, Clef), RL fine-tuning, evals in CI,
-  cost and latency — and ends with an end-to-end capstone.
+  cost and latency — and ends with an end-to-end capstone. Every lab is a Scala 3 script using
+  only the standard library or a Rust cargo project (candle for tensors and neural networks);
+  the courses that teach in Python are read and watched, never run.
 primary_sources:
   - title: "DOU — what to study to become an ML/CV engineer in 2026 (The Fourth Law team)"
     url: https://dou.ua/forums/topic/62000/
@@ -56,6 +58,9 @@ primary_sources:
   - title: "PyTorch Tutorials — Learn the Basics"
     url: https://pytorch.org/tutorials/beginner/basics/intro.html
     verified: false
+  - title: "Hugging Face candle — minimalist ML framework for Rust"
+    url: https://github.com/huggingface/candle
+    verified: true
   - title: "Albumentations documentation"
     url: https://albumentations.ai/docs/
     verified: false
@@ -126,10 +131,11 @@ rungs:
       optimiser updates θ → back to the model. A side branch shows unseen data flowing into the
       same trained model to measure generalisation, with no arrow back to the optimiser.
     example: >-
-      Five houses (size in m², price in k$). In a Kaggle notebook with numpy, compare two candidate
-      lines price = a·size + b by computing MAE and MSE for each and pick the winner. Then add one
-      outlier house (a mansion) and observe that MSE and MAE now disagree about which line is
-      better — a first taste of "the loss you choose decides what good means". About 10 lines.
+      Scala 3 script (stdlib): five houses (size in m², price in k$) as a List[(Double, Double)];
+      write mae and mse as one-line helpers over zip and compare two candidate lines price = a·size
+      + b, picking the winner. Then add one outlier house (a mansion) and observe that MSE and MAE
+      now disagree about which line is better — a first taste of "the loss you choose decides what
+      good means". About 15 lines in a single @main def lab().
     presentation: minimal
     sources:
       - title: "DOU — what to study to become an ML/CV engineer in 2026 (The Fourth Law team)"
@@ -149,31 +155,37 @@ rungs:
         verified: false
 
   - id: ai-ml-02
-    title: "Your first model: pandas in, predictions out"
+    title: "Your first model: Scala collections in, predictions out"
     level: B
     est_min: 25
     prereqs: [ai-ml-01]
     summary: >-
-      Before any maths, get the mechanics into your hands: load a CSV into a pandas DataFrame,
-      look at it, choose features X and target y, fit a scikit-learn model and predict. Kaggle's
-      Intro to ML does exactly this with the Melbourne housing data, and the Pandas micro-course
-      covers the DataFrame operations you will reach for daily. For a Scala engineer, a DataFrame
-      is closest to a Spark DataFrame: columnar, vectorised, with groupby/agg.
+      Before any maths, get the mechanics into your hands: load a CSV, look at it, choose features
+      X and target y, fit a model and predict. Kaggle's Intro to ML walks through exactly this on
+      the Melbourne housing data, and its Pandas micro-course covers the table operations you will
+      reach for daily; the course uses Python, so read it for the workflow and do the lab in Scala.
+      There a table is a List of case classes and map/groupBy are the column and aggregation verbs —
+      the same shape as the Spark DataFrame you already know.
     key_points:
-      - "DataFrame and Series; read_csv, head, describe; selecting with columns, loc and iloc."
+      - "A table as data: case-class rows in a List, columns as field projections, a describe-style summary of count, mean, min and max."
       - "Choosing the prediction target y and the feature list X; dropping rows with missing values as the first crude fix."
-      - "The scikit-learn contract: define → fit → predict (evaluate comes in rung 03)."
-      - "DecisionTreeRegressor as a first model: no scaling needed, easy to picture."
-      - "pandas ↔ Spark DataFrame parallels: vectorised column operations, groupby and aggregation."
+      - "The contract every ML library follows: define → fit → predict (evaluate comes in rung 03)."
+      - "A decision tree as a first model (here a one-split stump): no scaling needed, easy to picture."
+      - "Collections ↔ Spark DataFrame parallels: map for column operations, groupBy plus an aggregate for group-and-aggregate."
     diagram: >-
-      Left-to-right pipeline: CSV file → DataFrame (head/describe) → select y and X →
-      model.fit(X, y) → model.predict(X_new) → predictions column; the four scikit-learn steps
-      define/fit/predict/evaluate labelled under the arrows, with "evaluate" greyed out as next lesson.
+      Left-to-right pipeline: CSV file → List[House] (summary statistics) → select y and X →
+      fit(X, y) → predict(X_new) → predictions; the four steps define/fit/predict/evaluate
+      labelled under the arrows, with "evaluate" greyed out as next lesson.
     example: >-
-      Kaggle notebook cells: pd.read_csv on the Melbourne housing CSV used by the course; .describe();
-      pick five numeric features (Rooms, Bathroom, Landsize, Lattitude, Longtitude — the course's own
-      column spellings); DecisionTreeRegressor(random_state=1).fit(X, y); predict the first five rows
-      and compare with y.head(). Finish with one groupby: mean Price by Rooms.
+      Scala 3 script (stdlib): the Kaggle course does this with pandas and scikit-learn; here the
+      DataFrame is a List of case classes. Write a 12-row CSV (Rooms, Bathroom, Landsize, Lattitude,
+      Longtitude, Price — the course's own column spellings) to houses.csv with
+      java.nio.file.Files.writeString, read it back with scala.io.Source.fromFile, and parse each
+      line into case class House. Print a describe-like summary (count, mean, min, max per column);
+      fit a hand-written one-split regression stump on Rooms (try every threshold, keep the one with
+      the lowest squared error, predict each side's mean price); predict the first five rows and
+      compare with their prices. Finish with houses.groupBy(_.rooms) and a mean Price per group.
+      Optional: point the same code at the course's melb_data.csv.
     presentation: minimal
     sources:
       - title: "Kaggle Learn — Intro to Machine Learning"
@@ -199,20 +211,24 @@ rungs:
       datasets, and data leakage — the bug where information about the answer sneaks into the
       features. These habits separate a model that works from one that only looks like it does.
     key_points:
-      - "Train / validation / test splits; the test set is touched once; train_test_split."
+      - "Train / validation / test splits; the test set is touched once; a seeded shuffle-and-split."
       - "Capacity versus error: underfitting (high bias) and overfitting (high variance); the U-shaped validation curve."
       - "k-fold cross-validation: a steadier estimate at k times the cost."
       - "Data leakage: target leakage and train–test contamination (e.g. preprocessing fitted on all rows)."
       - "QA analogy: the validation set is a test suite the model must never see during development."
     diagram: >-
-      Error versus model capacity (max_leaf_nodes on a log axis): training error falls
+      Error versus model capacity (k-nearest neighbours with k falling from 100 to 1 on a log
+      axis — max_leaf_nodes rising for a tree plays the same role): training error falls
       monotonically, validation error is U-shaped; the sweet spot is marked, the left region
       labelled "underfitting", the right "overfitting".
     example: >-
-      The Kaggle Intro to ML exercise: train_test_split the housing data, loop max_leaf_nodes over
-      [5, 50, 500, 5000], print validation MAE for each and choose the best. Then compute the
-      in-sample MAE of the 5000-leaf tree to see how misleading it is. Optional: cross_val_score
-      with cv=5 on the best setting.
+      Scala 3 script (stdlib): generate 300 synthetic houses with a seeded scala.util.Random (price
+      = 3·size + 20·rooms + noise), standardise the features, shuffle and split 80/20 by hand, and
+      use k-nearest-neighbour regression (about five lines: sort training rows by distance, average
+      the k nearest prices) as a model whose capacity you can dial. Print validation MAE for k in
+      [100, 30, 10, 3, 1] and choose the best. Then compute the in-sample MAE of k = 1 — exactly 0,
+      because it memorises — to see how misleading it is. Optional: a hand-written 5-fold split (row
+      index mod 5) averaging validation MAE for the best k.
     presentation: minimal
     sources:
       - title: "Kaggle Learn — Intro to Machine Learning"
@@ -240,23 +256,26 @@ rungs:
       Every model in this track treats data as vectors and matrices: a row of features is a
       vector, a dataset is a matrix, and a linear model is a matrix–vector product. 3Blue1Brown's
       view of vectors as arrows and matrices as transformations of space gives the geometric
-      intuition; numpy gives the code. This is the vocabulary needed for gradients, neural network
-      layers and embeddings.
+      intuition; a few Scala helpers over Vector[Double] give the code. This is the vocabulary
+      needed for gradients, neural network layers and embeddings.
     key_points:
       - "Two views of a vector: a list of numbers (a feature vector) and an arrow in space."
       - "Linear combinations and span: everything reachable by scaling and adding vectors."
       - "A matrix as a linear transformation; its columns are where the basis vectors land."
       - "Matrix–vector and matrix–matrix products; shapes (n×d)·(d) → (n) as a batch of predictions."
-      - "numpy shapes and broadcasting; shape errors as the everyday reality."
+      - "Shapes and shape errors as the everyday reality (checked by hand here; broadcasting arrives with candle tensors in rung 14)."
     diagram: >-
       Left: a 4×3 data matrix X (4 houses × [size, rooms, age]) and a weight vector w of length 3;
       an arrow labelled "X @ w" produces a length-4 vector of predictions. Right: the 2×2 matrix
       [[2, 1], [0, 1]] drawn as a transformation moving the unit square spanned by î and ĵ to a
       parallelogram.
     example: >-
-      numpy: X = 4 houses × [size, rooms, age]; w = [3.0, 10.0, −0.5]; compute X @ w and verify
-      one entry by hand. Then apply [[2, 1], [0, 1]] to î = (1, 0), ĵ = (0, 1) and (1, 1), and
-      check that the image of (1, 1) is the sum of the images of î and ĵ (linearity).
+      Scala 3 script (stdlib): write dot(a, b) and matVec(m, v) helpers over Vector[Double] (a
+      require on the lengths is your shape check); X = 4 houses × [size, rooms, age], w =
+      Vector(3.0, 10.0, −0.5); compute matVec(X, w) and verify one entry by hand. Then apply [[2,
+      1], [0, 1]] to î = (1, 0), ĵ = (0, 1) and (1, 1), and check that the image of (1, 1) is the
+      sum of the images of î and ĵ (linearity). Finally pass a length-2 vector to matVec and read
+      the failed require — the shape error you will meet daily.
     presentation: minimal
     sources:
       - title: "3Blue1Brown — Essence of Linear Algebra"
@@ -291,9 +310,10 @@ rungs:
       drawn as a dashed perpendicular; a small table beside it: θ = 0° → cos 1, 90° → 0,
       180° → −1.
     example: >-
-      numpy: three toy word-count vectors for documents about cats, dogs and tax; compute pairwise
-      dot products and cosine similarities. Then multiply the cat document by 10 (the same text
-      repeated ten times) and show that its dot products change while its cosine similarities do not.
+      Scala 3 script (stdlib): three toy word-count vectors (a six-word vocabulary) for documents
+      about cats, dogs and tax; write dot, norm and cosine helpers and print the pairwise dot
+      products and cosine similarities. Then multiply the cat vector by 10 (the same text repeated
+      ten times) and show that its dot products change while its cosine similarities do not.
     presentation: minimal
     sources:
       - title: "3Blue1Brown — Essence of Linear Algebra"
@@ -332,9 +352,10 @@ rungs:
       A parabola L(θ) with a ball at successive θ values stepping down to the minimum; a second
       panel shows the same parabola with too-large steps zig-zagging across the bowl and away from it.
     example: >-
-      Pure Python: minimise L(w) = (w − 3)² from w = 0 with η = 0.1, 0.9 and 1.1 for 20 steps,
-      printing w each step — smooth convergence, oscillating convergence, divergence. Then fit only
-      an intercept b to five numbers by gradient descent on MSE and confirm it converges to their mean.
+      Scala 3 script (stdlib): minimise L(w) = (w − 3)² from w = 0 with η = 0.1, 0.9 and 1.1 for 20
+      steps (a loop with the derivative 2·(w − 3) written by hand), printing w each step — smooth
+      convergence, oscillating convergence, divergence. Then fit only an intercept b to five numbers
+      by gradient descent on MSE and confirm it converges to their mean.
     presentation: minimal
     sources:
       - title: "StatQuest — Gradient Descent, Step-by-Step"
@@ -362,7 +383,7 @@ rungs:
       With many parameters the derivative becomes the gradient — a vector of partial derivatives
       pointing uphill — and gradient descent steps against it. For linear regression with mean
       squared error the gradient has a compact matrix form, so the whole training loop is a few
-      lines of numpy. Mini-batch stochastic gradient descent, which estimates the gradient from a
+      lines of Scala. Mini-batch stochastic gradient descent, which estimates the gradient from a
       sample, is how every network in phase 2 is trained.
     key_points:
       - "Partial derivatives and the gradient vector ∇L; the negative gradient is the steepest-descent direction."
@@ -375,10 +396,12 @@ rungs:
       drawn as arrows perpendicular to the contours; a second path, for unscaled features,
       zig-zags along a long narrow valley.
     example: >-
-      numpy lab: generate 200 points from y = 2·x1 − 3·x2 + 1 + noise; implement batch gradient
-      descent with the matrix gradient for 500 steps; print the recovered w and b. Repeat with x2
-      multiplied by 100 to provoke the learning-rate problem, fix it with standardisation, and
-      compare with np.linalg.lstsq.
+      Scala 3 script (stdlib): generate 200 points from y = 2·x1 − 3·x2 + 1 + noise with a seeded
+      scala.util.Random; implement batch gradient descent with the matrix gradient (2/n)·Xᵀ(ŷ − y),
+      using small transpose and matVec helpers, for 500 steps; print the recovered w and b. Repeat
+      with x2 multiplied by 100 to provoke the learning-rate problem, fix it with standardisation,
+      and compare with the closed-form answer from the 3×3 normal equations XᵀX·θ = Xᵀy solved by a
+      ten-line Gaussian-elimination helper.
     presentation: standard
     sources:
       - title: "3Blue1Brown — Neural Networks"
@@ -420,10 +443,11 @@ rungs:
       P(fraud | flagged). (2) A normal curve slid along fixed data points at three candidate means,
       with the likelihood highest where the curve fits the data.
     example: >-
-      Python: a fraud detector catches 95% of fraud and wrongly flags 1% of legitimate
-      transactions; fraud's base rate is 0.2%. Compute P(fraud | flagged) with Bayes' theorem
-      (0.95·0.002 / (0.95·0.002 + 0.01·0.998) ≈ 0.16). Then with numpy compute the log-likelihood
-      of 10 coin flips with 7 heads for p = 0.1 … 0.9 and confirm the maximum is at p = 0.7.
+      Scala 3 script (stdlib): a fraud detector catches 95% of fraud and wrongly flags 1% of
+      legitimate transactions; fraud's base rate is 0.2%. Compute P(fraud | flagged) with Bayes'
+      theorem (0.95·0.002 / (0.95·0.002 + 0.01·0.998) ≈ 0.16). Then compute the log-likelihood of 10
+      coin flips with 7 heads, 7·log p + 3·log(1 − p), for p = 0.1 … 0.9 and confirm the maximum is
+      at p = 0.7.
     presentation: standard
     sources:
       - title: "StatQuest — Probability is not Likelihood"
@@ -459,10 +483,13 @@ rungs:
       between 0 and 1, with the 0.5 threshold dashed. Right: the log-loss curves −log(p) for y = 1
       and −log(1 − p) for y = 0, showing the steep penalty for confident wrong answers.
     example: >-
-      scikit-learn: LogisticRegression on load_breast_cancer (features standardised); predict_proba
-      for three test rows; compute their log loss by hand with numpy and compare with
-      sklearn.metrics.log_loss on the same rows. Then lower the threshold from 0.5 to 0.2 and count
-      how many predictions flip.
+      Scala 3 script (stdlib): generate 400 points from two overlapping 2-D Gaussian clusters
+      (benign and malignant stand-ins) with a seeded scala.util.Random, standardise the features and
+      train logistic regression by gradient descent on log loss (rung 07's loop plus a sigmoid).
+      Print predicted probabilities for three held-out rows and compute their log loss by hand;
+      check the analytical gradient (ŷ − y)·x against central finite differences of the loss. Then
+      lower the threshold from 0.5 to 0.2 and count how many predictions flip. Optional: three
+      clusters with softmax and categorical cross-entropy.
     presentation: standard
     sources:
       - title: "StatQuest — Logistic Regression"
@@ -504,10 +531,14 @@ rungs:
       trained on bootstrap samples, outputs averaged. (3) Gradient boosting: tree 1 → residuals →
       tree 2 → residuals → tree 3, with predictions summed and scaled by the learning rate.
     example: >-
-      Kaggle Intermediate ML: build a Pipeline with SimpleImputer and OneHotEncoder inside a
-      ColumnTransformer; compare RandomForestRegressor(n_estimators=100) with XGBRegressor
-      (n_estimators=1000, learning_rate=0.05, early stopping on a validation split) and the
-      rung-03 single tree; report validation MAE for all three in one table.
+      Scala 3 script (stdlib): reuse rung 03's synthetic houses. Write a recursive regression tree
+      (best variance-reducing split, a max-depth limit) in about 30 lines; build a random forest
+      from 25 trees on bootstrap samples with a random feature subset per split; build gradient
+      boosting from depth-2 trees fitted to the current residuals with learning rate 0.1, stopping
+      when validation MAE has not improved for 10 rounds (XGBoost's early stopping, by hand). Report
+      validation MAE for the rung-03 baseline, the single tree, the forest and boosting in one
+      table. Optional: add a categorical suburb column, one-hot encoded from the training rows only
+      so nothing leaks.
     presentation: standard
     sources:
       - title: "Kaggle Learn — Intro to Machine Learning"
@@ -548,10 +579,11 @@ rungs:
       recall = TP/(TP + FN); beside it an ROC curve with the diagonal random baseline and one
       point labelled "threshold 0.5".
     example: >-
-      scikit-learn on the rung-09 breast-cancer model: confusion_matrix, classification_report,
-      roc_auc_score and average_precision_score; sweep thresholds 0.1 … 0.9 and print precision and
-      recall at each; then choose the threshold that minimises 10·FN + FP ("a missed malignant case
-      costs ten false alarms").
+      Scala 3 script (stdlib): on the rung-09 model's validation probabilities, build the confusion
+      matrix, precision, recall and F1 by hand; compute ROC AUC as the share of (positive, negative)
+      pairs ranked correctly and average precision from the scores sorted descending; sweep
+      thresholds 0.1 … 0.9 and print precision and recall at each; then choose the threshold that
+      minimises 10·FN + FP ("a missed malignant case costs ten false alarms").
     presentation: standard
     sources:
       - title: "StatQuest — The Confusion Matrix; ROC and AUC"
@@ -570,7 +602,7 @@ rungs:
         kind: docs
         verified: false
 
-  # ──────────────────── Phase 2 — Neural networks and PyTorch (B → I) ────────────────────
+  # ─────────────────── Phase 2 — Neural networks and candle (B → I) ───────────────────
 
   - id: ai-ml-12
     title: "From perceptron to multilayer network"
@@ -594,9 +626,10 @@ rungs:
       one output neuron; beside it the four XOR points in the plane with the two hidden neurons'
       lines carving out the positive region.
     example: >-
-      numpy forward pass of a 2-2-1 network with hand-set weights and a step (or steep sigmoid)
-      activation that solves XOR; evaluate all four inputs. Then count the parameters of
-      3Blue1Brown's 784-16-16-10 network: (784·16 + 16) + (16·16 + 16) + (16·10 + 10) = 13,002.
+      Scala 3 script (stdlib): forward pass of a 2-2-1 network with hand-set weights and a step (or
+      steep sigmoid) activation that solves XOR, reusing rung 04's matVec helper; evaluate all four
+      inputs. Then count the parameters of 3Blue1Brown's 784-16-16-10 network in code: (784·16 + 16)
+      + (16·16 + 16) + (16·10 + 10) = 13,002.
     presentation: standard
     sources:
       - title: "3Blue1Brown — Neural Networks"
@@ -624,7 +657,8 @@ rungs:
       Backpropagation is the chain rule applied systematically on a computation graph: a forward
       pass computes values, a backward pass sends gradients from the loss to every parameter by
       multiplying local derivatives. Andrej Karpathy's micrograd builds a working autograd engine
-      in about a hundred lines of Python, which demystifies what PyTorch does in the next rung.
+      in about a hundred lines (the video uses Python; the lab here is Scala), which demystifies
+      what candle's autograd does in the next rung.
       Once seen, "the network learns" stops being magic.
     key_points:
       - "Computation graph: nodes are operations; values flow forward, gradients flow backward."
@@ -637,10 +671,11 @@ rungs:
       square → L; forward values written above each edge and backward gradients below it in a
       second colour.
     example: >-
-      Pure Python, no libraries: forward pass of L = (w·x + b − y)² with w = 2, x = 3, b = 1,
-      y = 10 gives prediction 7, residual −3, L = 9. Backward by hand: dL/dpred = −6, dL/dw = −18,
-      dL/db = −6. Verify both with central finite differences (L(w + h) − L(w − h)) / 2h. Optional:
-      follow the first hour of the micrograd video.
+      Scala 3 script (stdlib): forward pass of L = (w·x + b − y)² with w = 2, x = 3, b = 1, y = 10
+      gives prediction 7, residual −3, L = 9. Backward by hand: dL/dpred = −6, dL/dw = −18, dL/db =
+      −6. Verify both with central finite differences (L(w + h) − L(w − h)) / 2h. Optional: follow
+      the first hour of the micrograd video (coded in Python) and port its Value class to a small
+      Scala class with a mutable grad and a backward closure.
     presentation: standard
     sources:
       - title: "Andrej Karpathy — The spelled-out intro to neural networks and backpropagation: building micrograd"
@@ -660,36 +695,51 @@ rungs:
         verified: false
 
   - id: ai-ml-14
-    title: "PyTorch basics: tensors, autograd and a training loop"
+    title: "Tensors and autograd with candle: a training loop in Rust"
     level: B
     est_min: 30
     prereqs: [ai-ml-13]
     summary: >-
-      PyTorch is the default deep-learning framework, and its core is small: tensors (numpy arrays
-      that can live on a GPU), autograd (rung 13's micrograd at industrial strength), nn.Module for
-      models, and a training loop you write yourself. The official "Learn the Basics" tutorial
-      covers all of it on FashionMNIST. Writing the loop by hand — zero_grad, forward, loss,
-      backward, step — is the habit that makes every later model readable.
+      From here on the labs need a real tensor library, and in Rust that is Hugging Face's candle.
+      Its core is small: tensors that can live on CPU or GPU, autograd through Var (rung 13's
+      micrograd at industrial strength), building blocks in candle-nn, and a training loop you
+      write yourself. The PyTorch "Learn the Basics" tutorial stays the clearest conceptual
+      walkthrough of the same ideas and maps almost one-to-one onto candle's API. Writing the loop
+      by hand — forward, loss, backward, step — is the habit that makes every later model readable.
     key_points:
-      - "Tensors: shape, dtype, device; numpy interop; broadcasting as in numpy."
-      - "Autograd: requires_grad, loss.backward(), .grad, and torch.no_grad() for evaluation."
-      - "Dataset and DataLoader: batching and shuffling."
-      - "nn.Module, nn.Sequential, nn.Linear, nn.ReLU; model.parameters()."
-      - "The five-line training step (zero_grad, forward, loss, backward, step) plus a separate evaluation loop."
+      - "Tensors: shape, dtype, device (Device::Cpu, CUDA or Metal); broadcasting is explicit (broadcast_add, broadcast_mul); every op returns a Result."
+      - "Autograd: a Var is a trainable tensor; loss.backward() returns a fresh GradStore and grads.get(&var) reads a gradient, so there is no zero_grad to forget."
+      - "Batching by hand: shuffle indices and index_select a mini-batch (the job a DataLoader does in the tutorial)."
+      - "Models: VarMap and VarBuilder create named parameters; candle_nn::linear, seq() and Activation compose layers behind the Module trait's forward."
+      - "The training step: forward, loss, backward, optimiser step (SGD or AdamW; backward_step does the last two) plus an evaluation pass that never calls backward."
     diagram: >-
-      One epoch as a loop: DataLoader yields a batch (X, y) → model(X) → loss_fn(pred, y) →
-      loss.backward() fills .grad → optimizer.step() updates parameters → optimizer.zero_grad() →
-      next batch; a side box shows the evaluation loop under torch.no_grad().
+      One epoch as a loop: shuffled indices yield a batch (X, y) → model.forward(&X) →
+      candle_nn::loss::mse(&pred, &y) → loss.backward() returns a GradStore → optimiser.step(&grads)
+      updates the Vars in the VarMap → next batch; a side box shows the evaluation pass, which
+      runs forward only and never calls backward.
     example: >-
-      Lab: reproduce rung 07's linear regression in PyTorch (synthetic data, nn.Linear(2, 1),
-      MSELoss, SGD lr 0.1, 200 steps) and confirm it recovers w ≈ [2, −3], b ≈ 1. Check that
-      autograd reproduces rung 13's hand gradients (dL/dw = −18, dL/db = −6 for w = 2, x = 3,
-      b = 1, y = 10). Then run the FashionMNIST quickstart for two epochs.
+      Rust (cargo, crates: candle-core, candle-nn): reproduce rung 07's linear regression (synthetic
+      data from Tensor::randn, candle_nn::linear(2, 1, vb), candle_nn::loss::mse, SGD lr 0.1, 200
+      steps) and confirm it recovers w ≈ [2, −3], b ≈ 1. Check that autograd reproduces rung 13's
+      hand gradients: make w = 2 and b = 1 Vars, compute L = (w·3 + b − 10)², call backward() and
+      read dL/dw = −18 and dL/db = −6 from the GradStore. Then train a 2-8-1 MLP (seq() of linear,
+      relu, linear) on rung 12's four XOR points with a hand-written loop and print the four
+      predictions.
     presentation: standard
     sources:
+      - title: "Hugging Face candle — minimalist ML framework for Rust"
+        url: https://github.com/huggingface/candle
+        locator: "README: \"Get started\" (Tensor::randn, matmul, switching Device), the crate structure (candle-core, candle-nn, candle-transformers, candle-datasets) and the examples list"
+        kind: docs
+        verified: true
+      - title: "candle-core API documentation (docs.rs)"
+        url: https://docs.rs/candle-core
+        locator: "Structs Tensor and Var, enum Device, module backprop (GradStore); then docs.rs/candle-nn for linear, seq, loss::mse, SGD, AdamW, VarMap and VarBuilder"
+        kind: docs
+        verified: true
       - title: "PyTorch Tutorials — Learn the Basics"
         url: https://pytorch.org/tutorials/beginner/basics/intro.html
-        locator: "Pages \"Tensors\", \"Datasets & DataLoaders\", \"Build the Neural Network\", \"Automatic Differentiation with torch.autograd\", \"Optimizing Model Parameters\""
+        locator: "Conceptual reading (the lab is in candle): pages \"Tensors\", \"Datasets & DataLoaders\", \"Build the Neural Network\", \"Automatic Differentiation with torch.autograd\", \"Optimizing Model Parameters\""
         kind: docs
         verified: false
       - title: "StatQuest — Introduction to Coding Neural Networks with PyTorch"
@@ -721,9 +771,11 @@ rungs:
       of activation histograms across 10 layers — collapsing to zero with too-small init,
       saturating with too-large init, staying stable with He init.
     example: >-
-      PyTorch lab: a 10-layer MLP of width 256 with tanh; push a batch of random inputs through and
-      print each layer's activation standard deviation for init std 0.01, 1.0 and Xavier. Repeat
-      with ReLU and nn.init.kaiming_normal_ and compare.
+      Rust (cargo, crates: candle-core, candle-nn): a 10-layer MLP of width 256 with tanh; push a
+      batch of 512 random inputs (Tensor::randn) through and print each layer's activation standard
+      deviation (sqrt(mean(x²) − mean(x)²)) for weight init std 0.01, 1.0 and Xavier (√(2 / (fan_in
+      + fan_out)) = 1/16), creating each weight matrix with Tensor::randn(0f32, std, (256, 256),
+      &dev). Repeat with ReLU and He/Kaiming init (std √(2 / fan_in)) and compare.
     presentation: standard
     sources:
       - title: "CS231n notes — Neural Networks Part 1: Setting up the Architecture"
@@ -765,10 +817,14 @@ rungs:
       zig-zagging across the valley, momentum overshooting then settling, Adam heading more
       directly to the minimum.
     example: >-
-      PyTorch lab: minimise the Rosenbrock function f(x, y) = (1 − x)² + 100(y − x²)² from
-      (−1.5, 2) with torch.optim.SGD (lr 1e-3), SGD with momentum 0.9, and Adam (lr 1e-2) for 2,000
-      steps each, printing the distance to (1, 1) every 500 steps. Then train the rung-14
-      FashionMNIST model for two epochs with SGD versus AdamW and compare.
+      Scala 3 script (stdlib): the point is the update rules, so write them by hand. Minimise the
+      Rosenbrock function f(x, y) = (1 − x)² + 100(y − x²)² from (−1.5, 2) with its analytic
+      gradient, using plain SGD (lr 1e-3), SGD with momentum 0.9, and Adam (lr 1e-2, β1 0.9, β2
+      0.999, ε 1e-8, with bias correction) for 2,000 steps each — each optimiser a small class
+      holding its state — printing the distance to (1, 1) every 500 steps. Then add AdamW's
+      decoupled weight decay (a one-line change) and a cosine learning-rate schedule with 100 warmup
+      steps, and rerun Adam. candle-nn's SGD and AdamW, used from rung 17, implement the same
+      formulas.
     presentation: standard
     sources:
       - title: "CS231n notes — Neural Networks Part 3: Learning and Evaluation"
@@ -800,7 +856,7 @@ rungs:
       revisits rung 03's under/overfitting curve, now as train and validation loss per epoch.
     key_points:
       - "L2 penalty / weight decay shrinks weights; its strength is a hyperparameter."
-      - "Dropout: train-time random masking with rescaling (inverted dropout), off at evaluation — model.train() versus model.eval()."
+      - "Dropout: train-time random masking with rescaling (inverted dropout), off at evaluation — candle's forward_t(x, train) flag (model.train() and model.eval() in the readings)."
       - "Early stopping: monitor validation loss, keep the best checkpoint, use patience."
       - "Reading learning curves to diagnose overfitting versus underfitting."
       - "More data and augmentation as the strongest regulariser (bridge to rung 19)."
@@ -809,10 +865,14 @@ rungs:
       validation loss turns upward after some epoch, with the early-stopping point marked; (b) with
       dropout and weight decay — a narrower gap and a lower validation minimum.
     example: >-
-      PyTorch lab: deliberately overfit a 3-layer MLP on 1,000 FashionMNIST images for 30 epochs
-      and plot train versus validation loss; add nn.Dropout(0.5) and weight_decay=1e-4 in AdamW and
-      rerun; implement early stopping with patience 3 that saves the best state_dict. Forget
-      model.eval() once on purpose and observe the noisy validation numbers.
+      Rust (cargo, crates: candle-core, candle-nn, rand): deliberately overfit: generate a small
+      noisy two-class dataset (300 training and 300 validation points from two interleaved moons,
+      20% of training labels flipped) and train a 3-layer MLP of width 256 for 300 epochs with
+      AdamW, printing train and validation loss every 10 epochs. Add candle_nn::Dropout::new(0.5)
+      (forward_t with train = true only while training) and weight_decay 1e-4 in ParamsAdamW and
+      rerun; implement early stopping with patience 3 (checked every 10 epochs) that saves the best
+      weights with varmap.save("best.safetensors"). Leave train = true during validation once on
+      purpose and observe the noisy validation numbers.
     presentation: standard
     sources:
       - title: "Kaggle Learn — Intro to Deep Learning"
@@ -854,10 +914,12 @@ rungs:
       output cell computed explicitly); then a network sketch image → conv/ReLU → pool → conv/ReLU
       → pool → flatten → dense → class scores, with tensor shapes annotated at each stage.
     example: >-
-      PyTorch: apply a hand-made 3×3 vertical-edge kernel (columns 1, 0, −1) with F.conv2d to a
-      synthetic 8×8 image whose left half is dark and right half bright, and print the feature map.
-      Then create nn.Conv2d(3, 16, 3, padding=1), check the output shape for a (1, 3, 32, 32) input,
-      and verify the parameter count 3·3·3·16 + 16 = 448 against model.parameters().
+      Rust (cargo, crates: candle-core, candle-nn): apply a hand-made 3×3 vertical-edge kernel
+      (columns 1, 0, −1) with Tensor::conv2d to a synthetic 8×8 single-channel image of shape (1, 1,
+      8, 8) whose left half is dark and right half bright, and print the 6×6 feature map. Then
+      create candle_nn::conv2d(3, 16, 3, Conv2dConfig { padding: 1, ..Default::default() }, vb),
+      check the output shape for a (1, 3, 32, 32) input, and verify the parameter count 3·3·3·16 +
+      16 = 448 by summing elem_count() over varmap.all_vars().
     presentation: standard
     sources:
       - title: "Stanford CS231n — Deep Learning for Computer Vision"
@@ -886,24 +948,28 @@ rungs:
       on ImageNet, keep its convolutional base as a feature extractor and train a new head, or
       fine-tune the top layers, on your small dataset. Data augmentation stretches that small
       dataset by applying label-preserving transformations — flips, crops, colour jitter, blur —
-      at training time. Albumentations is the library the dou.ua roadmap recommends; this rung
-      covers which augmentations are safe for which task and how to wire them into a PyTorch Dataset.
+      at training time. Albumentations, a Python library, is the one the dou.ua roadmap recommends
+      and its docs are the best reading on which augmentations are safe for which task; the lab
+      writes the same transforms in Rust and wires them into a training data pipeline.
     key_points:
       - "Pretrained base + new head; freezing versus fine-tuning; a lower learning rate for pretrained layers."
       - "Pretrained weights come with an expected input size and normalisation — respect them."
       - "Augmentation as encoding invariances; label-preserving versus label-breaking transforms (e.g. horizontal flip on text or digits)."
-      - "Albumentations Compose pipelines; geometric versus pixel-level transforms; the same transform applied to masks and boxes for segmentation and detection."
+      - "Augmentation pipelines as composed transforms (Albumentations' Compose is the reference design); geometric versus pixel-level transforms; the same transform applied to masks and boxes for segmentation and detection."
       - "Augment at train time only; test-time augmentation as an optional extra."
     diagram: >-
       Two parts: (1) a frozen pretrained convolutional base (greyed out) feeding a new trainable
       classification head; (2) one input photo fanning out into six augmented variants (flip, crop,
       rotate, brightness, blur, cutout) that all map to the same label.
     example: >-
-      Lab: an Albumentations pipeline A.Compose([A.HorizontalFlip(p=0.5),
-      A.RandomBrightnessContrast(p=0.3), A.Normalize(), ToTensorV2()]) inside a PyTorch Dataset's
-      __getitem__; visualise eight augmented copies of one image. Then load torchvision's resnet18
-      with pretrained weights, replace model.fc with nn.Linear(512, num_classes), freeze the rest,
-      and train one epoch on a small image-folder dataset.
+      Rust (cargo, crates: image, candle-core, candle-nn): (1) an augmentation pipeline as a Vec of
+      boxed closures over the image crate — horizontal flip with p = 0.5, a random crop resized
+      back, brightness and contrast jitter, a light blur — applied eight times to one photo and
+      saved as a 4×2 contact sheet. (2) Transfer learning in miniature: load rung 17's
+      best.safetensors into a VarMap as the "pretrained" base, add a fresh linear head in a second
+      VarMap, train on a relabelled task passing only the head's Vars to AdamW (that is what
+      freezing means), and assert that the base weights are bit-for-bit unchanged afterwards.
+      Optional: fine-tune the ResNet in candle-transformers on a small image folder.
     presentation: standard
     sources:
       - title: "Albumentations documentation"
@@ -946,10 +1012,14 @@ rungs:
       2-D projection with clusters (animals, countries, verbs) and the king − man + woman ≈ queen
       parallelogram.
     example: >-
-      Lab: nn.Embedding(10, 4) in PyTorch to see that it is just a table. Then with
-      sentence-transformers' all-MiniLM-L6-v2, embed six sentences (two about car washes, two about
-      Scala, two about cats), compute the cosine-similarity matrix and check the clusters. Add one
-      Ukrainian sentence and compare against paraphrase-multilingual-MiniLM-L12-v2.
+      Rust (cargo, crates: candle-core, candle-nn, candle-transformers, tokenizers, hf-hub): first
+      build candle_nn::embedding(10, 4, vb) and check that its forward on ids [3, 7] returns exactly
+      rows 3 and 7 of its weight table — it is just a lookup table. Then, following the bert example
+      in the candle repo, load sentence-transformers/all-MiniLM-L6-v2 (weights and tokenizer.json
+      fetched once from the Hugging Face Hub with hf-hub), embed six sentences (two about car
+      washes, two about Scala, two about cats) with mean pooling and L2 normalisation, print the
+      cosine-similarity matrix and check the clusters. Add one Ukrainian sentence and compare
+      against paraphrase-multilingual-MiniLM-L12-v2.
     presentation: standard
     sources:
       - title: "Jay Alammar — The Illustrated Word2vec"
@@ -991,10 +1061,13 @@ rungs:
       (summing to 1) from softmax(q₃·kᵢ/√d). Below, the matrix form: Q (n×d) × Kᵀ (d×n) → n×n
       score matrix with the upper triangle masked → row-wise softmax → × V.
     example: >-
-      numpy lab: four tokens with random 8-dim embeddings and random W_q, W_k, W_v (8×4); compute
-      Q, K, V, the scaled scores, a causal mask (−inf above the diagonal), a row-wise softmax and
-      the output weights @ V; assert every row sums to 1 and row 0 attends only to itself. Then
-      compare with torch.nn.functional.scaled_dot_product_attention(q, k, v, is_causal=True).
+      Scala 3 script (stdlib): four tokens with random 8-dim embeddings and random W_q, W_k, W_v
+      (8×4) from a seeded scala.util.Random, as Vector[Vector[Double]] with matMul and transpose
+      helpers; compute Q, K, V, the scaled scores, a causal mask (Double.NegativeInfinity above the
+      diagonal), a row-wise softmax and the output weights · V; assert every row sums to 1 and row 0
+      attends only to itself. Then drop the mask, reverse the token order and confirm the outputs
+      come back in the same reversed order — attention alone is order-blind, which is why rung 22
+      adds positions.
     presentation: standard
     sources:
       - title: "3Blue1Brown — Neural Networks"
@@ -1037,10 +1110,12 @@ rungs:
       next block; shapes (B, T, C) annotated at each step; after the last block → linear → softmax
       over the vocabulary.
     example: >-
-      PyTorch lab: implement a ~40-line pre-norm decoder block (rung-21 attention or
-      nn.MultiheadAttention, LayerNorm, a 2-layer MLP with GELU) with d_model = 64, 4 heads, T = 8;
-      push a (2, 8, 64) tensor through two stacked blocks printing shapes; count parameters per
-      block and compare with ≈ 12·d² (4d² for the attention projections + 8d² for the MLP) plus
+      Rust (cargo, crates: candle-core, candle-nn): implement a ~60-line pre-norm decoder block as a
+      struct with a forward method — rung 21's attention split into 4 heads (reshape (B, T, C) → (B,
+      h, T, C/h), causal mask, candle_nn::ops::softmax over the last dimension),
+      candle_nn::layer_norm, and a 2-layer MLP with gelu — with d_model = 64 and T = 8; push a (2,
+      8, 64) tensor through two stacked blocks printing shapes; count parameters per block from the
+      VarMap and compare with ≈ 12·d² (4d² for the attention projections + 8d² for the MLP) plus
       biases and norms.
     presentation: standard
     sources:
@@ -1083,10 +1158,12 @@ rungs:
       three successive merges, each merge adding one vocabulary entry; a side table maps the final
       token ids back to strings.
     example: >-
-      Lab: count tokens for the same two sentences in English and in Ukrainian — with tiktoken for an
-      open tokenizer and with Anthropic's token-counting endpoint for Claude — compute the ratio and
-      print the token pieces to see where words split. Then implement five BPE merges in ~20 lines
-      of Python on the toy vocabulary from Sennrich et al. (Algorithm 1) and print each merge.
+      Rust (cargo, crates: tiktoken-rs, reqwest (blocking, json), serde_json): count tokens for the
+      same two sentences in English and in Ukrainian — with tiktoken-rs's o200k_base for an OpenAI
+      tokenizer and with Anthropic's token-counting endpoint (POST /v1/messages/count_tokens) for
+      Claude — compute the ratio and decode each token id on its own to see where words split. Then
+      implement five BPE merges in ~25 lines on the toy vocabulary from Sennrich et al. (Algorithm
+      1: count adjacent symbol pairs in a HashMap, merge the most frequent) and print each merge.
     presentation: standard
     sources:
       - title: "Andrej Karpathy — Let's build the GPT Tokenizer"
@@ -1129,10 +1206,11 @@ rungs:
       SFT → instruction model; prompts + preference comparisons → reward model → RL (PPO) or DPO →
       assistant model. Each arrow is labelled with its data and its objective.
     example: >-
-      Lab: (1) a model guessing uniformly over a 50,000-token vocabulary has loss ln(50000) ≈ 10.8
-      nats per token; compute the analogous baseline for Karpathy's 65-character Shakespeare model,
-      ln(65) ≈ 4.17, and compare with the validation loss he reaches in "Let's build GPT".
-      (2) Implement the DPO loss for one preference pair in numpy from given policy and reference
+      Scala 3 script (stdlib): (1) a model guessing uniformly over a 50,000-token vocabulary has
+      loss ln(50000) ≈ 10.8 nats per token; compute the analogous baseline for Karpathy's
+      65-character Shakespeare model, ln(65) ≈ 4.17, and compare with the validation loss he reaches
+      in "Let's build GPT". (2) Implement the DPO loss −log σ(β·[(log π(y_w) − log π_ref(y_w)) −
+      (log π(y_l) − log π_ref(y_l))]) for one preference pair from given policy and reference
       log-probabilities, and watch it fall as the chosen response's log-probability rises.
     presentation: standard
     sources:
@@ -1176,11 +1254,12 @@ rungs:
       the model; a side bar contrasts the single prefill step over the whole prompt with the
       one-token decode steps.
     example: >-
-      numpy lab: logits [2.0, 1.0, 0.5, 0.1, −1.0] for five candidate tokens; compute softmax at
-      T = 0.2, 1.0 and 2.0; apply top-p 0.9 and renormalise; sample 1,000 times at each setting and
-      tabulate the frequencies. Then compute the KV cache for a hypothetical model with 32 layers,
-      8 KV heads, head_dim 128, a 32,768-token context and 2-byte values: 2·32·8·128·32768·2 bytes
-      = 4 GiB per sequence.
+      Scala 3 script (stdlib): logits [2.0, 1.0, 0.5, 0.1, −1.0] for five candidate tokens; compute
+      softmax at T = 0.2, 1.0 and 2.0; apply top-p 0.9 and renormalise; sample 1,000 times at each
+      setting with a seeded scala.util.Random (inverse CDF over the cumulative probabilities) and
+      tabulate the frequencies. Then compute the KV cache, in Long arithmetic, for a hypothetical
+      model with 32 layers, 8 KV heads, head_dim 128, a 32,768-token context and 2-byte values:
+      2·32·8·128·32768·2 bytes = 4 GiB per sequence.
     presentation: standard
     sources:
       - title: "Hugging Face blog — How to generate text: using different decoding methods"
@@ -1222,10 +1301,11 @@ rungs:
       documents | conversation history | current user turn | reserved output budget; arrows show
       which segments get compacted or evicted as the conversation grows.
     example: >-
-      Lab: call the Anthropic Messages API with curl twice for the same task — turn a car-wash
-      support ticket into JSON — first as a one-line prompt, then with a system role, the ticket in
-      <ticket> tags, one example and an explicit JSON schema; compare five runs of each. Measure each
-      prompt with the token-counting endpoint (POST /v1/messages/count_tokens).
+      Rust (cargo, crates: reqwest (blocking, json), serde_json): call the Anthropic Messages API
+      twice for the same task — turn a car-wash support ticket into JSON — first as a one-line
+      prompt, then with a system role, the ticket in <ticket> tags, one example and an explicit JSON
+      schema; run each five times and count how often serde_json parses the reply into the expected
+      shape. Measure each prompt with the token-counting endpoint (POST /v1/messages/count_tokens).
     presentation: standard
     sources:
       - title: "Claude developer documentation"
@@ -1267,10 +1347,12 @@ rungs:
       calibrated against human labels → online A/B or shadow traffic; a feedback arrow carries
       production failures back into the eval set.
     example: >-
-      Python lab: a 20-case eval for the rung-26 ticket-to-JSON prompt with a code grader (valid
-      JSON, required keys, allowed enum values) plus a 3-point rubric scored by a judge model; label
-      10 outputs yourself and compute judge–human agreement; bootstrap a 95% confidence interval on
-      the pass rate with numpy.
+      Rust (cargo, crates: reqwest (blocking, json), serde_json, rand): a 20-case eval for the
+      rung-26 ticket-to-JSON prompt with a code grader (parses with serde_json, required keys,
+      allowed enum values) plus a 3-point rubric scored by a judge model through the same Messages
+      API client; label 10 outputs yourself and compute judge–human agreement; bootstrap a 95%
+      confidence interval on the pass rate (2,000 resamples with rand, then the 2.5th and 97.5th
+      percentiles).
     presentation: standard
     sources:
       - title: "This repo — 20-llm-agent-systems/evaluating-agents.md"
@@ -1313,11 +1395,13 @@ rungs:
       answer with citations. Evaluation probes attach after the reranker (recall@k) and after
       generation (faithfulness).
     example: >-
-      Python lab: eight short documents about car-wash membership rules and five labelled
-      questions; retrieve with rank_bm25 and with sentence-transformers cosine similarity, fuse with
-      reciprocal rank fusion (score = Σ 1/(60 + rank)), and compute recall@3 and MRR for BM25,
-      vectors and the fusion. Feed the top-3 fused chunks to Claude with an instruction to cite
-      chunk ids.
+      Rust (cargo, crates: candle-core, candle-nn, candle-transformers, tokenizers, hf-hub, reqwest
+      (blocking, json), serde_json): eight short documents about car-wash membership rules and five
+      labelled questions; retrieve with a hand-written BM25 (k1 = 1.2, b = 0.75, about 25 lines) and
+      with rung 20's MiniLM embeddings and cosine similarity, fuse with reciprocal rank fusion
+      (score = Σ 1/(60 + rank)), and compute recall@3 and MRR for BM25, vectors and the fusion. Feed
+      the top-3 fused chunks to Claude through the Messages API with an instruction to cite chunk
+      ids.
     presentation: standard
     sources:
       - title: "This repo — 20-llm-agent-systems/rag-and-retrieval.md"
@@ -1360,10 +1444,12 @@ rungs:
       messages to worker agents and tools, each tool call carrying an idempotency key and a timeout;
       a budget meter (steps, tokens, money) and a checkpoint store beside the loop.
     example: >-
-      Python lab (~50 lines with the anthropic SDK): a one-tool agent (lookup_order(order_id)) using
-      the Messages API tool-use loop; add a max_steps budget, a per-tool timeout, an idempotency key
-      on a refund tool, and log each step as a JSON line. Inject a tool failure and watch whether the
-      loop recovers or stops cleanly.
+      Rust (cargo, crates: reqwest (blocking, json), serde_json, uuid): about 80 lines: a one-tool
+      agent (lookup_order(order_id)) on the Messages API tool-use loop — send the tool definitions,
+      match on stop_reason "tool_use", run the tool, append a tool_result block, repeat. Add a
+      max_steps budget, a per-tool timeout, an idempotency key (a UUID) on a refund tool, and log
+      each step as a JSON line. Inject a tool failure and watch whether the loop recovers or stops
+      cleanly.
     presentation: standard
     sources:
       - title: "Anthropic Engineering — Building effective agents"
@@ -1407,11 +1493,13 @@ rungs:
       tools/list → the model decides on a tool_use → tools/call → result → tool_result back into the
       model's context; a dashed trust boundary encloses the server and the external API it calls.
     example: >-
-      Lab: a ~25-line MCP server with the official Python SDK (FastMCP) exposing one tool,
-      get_wash_status(site_id), with typed parameters and a precise description; inspect it with
-      npx @modelcontextprotocol/inspector, list tools, call it and read the JSON-RPC messages. Then
-      rewrite the description and error message following Anthropic's tool-writing guidance and
-      compare how Claude Code uses the tool before and after.
+      Rust (cargo, crates: rmcp (features server, macros, transport-io), tokio, serde, schemars): a
+      ~40-line MCP server with the official Rust SDK exposing one tool, get_wash_status(site_id),
+      declared with #[tool_router] and #[tool] on a typed parameter struct with a precise
+      description and served over stdio; inspect it with npx @modelcontextprotocol/inspector, list
+      tools, call it and read the JSON-RPC messages. Then rewrite the description and error message
+      following Anthropic's tool-writing guidance and compare how Claude Code uses the tool before
+      and after.
     presentation: deep
     sources:
       - title: "Model Context Protocol"
@@ -1447,17 +1535,21 @@ rungs:
       - "Context management: CLAUDE.md memory, auto-compaction, subagents as context isolation, skills loaded on demand."
       - "Control: permission modes and allow/deny rules; PreToolUse/PostToolUse hooks as policy enforcement points."
       - "Extension points: MCP servers, custom slash commands, skills, plugins."
-      - "Programmatic use: claude -p with JSON output, the Agent SDK query loop in Python or TypeScript, and where this fits in CI (rung 36)."
+      - "Programmatic use: claude -p with JSON output (driven from Rust in the lab), the Agent SDK's query loop (its SDKs are Python and TypeScript, so it is reading material here), and where this fits in CI (rung 36)."
     diagram: >-
       Concentric layers: the model at the core → the agent loop (gather context, act, verify) →
       harness services (compaction, subagents, permissions, hooks) → extension points (MCP
       servers, skills, slash commands, plugins) → surfaces (interactive CLI, headless print mode,
       Agent SDK embedded in your own service).
     example: >-
-      Lab: (1) a PreToolUse hook script that blocks Bash commands matching rm -rf and appends every
-      tool call to a JSONL audit log; (2) run claude -p "list the TODOs in this repo as JSON" with
-      JSON output format from a shell script and parse the result with jq; (3) the same task as
-      ~15 lines with the Agent SDK's query() in Python, restricted to the Read, Grep and Glob tools.
+      Rust (cargo, crates: serde_json): (1) a PreToolUse hook as a small Rust binary that reads the
+      hook's JSON from stdin, exits with code 2 (block) when a Bash command matches rm -rf, and
+      appends every tool call to a JSONL audit log; register it in .claude/settings.json. (2) Run
+      claude -p "list the TODOs in this repo as JSON" --output-format json from a shell script and
+      parse the result with jq. (3) Drive the same headless call from Rust with
+      std::process::Command, restricted with --allowedTools "Read,Grep,Glob", and deserialise the
+      result with serde_json. The Agent SDK itself ships for Python and TypeScript, so read its
+      query() docs for the in-process equivalent rather than coding it here.
     presentation: deep
     sources:
       - title: "Claude Code / Claude developer hub"
@@ -1492,7 +1584,7 @@ rungs:
       - "Definition; the reliability diagram; expected calibration error (ECE) and its binning caveats."
       - "Proper scoring rules — log loss and Brier score — reward calibrated probabilities; accuracy and AUC do not."
       - "Why modern networks are overconfident (Guo et al.) and temperature scaling as a one-parameter fix fitted on validation data."
-      - "Platt (sigmoid) versus isotonic calibration in scikit-learn's CalibratedClassifierCV, and their data needs."
+      - "Platt (sigmoid) versus isotonic (pool-adjacent-violators) calibration, and their data needs (compared in the calibration guide in the sources)."
       - "Using calibrated probabilities: expected-cost thresholds and abstention (act if p ≥ τ, otherwise escalate)."
     diagram: >-
       A reliability diagram: predicted-confidence bins on the x-axis, observed accuracy on the
@@ -1500,11 +1592,15 @@ rungs:
       diagonal at high confidence, and the same model after temperature scaling hugs it; a small
       histogram of prediction counts sits underneath.
     example: >-
-      scikit-learn lab: train GaussianNB and LogisticRegression on make_classification
-      (n_samples=20000); plot calibration_curve for both and compute brier_score_loss and log_loss;
-      wrap GaussianNB in CalibratedClassifierCV(method="isotonic") and re-plot. Then implement
-      temperature scaling for a softmax classifier by finding T that minimises validation NLL with
-      scipy.optimize.minimize_scalar.
+      Scala 3 script (stdlib): generate 20,000 points from two overlapping 2-D Gaussians plus a
+      noisy duplicate of one feature (so naive Bayes' independence assumption breaks and it turns
+      overconfident); train a Gaussian naive Bayes (per-class means and variances, about 10 lines)
+      and rung 09's logistic regression; bin validation predictions into 10 confidence bins and
+      print the reliability table (mean predicted versus observed rate per bin), ECE, Brier score
+      and log loss for both. Fit isotonic calibration to the naive Bayes scores with a ~15-line
+      pool-adjacent-violators routine and re-print the table. Then implement temperature scaling:
+      find the T that minimises validation NLL of σ(logit / T) by golden-section search over [0.05,
+      10].
     presentation: deep
     sources:
       - title: "Guo, Pleiss, Sun, Weinberger — On Calibration of Modern Neural Networks (ICML 2017)"
@@ -1544,11 +1640,13 @@ rungs:
       Right: a decision model receives options [A, B, C] and emits a probability vector such as
       [0.71, 0.22, 0.07], which feeds a rule "act if max p ≥ τ, else escalate".
     example: >-
-      Lab: following the OpenRouter Jev guide exactly (model id and request fields as documented
-      there), send one curl request with a car-wash support ticket and four routing options and
-      print the returned probabilities. Send the same ticket to a chat model asking for one option
-      name, and compare latency (curl -w '%{time_total}') and the effort of handling each output.
-      Label ten tickets and save them for rung 34.
+      Rust (cargo, crates: reqwest (blocking, json), serde_json): following the OpenRouter Jev guide
+      exactly (model id and request fields as documented there), send one request with a car-wash
+      support ticket and four routing options and print the returned probabilities. Send the same
+      ticket to a chat model asking for one option name, time both calls with std::time::Instant,
+      and compare latency and the effort of handling each output (reading a JSON field versus string
+      matching with an off-list fallback). Label ten tickets and save them to tickets.json for rung
+      34.
     presentation: deep
     sources:
       - title: "mager.co — Jev decision model (2026-09-19)"
@@ -1591,11 +1689,12 @@ rungs:
       queue; a side panel plots accuracy, coverage (share auto-routed) and cost per 1,000 requests
       as τ varies.
     example: >-
-      Lab: call Clef-flash through the Workers AI REST API (POST
-      https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/ai/run/ followed by the model id
-      from the changelog, with the input format it documents) on the ten labelled tickets from
-      rung 33; compute accuracy and Brier score; sweep τ from 0.5 to 0.95 and plot coverage against
-      accuracy; put Jev and a chat-model baseline in the same table.
+      Rust (cargo, crates: reqwest (blocking, json), serde_json): call Clef-flash through the
+      Workers AI REST API (POST https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/ai/run/
+      followed by the model id from the changelog, with the input format it documents) on the ten
+      labelled tickets in rung 33's tickets.json; compute accuracy and Brier score; sweep τ from 0.5
+      to 0.95 and print coverage against accuracy as a table; put Jev and a chat-model baseline in
+      the same table.
     presentation: deep
     sources:
       - title: "Cloudflare changelog — Clef on Workers AI (2026-10-01)"
@@ -1639,12 +1738,12 @@ rungs:
       (advantage = reward − group mean, KL to the reference model) → updated LoRA adapter; a side
       gauge tracks ECE from the reliability diagram so calibration drift stays visible.
     example: >-
-      numpy lab: a 3-option softmax policy for one context where the correct option is B 70% of
-      the time and A 30%. (a) REINFORCE with 0/1 reward — sample an option, reward 1 if it matches
-      the sampled label, θ += lr·R·∇log π — and watch p(B) climb toward 1. (b) Gradient ascent on
-      the log score log π(label) — and watch p converge to about [0.3, 0.7, 0.0]. Compare Brier
-      scores. Finally replace the single sample in (a) with a group of 8 and a group-mean baseline,
-      GRPO-style, and compare gradient variance.
+      Scala 3 script (stdlib): a 3-option softmax policy for one context where the correct option is
+      B 70% of the time and A 30%. (a) REINFORCE with 0/1 reward — sample an option, reward 1 if it
+      matches the sampled label, θ += lr·R·∇log π — and watch p(B) climb toward 1. (b) Gradient
+      ascent on the log score log π(label) — and watch p converge to about [0.3, 0.7, 0.0]. Compare
+      Brier scores. Finally replace the single sample in (a) with a group of 8 and a group-mean
+      baseline, GRPO-style, and compare gradient variance.
     presentation: deep
     sources:
       - title: "OpenAI Spinning Up in Deep RL"
@@ -1680,18 +1779,20 @@ rungs:
       - "Gate on intervals, not points: several samples per case, bootstrap or Wilson intervals; pass@k versus pass^k for consistency."
       - "Pin everything that can drift — model snapshot ids, judge prompt and model, dataset version — and record them in the run artifact."
       - "Flakiness: quarantine, temperature policy, separating model regressions from infrastructure errors."
-      - "Cost and time budgets in CI; caching unchanged cases; tooling options (promptfoo, Inspect, plain pytest)."
+      - "Cost and time budgets in CI; caching unchanged cases; tooling options (promptfoo, Inspect, or a plain cargo test)."
     diagram: >-
       CI pipeline: PR opened → lint and unit tests → deterministic eval tier (seconds) → sampled
       regression tier (k samples × N cases, budget cap) → compare with the baseline run (bootstrap
       interval on the difference) → gate pass/fail → artifact (scores, model ids, cost); a nightly
       job runs the full suite and refreshes the baseline.
     example: >-
-      Lab: a GitHub Actions workflow (~30 lines of YAML) that runs a pytest-based eval of the
-      rung-27 ticket-to-JSON prompt on 20 cases × 3 samples, writes results.json, and fails when the
-      95% bootstrap interval of (new − baseline) pass rate lies entirely below zero — a confident
-      regression — while only warning when the interval overlaps zero. The bootstrap is about 15
-      lines of numpy.
+      Rust (cargo, crates: reqwest (blocking, json), serde_json, rand): turn rung 27's eval into a
+      cargo integration test (tests/eval.rs) that runs the ticket-to-JSON prompt on 20 cases × 3
+      samples, writes results.json, and fails when the 95% bootstrap interval of (new − baseline)
+      pass rate lies entirely below zero — a confident regression — while only warning when the
+      interval overlaps zero; the bootstrap is about 15 lines. Wrap it in a ~30-line GitHub Actions
+      workflow (install the Rust toolchain, cargo test --test eval with the API key from secrets,
+      upload results.json as an artifact).
     presentation: deep
     sources:
       - title: "This repo — 20-llm-agent-systems/evaluating-agents.md"
@@ -1734,12 +1835,12 @@ rungs:
       call → second model call). Right: a cost waterfall showing monthly spend after each lever
       (caching, routing, batching) is applied.
     example: >-
-      Python lab: a cost calculator for a support assistant at 270k interactions per month (the
-      volume in section 20's case study), 3k input and 400 output tokens per call, 2.5 calls per
-      interaction; take current prices from the provider's pricing page rather than memory. Model
-      three levers — 80% of input served from a cached prefix, 60% of traffic resolved by a
-      decision-model router, nightly summarisation moved to batch processing — and print the
-      monthly total after each.
+      Scala 3 script (stdlib): a cost calculator for a support assistant at 270k interactions per
+      month (the volume in section 20's case study), 3k input and 400 output tokens per call, 2.5
+      calls per interaction, written as a case class Scenario and a monthly-cost function; take
+      current prices from the provider's pricing page rather than memory. Model three levers — 80%
+      of input served from a cached prefix, 60% of traffic resolved by a decision-model router,
+      nightly summarisation moved to batch processing — and print the monthly total after each.
     presentation: deep
     sources:
       - title: "This repo — 20-llm-agent-systems/production-llmops.md"
@@ -1782,10 +1883,12 @@ rungs:
       offline eval report → deploy behind a CI gate → monitor (online metrics, drift, cost) →
       feedback into the eval set, with "definition of done" checkpoints marked along it.
     example: >-
-      Lab (the first ten minutes of the capstone): write a one-page project brief in Markdown —
-      problem, user, decision, metric and target, guardrail, data source, baseline, eval plan,
-      deployment target, cost budget — for one suggested project, and create the repo skeleton
-      (src/, evals/, .github/workflows/eval.yml, README) with one failing eval test that defines done.
+      Rust (cargo, crates: serde, serde_json): (the first ten minutes of the capstone) write a
+      one-page project brief in Markdown — problem, user, decision, metric and target, guardrail,
+      data source, baseline, eval plan, deployment target, cost budget — for one suggested project,
+      and create the repo skeleton with cargo new (src/, tests/eval.rs, .github/workflows/eval.yml,
+      README) with one failing eval test that defines done. For a hand-built classical-ML project,
+      Scala 3 stdlib scripts are the equally valid choice.
     presentation: deep
     sources:
       - title: "Google — Rules of Machine Learning: Best Practices for ML Engineering (Zinkevich)"

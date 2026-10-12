@@ -14,6 +14,8 @@ JSON (or a path) to stdout. Failures print one `error: ...` line and exit 2.
 | `render_email.py` | optional: lessons -> `dojo/out/email.json` for an explicit "resend by email" request; the daily run delivers by push + Dojo (SPEC §9) |
 | `mark.py` | `<id> passed\|review\|skipped\|sent`: front matter, state, log; idempotent |
 | `file_passed.py` | files passed lessons into the KB: section README row, root README link (SPEC §8) |
+| `toolchain.sh` | installs Scala 3 (GitHub release, stdlib only) and checks cargo; run once per job |
+| `run_lab.py` | `<id>`: runs every ```scala/```rust block marked `// file:` and prints the real output (SPEC §4 Language rule) |
 | `sync_db.py` | `export <id>…\|--all`, `tracks`, `meta`, `all` -> `dojo/out/db/<collection>/<id>.json` |
 
 ## Commands the daily job runs, in order (`D` = today's Kyiv date, `D-1` = lesson id `<D>-1`)

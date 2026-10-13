@@ -29,3 +29,7 @@
 {"ts": "2026-10-12T05:55:34Z", "event": "sent", "lesson": "2026-10-12-1", "by": "job", "note": "core · claude-academy-01"}
 {"ts": "2026-10-12T06:03:20Z", "event": "sent", "lesson": "2026-10-12-2", "by": "job", "note": "fresh · ai-ml"}
 {"ts": "2026-10-12T06:14:24Z", "event": "sent", "lesson": null, "by": "job", "note": "day 7: 2026-10-12-1, 2026-10-12-2"}
+{"ts": "2026-10-13T05:54:50Z", "event": "passed", "lesson": "2026-10-08-1", "by": "dashboard", "note": "was sent"}
+{"ts": "2026-10-13T05:54:51Z", "event": "filed", "lesson": "2026-10-08-1", "by": "job", "note": "25-software-architecture/coupling-and-cohesion.md"}
+{"ts": "2026-10-13T05:55:05Z", "event": "sent", "lesson": "2026-10-13-1", "by": "job", "note": "core · rust-01"}
+{"ts": "2026-10-13T06:18:13Z", "event": "sent", "lesson": "2026-10-13-2", "by": "job", "note": "fresh · fp-scala"}

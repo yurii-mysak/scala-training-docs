@@ -1,0 +1,5 @@
+flowchart LR
+  L39["library built with 3.9 LTS"] --> A39["app on 3.9 LTS: reads it"]
+  L39 --> A310["app on 3.10 Next: reads it"]
+  L310["library built with 3.10 Next"] --> B310["app on 3.10 Next: reads it"]
+  L310 -.-> B39["app on 3.9 LTS: cannot read it"]

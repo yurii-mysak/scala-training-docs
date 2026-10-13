@@ -180,6 +180,7 @@ Lessons marked *passed* are filed into the numbered sections below (new ones app
 ### [25 — Software Architecture & Design](25-software-architecture/)
 | Level | Topics |
 |-------|--------|
+| B | [Coupling and cohesion](25-software-architecture/coupling-and-cohesion.md) |
 | I | [High availability is not resilience — the TLS upgrade that hid behind green dashboards](25-software-architecture/high-availability-is-not-resilience-the-tls-upgrade-that.md) |
 
 ---

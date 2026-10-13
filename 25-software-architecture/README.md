@@ -6,6 +6,7 @@ Software architecture and design: boundaries, modularity, trade-offs, and the pa
 
 | # | Topic | File | Interview Focus |
 |---|-------|------|-----------------|
+| 2 | Coupling and cohesion | [coupling-and-cohesion.md](coupling-and-cohesion.md) | Cohesion — the elements of a module serve one purpose and change for the same reason |
 
 ## Intermediate
 

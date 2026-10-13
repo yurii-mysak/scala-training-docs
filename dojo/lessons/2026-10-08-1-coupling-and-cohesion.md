@@ -10,10 +10,10 @@ level: B
 title: Coupling and cohesion
 est_min: 20
 files_to: 25-software-architecture
-status: sent
+status: passed
 sent_at: 2026-10-08T05:54:34Z
-marked_at: null
-filed_to: null
+marked_at: 2026-10-12T21:24:09Z
+filed_to: 25-software-architecture/coupling-and-cohesion.md
 review_due: null
 sources:
 - title: Connascence

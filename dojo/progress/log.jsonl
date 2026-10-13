@@ -33,3 +33,4 @@
 {"ts": "2026-10-13T05:54:51Z", "event": "filed", "lesson": "2026-10-08-1", "by": "job", "note": "25-software-architecture/coupling-and-cohesion.md"}
 {"ts": "2026-10-13T05:55:05Z", "event": "sent", "lesson": "2026-10-13-1", "by": "job", "note": "core · rust-01"}
 {"ts": "2026-10-13T06:18:13Z", "event": "sent", "lesson": "2026-10-13-2", "by": "job", "note": "fresh · fp-scala"}
+{"ts": "2026-10-13T06:42:44Z", "event": "sent", "lesson": null, "by": "job", "note": "day 8: 2026-10-13-1, 2026-10-13-2"}

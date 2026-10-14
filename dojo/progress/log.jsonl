@@ -42,3 +42,4 @@
 {"ts": "2026-10-14T05:55:23Z", "event": "filed", "lesson": "2026-10-09-1", "by": "job", "note": "10-networking/what-really-happens-in-a-tcp-handshake-and-teardown.md"}
 {"ts": "2026-10-14T05:55:55Z", "event": "sent", "lesson": "2026-10-14-1", "by": "job", "note": "core · ai-ml-03"}
 {"ts": "2026-10-14T06:03:16Z", "event": "sent", "lesson": "2026-10-14-2", "by": "job", "note": "fresh · ai-ml"}
+{"ts": "2026-10-14T06:20:36Z", "event": "sent", "lesson": null, "by": "job", "note": "day 9: 2026-10-14-1, 2026-10-14-2"}

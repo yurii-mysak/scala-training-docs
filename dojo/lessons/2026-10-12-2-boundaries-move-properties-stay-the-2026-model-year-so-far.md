@@ -27,7 +27,7 @@ sources:
 > Fresh · AI / ML foundations · Intermediate · ~30 min · from today's feeds
 
 ## Why this matters
-Today's core lesson gave you a four-axis map of a generative model — next-token prediction, knowledge, working memory, steerability — and claimed the map survives new releases because "boundaries shift but the properties remain the same". That claim is only worth anything if you can test it against a year of actual releases. Simon Willison's "2026 in LLMs (so far)" (2026-09-27) walks the model year month by month, and this lesson uses it as the test data: every event moved a boundary, not one added a fifth axis. That is the difference between a platform decision you make once and one you redo every quarter.
+Today's core lesson gave you a four-axis map of a generative model — next-token prediction, knowledge, working memory, steerability — and claimed the map survives new releases because "boundaries shift but the properties remain the same". That claim is only worth anything if you can test it against a year of actual releases. Simon Willison's "2026 in LLMs (so far)" (2026-09-27) walks the model year month by month, and this lesson uses it as the test data: every event about the models landed on an existing axis, not one added a fifth, and the two that fit no axis were about supply, not the model. That is the difference between a platform decision you make once and one you redo every quarter.
 
 ## Primer
 You are level B in this domain, so here is only what this lesson needs.
@@ -38,7 +38,7 @@ A **coding agent** is not a model. It is three things: the model, **tools** it m
 
 A **local model** is one whose weights you download and run on your own machine instead of calling an API. The download is a **quantised weights file**: parameters rounded from 16 bits each down to roughly 4–5, which shrinks the file several-fold for a little accuracy. That is why tens of billions of parameters arrive as a ~20GB file.
 
-A **token budget** is a cap the harness or the API puts on how many tokens one request may *produce*, including the model's hidden "thinking" tokens. It is a spending limit on output, not a context window, which limits how much *input* the model can see at once.
+A **token budget** is a cap the harness or the API puts on how many tokens one request may *produce*, including the model's hidden "thinking" tokens. It is not the context window, which caps how many tokens the model can *hold* at once. Both cap the same thing, though: the running token sequence the model re-reads on every step, which the core lesson calls **working memory**. Every thinking token is appended to that sequence, so the context window is how much working memory the model can hold, and the output budget is how much of it one request may *spend* on its own tokens. That is why this lesson files an output-budget overrun on the working-memory axis even though it is not a context-window problem.
 
 ## The idea
 
@@ -55,7 +55,7 @@ On the map, that is **steerability**: the same next-token predictor, given tools
 
 ```mermaid
 flowchart TD
-  P["Input: prompt + every tool result so far"] --> M["Model: probability for each next token"]
+  P["Working memory: prompt, tool results, tokens so far"] --> M["Model: probability for each next token"]
   M --> S["Harness samples 1 token, appends it"]
   S --> B{"Output budget left?"}
   B -- "no" --> X["Stop with no answer"]
@@ -65,7 +65,7 @@ flowchart TD
   T -- "nothing yet" --> M
   T -- "the final answer" --> A["Answer returned"]
 ```
-*Figure 1: A coding agent is a model inside a loop. Steerability lives in the loop (tools, stop conditions); working memory is the budget check. Drawn for this lesson from the Primer's definitions.*
+*Figure 1: A coding agent is a model inside a loop. Steerability lives in the loop (tools, stop conditions); working memory is the top box; the output-budget check caps how much one request may add. Drawn for this lesson from the Primer's definitions.*
 
 By January the quality boundary on generated code had moved far enough that Willison retires his own hedge:
 
@@ -152,7 +152,7 @@ gantt
 > "That gave us less than two weeks of Fable access before the price went up."
 > — Simon Willison, *2026 in LLMs (so far)*, 2026-09-27, https://simonwillison.net/2026/Sep/27/2026-in-llms-so-far/
 
-The transferable lesson is one line: do not architect around a single model vendor and version. Availability is not a property of the model; it is a property of your supply chain.
+The transferable lesson is one line: do not architect around a single model vendor and version. Availability is not a property of the model; it is a property of your supply chain. So the lab tags the suspension and return as supply-chain events, outside the four-axis map.
 
 ### The one row that is a property, not a boundary
 
@@ -161,7 +161,7 @@ September supplies the counterexample that proves the shape of the map — a lim
 > "Opus 5.5 thought for 128,000 tokens and then gave up! It ran out of tokens before it got to the response."
 > — Simon Willison, *2026 in LLMs (so far)*, 2026-09-27, https://simonwillison.net/2026/Sep/27/2026-in-llms-so-far/
 
-Be precise about what that is. It is an **output/thinking token budget** running out — the model spent its allowance on hidden reasoning and never emitted an answer (the "Stop with no answer" exit in Figure 1). It is *not* a context-window story; the post does not discuss context length at all. A toy harness shows why a bigger budget relocates the wall instead of removing it:
+Be precise about what that is. It is an **output/thinking token budget** running out — the model spent its allowance on hidden reasoning and never emitted an answer (the "Stop with no answer" exit in Figure 1). Not a context-window overflow (the post never discusses context length), but still working memory: the thinking tokens filled the sequence the model re-reads each step, and the budget caps how much one request may spend. A toy harness shows why a bigger budget relocates the wall instead of removing it:
 
 ```scala
 // file: Budget.scala
@@ -169,8 +169,9 @@ Be precise about what that is. It is an **output/thinking token budget** running
 def reply(think: Int, answer: Int, cap: Int): String =
   if think + answer <= cap then s"answer (${think + answer} tokens used)"
   else s"NOTHING - cap hit after ${cap min think} thinking tokens"
+val cases = List((5_000, 8_000), (20_000, 8_000), (20_000, 128_000), (150_000, 128_000))
 @main def budget(): Unit =
-  for (think, cap) <- List((5_000, 8_000), (20_000, 8_000), (20_000, 128_000), (150_000, 128_000)) do
+  for (think, cap) <- cases do
     println(f"think $think%7d  cap $cap%7d  ->  ${reply(think, 1_500, cap)}")
 ```
 
@@ -196,28 +197,29 @@ Seven hours of a loop is a longer run of the same loop, and the report pairs it 
 flowchart TD
   A["Four properties (durable)"] --> B["Next-token prediction"]
   A --> C["Knowledge frozen in weights"]
-  A --> D["Working memory: bounded tokens"]
+  A --> D["Working memory: tokens it can hold and spend"]
   A --> E["Steerability: model + tools + loop"]
   B --> B1["2026 boundary: generated code is good enough to ship"]
   C --> C1["2026 boundary: 20.9GB file runs on a laptop"]
-  D --> D1["2026 boundary: 128,000 thinking tokens, then it stops"]
+  D --> D1["2026: 128,000-token output budget spent thinking, no answer"]
   E --> E1["2026 boundary: 7-hour autonomous runs, agent teams"]
   B1 --> F["Property unchanged"]
   C1 --> F
   D1 --> F
   E1 --> F
+  F ~~~ O["Outside the map: Fable 5 pulled and restored = supply chain, not the model"]
 ```
-*Figure 4: Each 2026 headline sits on one of the four existing axes; none needed a new one. Drawn for this lesson from the quotes above.*
+*Figure 4: Each 2026 headline about the models sits on one of the four existing axes; none needed a new one. The Fable outage sits outside it: access, not the model. Drawn for this lesson from the quotes above.*
 
-The practical payoff: when you read a release note, ask which axis the number sits on. That tells you whether it changes your design (a boundary you designed around has moved) or only your expectations (the same property, restated larger).
+The payoff: for each release-note number, ask which axis it sits on. That tells you whether it changes your design (a boundary you designed around has moved) or only your expectations (the same property, restated larger).
 
 ## Lab
 
-**Question this lab answers:** across the ten events Willison reports for the 2026 model year, how many moved a *boundary* on one of the four axes, how many re-exposed a *property*, and how many days of the Fable episode were actually usable?
+**Question this lab answers:** of the ten events Willison reports for the 2026 model year, which are about the models at all, how many of those moved a *boundary* on one of the four axes or re-exposed a *property*, and how many days of the Fable episode were actually usable?
 
 ### Step 1 — save the program
 
-Scala 3, standard library only, no network. Save as `ModelYear.scala`. It prints every event, then a per-axis tally, then the Fable month day by day.
+Scala 3, standard library only, no network. Save as `ModelYear.scala`. It prints every event, then a per-axis tally of the model events, then the Fable month day by day.
 
 ```scala
 // file: ModelYear.scala
@@ -228,35 +230,42 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit.DAYS
 
 val Axes = List("next-token", "knowledge", "working-memory", "steerability")
-// (when, event, axis, kind)  kind: BOUNDARY = what is reachable in practice moved,
-//                                  PROPERTY = an unchanged structural limit showed up again
+// kind: BOUNDARY = what is reachable in practice moved
+//       PROPERTY = an unchanged structural limit showed up again
+//       SUPPLY   = about access to a model, not the model: no axis ("-"), outside the map
+// working-memory = the token sequence the model re-reads each step; the output budget
+//                  caps how much of it one request may spend on its own (thinking) tokens
 val Events = List(
-  ("Nov 2025",   "Opus 4.5 / GPT-5.1 coding agents reliable day-to-day", "steerability",   "BOUNDARY"),
-  ("2025-11-24", "OpenClaw first commit; post says 100k+ commits now",   "steerability",   "BOUNDARY"),
-  ("Jan 2026",   "LLMs writing good code becomes undeniable",            "next-token",     "BOUNDARY"),
-  ("2026-04-16", "Qwen3.6-35B-A3B, 20.9GB, runs on a laptop",            "knowledge",      "BOUNDARY"),
-  ("2026-06-09", "Claude Fable 5 launches",                              "knowledge",      "BOUNDARY"),
-  ("2026-06-12", "Fable access suspended (US government directive)",     "steerability",   "BOUNDARY"),
-  ("2026-07-01", "Fable returns",                                        "steerability",   "BOUNDARY"),
-  ("2026-07-09", "GPT-5.6 launches",                                     "knowledge",      "BOUNDARY"),
-  ("Aug 2026",   "Qwen 3.8 27B, 17GB, strong result in 21 minutes",      "knowledge",      "BOUNDARY"),
-  ("Sep 2026",   "Opus 5.5 thinks 128,000 tokens, runs out, gives up",   "working-memory", "PROPERTY"))
+  ("Nov 2025",   "Opus 4.5 / GPT-5.1 coding agents reliable", "steerability",   "BOUNDARY"),
+  ("2025-11-24", "OpenClaw first commit; 100k+ commits now",  "steerability",   "BOUNDARY"),
+  ("Jan 2026",   "LLMs writing good code is undeniable",      "next-token",     "BOUNDARY"),
+  ("2026-04-16", "Qwen3.6-35B-A3B, 20.9GB, runs on a laptop", "knowledge",      "BOUNDARY"),
+  ("2026-06-09", "Claude Fable 5 launches",                   "knowledge",      "BOUNDARY"),
+  ("2026-06-12", "Fable access suspended (US directive)",     "-",              "SUPPLY"),
+  ("2026-07-01", "Fable returns",                             "-",              "SUPPLY"),
+  ("2026-07-09", "GPT-5.6 launches",                          "knowledge",      "BOUNDARY"),
+  ("Aug 2026",   "Qwen 3.8 27B, 17GB, strong in 21 minutes",  "knowledge",      "BOUNDARY"),
+  ("Sep 2026",   "Opus 5.5 output budget: 128k, no answer",   "working-memory", "PROPERTY"))
 
 @main def modelYear(): Unit =
   println("=== Step 1: every event, one row ===")
   println(f"${"when"}%-11s ${"axis"}%-15s ${"kind"}%-9s event")
   for (when, event, axis, kind) <- Events do
-    require(Axes.contains(axis), s"unknown axis $axis")   // a fifth axis would crash here
     println(f"$when%-11s $axis%-15s $kind%-9s $event")
+  val (supply, model) = Events.partition(_._4 == "SUPPLY")
+  require(supply.forall(_._3 == "-"), "a supply-chain event was put on a model axis")
+  val misfits = model.filterNot(e => Axes.contains(e._3))   // a fifth axis would show up here
 
-  println("\n=== Step 2: per-axis tally ===")
+  println("\n=== Step 2: per-axis tally, model events only ===")
   println(f"${"axis"}%-15s ${"boundary"}%8s ${"property"}%8s ${"total"}%6s")
   for axis <- Axes do
-    val rows = Events.filter(_._3 == axis)
+    val rows = model.filter(_._3 == axis)
     val b = rows.count(_._4 == "BOUNDARY")
     println(f"$axis%-15s $b%8d ${rows.size - b}%8d ${rows.size}%6d")
-  val tb = Events.count(_._4 == "BOUNDARY")
-  println(f"${"ALL"}%-15s $tb%8d ${Events.size - tb}%8d ${Events.size}%6d   events that fit no axis: 0")
+  val tb = model.count(_._4 == "BOUNDARY")
+  println(f"${"ALL MODEL"}%-15s $tb%8d ${model.size - tb}%8d ${model.size}%6d")
+  println(s"model events that fit no axis: ${misfits.size}")
+  println(s"supply-chain events, outside the map: ${supply.size} of ${Events.size}")
 
   println("\n=== Step 3: Fable 5, day by day, launch to the GPT-5.6 launch ===")
   val launch = LocalDate.of(2026, 6, 9)
@@ -265,18 +274,22 @@ val Events = List(
   val gpt56  = LocalDate.of(2026, 7, 9)
   val days = Iterator.iterate(launch)(_.plusDays(1)).takeWhile(_.isBefore(gpt56)).toList
   val up   = days.map(d => !d.isAfter(lastUp) || !d.isBefore(back))
-  println("strip: " + up.map(u => if u then "#" else ".").mkString + "   (# usable day, . dark day)")
+  val strip = up.map(u => if u then "#" else ".").mkString
+  println(s"strip: $strip   (# usable day, . dark day)")
   var runs = Vector.empty[(Boolean, LocalDate, Int)]   // (usable?, first day, length)
   for (d, u) <- days.zip(up) do
-    if runs.nonEmpty && runs.last._1 == u then runs = runs.init :+ runs.last.copy(_3 = runs.last._3 + 1)
+    if runs.nonEmpty && runs.last._1 == u then
+      runs = runs.init :+ runs.last.copy(_3 = runs.last._3 + 1)
     else runs = runs :+ (u, d, 1)
   for (u, from, n) <- runs do
-    println(f"${if u then "usable" else "dark"}%-7s from $from  for $n%2d days  to ${from.plusDays(n - 1)}")
+    val label = if u then "usable" else "dark"
+    println(f"$label%-7s from $from  for $n%2d days  to ${from.plusDays(n - 1)}")
   val nUp = up.count(identity)
   println(f"calendar days : span=${days.size} usable=$nUp dark=${days.size - nUp} " +
           f"uptime=${nUp.toDouble / days.size}%.3f under_two_weeks=${nUp < 14}")
   val naiveUp = DAYS.between(launch, lastUp) + DAYS.between(back, gpt56)
-  println(f"naive subtract: usable=$naiveUp dark=${DAYS.between(lastUp, back)} (counts the 12th as dark)")
+  val naiveDark = DAYS.between(lastUp, back)
+  println(s"naive subtract: usable=$naiveUp dark=$naiveDark (counts the 12th as dark)")
 ```
 
 ### Step 2 — run it
@@ -290,24 +303,26 @@ Real output:
 ```text
 === Step 1: every event, one row ===
 when        axis            kind      event
-Nov 2025    steerability    BOUNDARY  Opus 4.5 / GPT-5.1 coding agents reliable day-to-day
-2025-11-24  steerability    BOUNDARY  OpenClaw first commit; post says 100k+ commits now
-Jan 2026    next-token      BOUNDARY  LLMs writing good code becomes undeniable
+Nov 2025    steerability    BOUNDARY  Opus 4.5 / GPT-5.1 coding agents reliable
+2025-11-24  steerability    BOUNDARY  OpenClaw first commit; 100k+ commits now
+Jan 2026    next-token      BOUNDARY  LLMs writing good code is undeniable
 2026-04-16  knowledge       BOUNDARY  Qwen3.6-35B-A3B, 20.9GB, runs on a laptop
 2026-06-09  knowledge       BOUNDARY  Claude Fable 5 launches
-2026-06-12  steerability    BOUNDARY  Fable access suspended (US government directive)
-2026-07-01  steerability    BOUNDARY  Fable returns
+2026-06-12  -               SUPPLY    Fable access suspended (US directive)
+2026-07-01  -               SUPPLY    Fable returns
 2026-07-09  knowledge       BOUNDARY  GPT-5.6 launches
-Aug 2026    knowledge       BOUNDARY  Qwen 3.8 27B, 17GB, strong result in 21 minutes
-Sep 2026    working-memory  PROPERTY  Opus 5.5 thinks 128,000 tokens, runs out, gives up
+Aug 2026    knowledge       BOUNDARY  Qwen 3.8 27B, 17GB, strong in 21 minutes
+Sep 2026    working-memory  PROPERTY  Opus 5.5 output budget: 128k, no answer
 
-=== Step 2: per-axis tally ===
+=== Step 2: per-axis tally, model events only ===
 axis            boundary property  total
 next-token             1        0      1
 knowledge              4        0      4
 working-memory         0        1      1
-steerability           4        0      4
-ALL                    9        1     10   events that fit no axis: 0
+steerability           2        0      2
+ALL MODEL              7        1      8
+model events that fit no axis: 0
+supply-chain events, outside the map: 2 of 10
 
 === Step 3: Fable 5, day by day, launch to the GPT-5.6 launch ===
 strip: ####..................########   (# usable day, . dark day)
@@ -320,27 +335,27 @@ naive subtract: usable=11 dark=19 (counts the 12th as dark)
 
 ### Reading the output
 
-**Step 1 block — the per-event table.** `when` is the date or month the post places the event in. `axis` is which of the four properties the event pressed on. `kind` is the judgement call: `BOUNDARY` means what is reachable in practice moved (quality, file size, run length, availability); `PROPERTY` means an unchanged structural limit showed up again at a new number. More `BOUNDARY` rows is neither good nor bad — it is the measurement. The `require` line is the falsification test in code: an event that fits no existing axis would stop the program, and it runs to the end.
+**Step 1 block — the per-event table.** `when` is the date or month the post places the event in. `axis` is which of the four properties the event pressed on, or `-` for none. `kind` is the judgement call: `BOUNDARY` means what is reachable in practice moved (quality, file size, run length); `PROPERTY` means an unchanged structural limit showed up again at a new number; `SUPPLY` means the event is about *access* to a model — a suspension, a return — not about the model, so it gets no axis and stays out of the tally. The Opus 5.5 row is on `working-memory` because the output budget caps how much of the re-read token sequence one request may spend (see the Primer). More `BOUNDARY` rows is neither good nor bad — it is the measurement. The falsification test is `misfits`: a *model* event whose axis is not one of the four would be counted there. The `require` guards only the bookkeeping: a supply event may not be slipped onto an axis to make the tally look tidy.
 
 | when | axis | kind | event |
 |---|---|---|---|
-| Nov 2025 | steerability | BOUNDARY | Opus 4.5 / GPT-5.1 coding agents reliable day-to-day |
-| 2025-11-24 | steerability | BOUNDARY | OpenClaw first commit; post says 100k+ commits now |
-| Jan 2026 | next-token | BOUNDARY | LLMs writing good code becomes undeniable |
+| Nov 2025 | steerability | BOUNDARY | Opus 4.5 / GPT-5.1 coding agents reliable |
+| 2025-11-24 | steerability | BOUNDARY | OpenClaw first commit; 100k+ commits now |
+| Jan 2026 | next-token | BOUNDARY | LLMs writing good code is undeniable |
 | 2026-04-16 | knowledge | BOUNDARY | Qwen3.6-35B-A3B, 20.9GB, runs on a laptop |
 | 2026-06-09 | knowledge | BOUNDARY | Claude Fable 5 launches |
-| 2026-06-12 | steerability | BOUNDARY | Fable access suspended (US government directive) |
-| 2026-07-01 | steerability | BOUNDARY | Fable returns |
+| 2026-06-12 | - | SUPPLY | Fable access suspended (US directive) |
+| 2026-07-01 | - | SUPPLY | Fable returns |
 | 2026-07-09 | knowledge | BOUNDARY | GPT-5.6 launches |
-| Aug 2026 | knowledge | BOUNDARY | Qwen 3.8 27B, 17GB, strong result in 21 minutes |
-| Sep 2026 | working-memory | PROPERTY | Opus 5.5 thinks 128,000 tokens, runs out, gives up |
+| Aug 2026 | knowledge | BOUNDARY | Qwen 3.8 27B, 17GB, strong in 21 minutes |
+| Sep 2026 | working-memory | PROPERTY | Opus 5.5 output budget: 128k, no answer |
 
-**Verdict:** ten months of the most competitive year in the field, and every event fits one of four pre-existing slots. The map is doing real work, not accommodating everything by being vague.
+**Verdict:** ten months of the most competitive year in the field: eight events are about the models, and every one of them fits one of four pre-existing slots; the other two are not about the model at all. The map is doing real work, and it also says what it does *not* cover, instead of accommodating everything by being vague.
 
-**Step 2 block — the tally.** Columns: `boundary` and `property` are counts of rows on that axis; `total` is their sum. A `property` row means you hit a wall, so fewer is better there. The tally traced by hand: steerability gets rows 1, 2, 6 and 7 → 4; knowledge gets rows 4, 5, 8 and 9 → 4; next-token gets row 3 → 1; working-memory gets row 10 → 1. Total 4 + 4 + 1 + 1 = 10, and 9 BOUNDARY + 1 PROPERTY = 10, so nothing is double-counted or dropped. The distribution is the finding: 8 of 10 events (4 steerability + 4 knowledge) are harness-and-weights plumbing, not changes to what a model *is*.
+**Step 2 block — the tally.** Columns: `boundary` and `property` are counts of model events on that axis; `total` is their sum. A `property` row means you hit a wall, so fewer is better there. The tally traced by hand: steerability gets rows 1 and 2 → 2; knowledge gets rows 4, 5, 8 and 9 → 4; next-token gets row 3 → 1; working-memory gets row 10 → 1. Total 2 + 4 + 1 + 1 = 8 model events, and 7 BOUNDARY + 1 PROPERTY = 8; rows 6 and 7 are the 2 supply-chain events, and 8 + 2 = 10, so nothing is double-counted or dropped. `model events that fit no axis: 0` is the falsification result. The distribution is the finding: 6 of 8 model events (2 steerability + 4 knowledge) are harness-and-weights plumbing, not changes to what a model *is*.
 
-![Heatmap of event counts: boundary row 1, 4, 0, 4; property row 0, 0, 1, 0](assets/2026-10-12-2-chart-2.png)
-*Figure 5: The Step 2 tally as a grid — dark cells are where the year's movement happened; the only property cell is working memory. Generated from the lab output.*
+![Heatmap of event counts: boundary row 1, 4, 0, 2, 0; property row 0, 0, 1, 0, 0; supply row 0, 0, 0, 0, 2](assets/2026-10-12-2-chart-2.png)
+*Figure 5: The Step 2 tally as a grid — dark cells are where the year's movement happened; the only property cell is working memory, and the two supply-chain events sit in the "no axis" column, outside the four-axis map. Generated from the lab output.*
 
 **Verdict:** the axes that moved most are the two you control in your own architecture — which harness you wire and which weights you point it at. The axis that bit back, working memory, is the one you have to design around rather than wait out.
 
@@ -357,15 +372,15 @@ naive subtract: usable=11 dark=19 (counts the 12th as dark)
 
 ### Cause → consequence
 
-1. **Cause.** Competition in 2026 pushed on what is cheap to push on: harness reliability (coding agents that finish the job), weights packaging (a 20.9GB file on a laptop, about 5 bits per parameter) and run length (seven autonomous hours). None of those require changing the mechanism.
-2. **Mechanism.** Because the mechanism stays next-token prediction with frozen weights, a bounded generation budget and a tool loop, every improvement has to express itself as a bigger number on one of those four axes. There is nowhere else for it to go, which is why the map keeps classifying new releases without being extended.
+1. **Cause.** Competition in 2026 pushed on what is cheap to push on: harness reliability (coding agents that finish the job), weights packaging (a 20.9GB file on a laptop, about 5 bits per parameter) and run length (seven autonomous hours). None of those require changing the mechanism. The year's other shock, the Fable outage, was not about a model at all.
+2. **Mechanism.** Because the mechanism stays next-token prediction with frozen weights, a bounded working memory (what it can hold, and what one request may spend) and a tool loop, every improvement has to express itself as a bigger number on one of those four axes. There is nowhere else for it to go, which is why the map keeps classifying new releases without being extended.
 3. **Consequence.** Vendor-specific facts — which model is best, what it costs, whether it is available in your region this week — decay in weeks. Axis-level facts do not. The one new risk the year actually surfaced was on the working-memory axis: a long run can consume its whole budget and return nothing.
 4. **What it means in practice.** For the car-wash POS platform: put model calls behind one internal interface in the Lua monorepo with the model name, endpoint and budget as configuration, never as inlined call sites — the Fable window shows that losing your best model four days after launch is a normal operating condition, so swapping providers has to be a config change, not a refactor. Treat every call as "may return nothing after a long wait": set an explicit output-token cap, a wall-clock timeout, and a non-LLM fallback path for anything a customer is waiting on at the wash bay. For your Claude Code Skills and MCP setups: write them against the four axes rather than a model version — put the shop's domain facts in files the agent reads (knowledge is frozen, so supply it as input), structure long tasks as checkpointed steps that each produce a verifiable artefact instead of one 128,000-token think, and give every long-running task a reference method to diff against, which is what made Rakuten's seven-hour run reportable rather than merely long.
 
 ## Self-check
-1. The Opus 5.5 event is classified as a `PROPERTY` row rather than a `BOUNDARY` row. Why, and what exactly ran out? <details><summary>Answer</summary>It ran out of its output/thinking token budget — the allowance on tokens the model may *produce*, including hidden reasoning — and returned nothing. It is a property row because the structural limit itself did not change; only the number did. Willison's words: "Opus 5.5 thought for 128,000 tokens and then gave up! It ran out of tokens before it got to the response." The Budget.scala example shows the same shape: raising the cap from 8,000 to 128,000 rescues a 20,000-token task, but a 150,000-token task still returns nothing. It is not a context-window or long-context story; the post does not discuss context length at all.</details>
+1. The Opus 5.5 event is classified as a `PROPERTY` row rather than a `BOUNDARY` row. Why, and what exactly ran out? <details><summary>Answer</summary>It ran out of its output/thinking token budget — the allowance on tokens the model may *produce*, including hidden reasoning — and returned nothing. It is a property row because the structural limit itself did not change; only the number did. Willison's words: "Opus 5.5 thought for 128,000 tokens and then gave up! It ran out of tokens before it got to the response." The Budget.scala example shows the same shape: raising the cap from 8,000 to 128,000 rescues a 20,000-token task, but a 150,000-token task still returns nothing. It is not a context-window or long-context story; the post does not discuss context length at all. It still sits on the working-memory axis, because the thinking tokens are written into the sequence the model re-reads each step, and the budget caps how much of that one request may spend.</details>
 2. January's "undeniable that LLMs write good code" is on the next-token-prediction axis. Does it mean the model stopped predicting tokens? <details><summary>Answer</summary>No. It means the quality boundary of what a token-by-token sampler produces moved past a usability line. The mechanism is unchanged: a distribution over the next token, sampled, appended, re-fed — exactly the five calls NextToken.scala prints, with billions of weights instead of a five-row table. "The output is now good" and "the mechanism is now different" are separate claims, and only the first is supported by the post.</details>
-3. Fable 5 was arguably the best model available in June 2026. What did the lab's day-by-day count show about relying on that, and what is the design rule? <details><summary>Answer</summary>Across the 30 days from 2026-06-09 to 2026-07-08 it was usable for 4 days (9–12 June; it was pulled on the evening of the 12th) plus 8 days (1–8 July, before GPT-5.6 launched on the 9th) = 12 days, 40% uptime, 18 days dark — matching Willison's "for 18 of those days it wasn’t available". Naive date subtraction gives 11/19 because it counts the 12th as dark. The rule: do not architect around a single model vendor and version. Availability belongs to your supply chain, not to the model, so model identity, endpoint and budgets live in configuration behind one interface with a fallback.</details>
+3. Fable 5 was arguably the best model available in June 2026. What did the lab's day-by-day count show about relying on that, and what is the design rule? <details><summary>Answer</summary>Across the 30 days from 2026-06-09 to 2026-07-08 it was usable for 4 days (9–12 June; it was pulled on the evening of the 12th) plus 8 days (1–8 July, before GPT-5.6 launched on the 9th) = 12 days, 40% uptime, 18 days dark — matching Willison's "for 18 of those days it wasn’t available". Naive date subtraction gives 11/19 because it counts the 12th as dark. The rule: do not architect around a single model vendor and version. Availability belongs to your supply chain, not to the model (which is why the lab tags the suspension and return `SUPPLY`, outside the four axes), so model identity, endpoint and budgets live in configuration behind one interface with a fallback.</details>
 
 ## Sources
 - [2026 in LLMs (so far)](https://simonwillison.net/2026/Sep/27/2026-in-llms-so-far/) — Simon Willison, 2026-09-27 — the primary evidence: the month-by-month timeline of the model year (§November 2025 through §September), the quoted passages on coding agents, code quality, the 20.9GB laptop model, the 18 dark Fable days and the 128,000-token give-up; the Qwen 3.8 27B 17GB figure (§August); the Fable 5 launch/suspension/return dates and the "Friday evening" timing used in the lab's day count; the July slide replicated as Figure 3; accessed 2026-10-15.

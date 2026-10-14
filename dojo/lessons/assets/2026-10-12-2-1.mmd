@@ -1,5 +1,5 @@
 flowchart TD
-  P["Input: prompt + every tool result so far"] --> M["Model: probability for each next token"]
+  P["Working memory: prompt, tool results, tokens so far"] --> M["Model: probability for each next token"]
   M --> S["Harness samples 1 token, appends it"]
   S --> B{"Output budget left?"}
   B -- "no" --> X["Stop with no answer"]

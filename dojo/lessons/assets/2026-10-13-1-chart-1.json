@@ -1,14 +1,35 @@
 {
-  "type": "bar",
-  "title": "Dependencies compile once: after an edit, cargo rebuilds 26-63x faster",
-  "x_label": "crate using serde + serde_json; a clean build compiles 12 crates, an edit recompiles only yours",
-  "y_label": "wall-clock seconds, median of 5 runs (log scale)",
-  "categories": ["cold: empty target/ (after cargo clean)", "incremental: touch src/main.rs, run again"],
-  "series": [
-    {"name": "cargo check", "y": [5.90, 0.094]},
-    {"name": "cargo build (debug)", "y": [6.44, 0.166]},
-    {"name": "cargo build --release", "y": [7.40, 0.288]}
-  ],
-  "value_fmt": "%.3g s",
-  "log_y": true
+ "type": "bar",
+ "title": "Dependencies compile once: after an edit, cargo rebuilds 15-51x faster",
+ "x_label": "crate using serde + serde_json; a clean build compiles 12 crates, an edit recompiles only yours",
+ "y_label": "wall-clock seconds, median of 5 runs (log scale)",
+ "categories": [
+  "cold: empty target/ (after cargo clean)",
+  "incremental: touch src/main.rs, run again"
+ ],
+ "series": [
+  {
+   "name": "cargo check",
+   "y": [
+    6.124,
+    0.119
+   ]
+  },
+  {
+   "name": "cargo build (debug)",
+   "y": [
+    6.374,
+    0.199
+   ]
+  },
+  {
+   "name": "cargo build --release",
+   "y": [
+    7.634,
+    0.522
+   ]
+  }
+ ],
+ "value_fmt": "%.3f s",
+ "log_y": true
 }

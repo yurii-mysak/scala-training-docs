@@ -52,8 +52,7 @@ point in the machine code. No tracing, no pause, no runtime to ship — the bina
 > "Some languages have garbage collection that regularly looks for no-longer-used memory as the program runs; in other languages, the programmer must explicitly allocate and free the memory. Rust uses a third approach: Memory is managed through a system of ownership with a set of rules that the compiler checks."
 > — The Rust Project Developers, *The Rust Programming Language, ch. 4.1 "What Is Ownership?"*, accessed 2026-10-15, https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html
 
-Rust decides everything in the compiler box; the JVM leaves loading, optimising and freeing to
-the running process:
+The two pipelines:
 
 ```mermaid
 flowchart LR
@@ -72,9 +71,10 @@ flowchart LR
   end
 ```
 
-You can watch the drop happen. `Drop` is Rust's destructor hook — a trait (Rust's interface) whose
-`drop` method the compiler calls when a value goes away; here it prints. `Noisy` wraps a heap
-`String`:
+*Figure 1: Rust settles checking, generics and freeing in `rustc`; the JVM settles loading, JIT and GC at run time. Drawn for this lesson.*
+
+You can watch the drop happen. `Drop` is Rust's destructor hook — a trait (Rust's interface) the
+compiler calls when a value goes away. `Noisy` wraps a heap `String` and prints:
 
 ```rust
 // file: main.rs
@@ -98,12 +98,12 @@ main ends
 
 `"tmp"` is freed at its block's `}`, before `main ends` prints; `"hello"` when `main` returns. No
 collector ran. On the JVM an unreachable object waits for the next GC cycle, which is why Scala
-reaches for `scala.util.Using` when a file must close on time. What gets freed is clearest in the
-book's own picture:
+reaches for `scala.util.Using` when a file must close on time. The book's picture of what gets
+freed:
 
 ![s1 holds ptr, len 5, capacity 5; ptr points to heap bytes h e l l o](assets/2026-10-13-1-fig-1.png)
 
-*Figure 1: The book's Figure 4-1, "The representation in memory of a `String` holding the value `"hello"` bound to `s1`". Source: The Rust Project Developers, The Rust Programming Language, ch. 4.1, [What Is Ownership?](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html) (MIT OR Apache-2.0).*
+*Figure 2: The book's Figure 4-1, "The representation in memory of a `String` holding the value `"hello"` bound to `s1`". Source: The Rust Project Developers, The Rust Programming Language, ch. 4.1, [What Is Ownership?](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html) (MIT OR Apache-2.0).*
 
 Left: pointer, length, capacity, on the stack. Right: the heap allocation. "Rust calls `drop`
 automatically at the closing curly bracket" (ch. 4.1), and `String`'s drop releases the right-hand table — the `free 5 heap bytes` line above. The safety the
@@ -115,13 +115,13 @@ lifetime analysis, monomorphisation (`Vec<i32>` and `Vec<String>` each get their
 where the JVM erases both to one class) and optimisation all happen ahead of time instead of in a
 JIT. You trade developer latency for runtime predictability — and get this back:
 
-![Startup time per run: /bin/true 1.67 ms, Rust 1.88 ms, precompiled Scala 212 ms, scala Lab.scala 3050 ms](assets/2026-10-13-1-chart-2.png)
+![Startup time per run: /bin/true 1.29 ms, Rust 1.63 ms, precompiled Scala 213.24 ms, scala Lab.scala 3005.42 ms](assets/2026-10-13-1-chart-2.png)
 
-*Figure 2: Time to run the same `Hello, world!`, measured in this lesson's build environment (Linux x86-64, OpenJDK 21, Scala 3.3.4, rustc 1.97); Rust and `/bin/true` averaged over 500 runs, JVM rows median of 7. Generated from the lesson's own measurements.*
+*Figure 3: Time to run the same `Hello, world!` (Linux x86-64, OpenJDK 21, Scala 3.3.4, rustc 1.97); mean of 2000 runs, JVM rows mean of 7. Commands and output: Lab Step 7.*
 
-The Rust binary takes 1.88 ms against 1.67 ms for `/bin/true`, which does nothing — so nearly all
-of it is the OS creating a process. Precompiled Scala needs 212 ms to start a JVM and load the
-Scala library; `scala Lab.scala`, how this course runs Scala labs, needs 3050 ms because it also
+The Rust binary takes 1.63 ms against 1.29 ms for `/bin/true`, which does nothing — so nearly all
+of it is the OS creating a process. Precompiled Scala needs 213 ms to start a JVM and load the
+Scala library; `scala Lab.scala` needs 3005 ms because it also
 compiles the script every time.
 
 ### rustup is Coursier plus a JVM switcher; cargo is sbt
@@ -147,8 +147,7 @@ lrwxrwxrwx 1 root root 6 Oct  2 15:38 /root/.cargo/bin/rustc -> rustup
 /root/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo
 ```
 
-Both are links to `rustup` (output from the lesson's build environment); the last line is the
-real cargo of the active toolchain. Switch toolchains and the same command reaches another
+Both are links to `rustup`; the last line is the real cargo of the active toolchain. Switch toolchains and the same command reaches another
 directory — no `JAVA_HOME` juggling.
 
 > "Cargo is Rust's build system and package manager."
@@ -183,6 +182,8 @@ flowchart LR
   end
 ```
 
+*Figure 4: rustup does Coursier's job, cargo does sbt's. Drawn for this lesson.*
+
 ### The cargo loop
 
 - `cargo new hello_iaido` — scaffolds `Cargo.toml`, `src/main.rs`, a git repo.
@@ -193,8 +194,7 @@ flowchart LR
   (ch. 1.3). Slower to build, faster to run, far smaller.
 - `cargo test` — runs every `#[test]` function; the runner is built in.
 
-Plus `cargo clippy` and `cargo fmt`. What one `cargo build` does — note the loop over dependencies
-not yet in `target/`:
+Plus `cargo clippy` and `cargo fmt`. What one `cargo build` does:
 
 ```mermaid
 sequenceDiagram
@@ -217,17 +217,18 @@ sequenceDiagram
   C-->>You: Finished `dev` profile in N s
 ```
 
-That loop makes the first build slow and later ones fast. Measured on a crate using `serde` and
-`serde_json`:
+*Figure 5: One `cargo build`; the loop runs only for crates not yet in `target/`. Drawn for this lesson from ch. 1.3.*
 
-![Cold builds 5.9 to 7.4 s; builds after an edit 0.094 to 0.288 s](assets/2026-10-13-1-chart-1.png)
+So the first build is slow and later ones fast, here on a crate using `serde` and `serde_json`:
 
-*Figure 3: Each command from an empty `target/` and again after touching `src/main.rs`; median of 5 runs, measured in this lesson's build environment (Linux x86-64, 2 shared cores, cargo 1.97). Generated from the lesson's own measurements.*
+![Cold builds 6.124 to 7.634 s; builds after an edit 0.119 to 0.522 s](assets/2026-10-13-1-chart-1.png)
 
-From clean, every command spends 6–7 s compiling 11 dependencies plus your crate. After an edit
-only your crate recompiles: 5.90 ÷ 0.094 = 63× faster for `check`, 6.44 ÷ 0.166 = 39× for debug,
-7.40 ÷ 0.288 = 26× for release. `check` stays cheapest (0.094 s against 0.166 s) because it skips
-machine code — keep it under a file watcher as your sbt shell.
+*Figure 6: Each command from an empty `target/` and after touching `src/main.rs`; median of 5 runs (Linux x86-64, 2 cores, cargo 1.97). Commands and output: Lab Step 7.*
+
+From clean, every command spends 6–8 s compiling 11 dependencies plus your crate. After an edit
+only your crate recompiles: 6.124 ÷ 0.119 = 51× faster for `check`, 6.374 ÷ 0.199 = 32× for
+debug, 7.634 ÷ 0.522 = 15× for release. `check` stays cheapest (0.119 s against 0.199 s) because
+it skips machine code — keep it under a file watcher as your sbt shell.
 
 Tests need no setup. In a `cargo new --lib calc` project, one test wrong on purpose:
 
@@ -388,7 +389,8 @@ the fix. In Scala a trailing `;` changes nothing — the one habit to unlearn.
 ## Lab
 
 **The question this lab answers:** what does each of the five cargo commands actually give you, and
-what does `let` do when you reuse the same name — rebind or mutate?
+what does `let` do when you reuse the same name — rebind or mutate? Step 7 then re-measures the
+two timing charts, Figures 3 and 6, so you can check them on your own machine.
 
 ### Step 1 — install the toolchain on the Mac
 
@@ -651,6 +653,136 @@ are on. Today do the exercises in `exercises/00_intro` (the UI lists them as `in
 and the first two in `exercises/01_variables` (`variables1`, `variables2`). They are exactly Step 4
 of this lab in exercise form: a missing `let`, then an uninitialised binding.
 
+### Step 7 — measure Figures 3 and 6 yourself
+
+Every number in Figures 3 and 6 comes from the small timing program below, run in this lesson's
+build environment (Linux x86-64, 2 shared cores, OpenJDK 21, Scala 3.3.4, rustc 1.97). It runs
+each command as a child process with its output discarded and reads `std::time::Instant` around
+it. Set up the three things it times, next to each other in one folder:
+
+```bash
+cargo new hello && (cd hello && cargo build --release)
+echo '@main def lab(): Unit = println("Hello, world!")' > Lab.scala
+mkdir -p out && scalac -d out Lab.scala
+cargo new serde_demo && (cd serde_demo && cargo add serde --features derive && cargo add serde_json)
+cargo new timer
+```
+
+Put this in `timer/src/main.rs`; the second program below goes into `serde_demo/src/main.rs`:
+
+```rust
+// file: main.rs
+// run: local
+use std::process::{Command, Stdio};
+use std::time::Instant;
+
+// Wall-clock seconds of one run of `cmd`, its output discarded.
+fn secs(cmd: &[&str]) -> f64 {
+    let t0 = Instant::now();
+    let mut c = Command::new(cmd[0]);
+    c.args(&cmd[1..]).stdout(Stdio::null()).stderr(Stdio::null());
+    let ok = c.status().expect("command not found").success();
+    assert!(ok, "{cmd:?} failed");
+    t0.elapsed().as_secs_f64()
+}
+
+// Figure 3: mean time of one run over n runs, in milliseconds.
+fn mean_ms(n: usize, label: &str, cmd: &[&str]) {
+    let total: f64 = (0..n).map(|_| secs(cmd)).sum();
+    println!("{label:<20} {:9.2} ms  (mean of {n} runs)", total / n as f64 * 1000.0);
+}
+
+// Figure 6: 5 cold runs (after cargo clean) and 5 runs after an edit; sorted, median.
+fn median_of_5(label: &str, cmd: &[&str]) {
+    let (mut cold, mut edit) = (Vec::new(), Vec::new());
+    for _ in 0..5 {
+        secs(&["cargo", "clean", "-q"]);
+        cold.push(secs(cmd));
+        secs(&["touch", "src/main.rs"]);
+        edit.push(secs(cmd));
+    }
+    for (kind, mut v) in [("cold", cold), ("edit", edit)] {
+        v.sort_by(f64::total_cmp);
+        let runs: Vec<String> = v.iter().map(|x| format!("{x:.3}")).collect();
+        println!("{label:<8} {kind}: {}  median {:.3} s", runs.join(" "), v[2]);
+    }
+}
+
+fn main() {
+    match std::env::args().nth(1).as_deref() {
+        Some("startup") => {
+            let cp = std::env::var("SCALA_CP").expect("set SCALA_CP (see the text)");
+            mean_ms(2000, "/bin/true", &["/bin/true"]);
+            mean_ms(2000, "Rust release binary", &["./hello/target/release/hello"]);
+            mean_ms(7, "Scala precompiled", &["java", "-cp", &cp, "lab"]);
+            mean_ms(7, "scala Lab.scala", &["scala", "Lab.scala"]);
+        }
+        Some("builds") => {
+            secs(&["cargo", "fetch", "-q"]);
+            median_of_5("check", &["cargo", "check"]);
+            median_of_5("debug", &["cargo", "build"]);
+            median_of_5("release", &["cargo", "build", "--release"]);
+        }
+        _ => eprintln!("usage: timer startup   or   timer builds"),
+    }
+}
+```
+
+```rust
+// file: main.rs
+// deps: serde@1+derive, serde_json@1
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Lesson {
+    id: String,
+    minutes: u32,
+}
+
+fn main() {
+    let l = Lesson { id: "2026-10-13-1".into(), minutes: 28 };
+    let json = serde_json::to_string(&l).unwrap();
+    let back: Lesson = serde_json::from_str(&json).unwrap();
+    println!("{json} -> {back:?}");
+}
+```
+
+```text
+{"id":"2026-10-13-1","minutes":28} -> Lesson { id: "2026-10-13-1", minutes: 28 }
+```
+
+Build the timer, point `SCALA_CP` at the compiled `out/` plus the two Scala library jars (their
+folder depends on how you installed Scala; with the 3.3.4 tarball it is its `lib/`), and run both
+measurements:
+
+```bash
+(cd timer && cargo build --release)
+LIB="$(dirname "$(which scala)")/../lib"
+export SCALA_CP="out:$LIB/scala3-library_3-3.3.4.jar:$LIB/scala-library-2.13.14.jar"
+./timer/target/release/timer startup
+(cd serde_demo && ../timer/target/release/timer builds)
+```
+
+Expected output — run locally. The lines below are the real output in this lesson's build
+environment, and they are exactly the numbers drawn in Figures 3 and 6; on your Mac the absolute
+times will differ:
+
+```text
+/bin/true                 1.29 ms  (mean of 2000 runs)
+Rust release binary       1.63 ms  (mean of 2000 runs)
+Scala precompiled       213.24 ms  (mean of 7 runs)
+scala Lab.scala        3005.42 ms  (mean of 7 runs)
+check    cold: 5.983 5.991 6.124 6.194 6.297  median 6.124 s
+check    edit: 0.109 0.112 0.119 0.132 0.133  median 0.119 s
+debug    cold: 6.132 6.251 6.374 6.506 6.520  median 6.374 s
+debug    edit: 0.182 0.196 0.199 0.201 0.224  median 0.199 s
+release  cold: 7.414 7.428 7.634 7.675 7.914  median 7.634 s
+release  edit: 0.484 0.513 0.522 0.532 0.549  median 0.522 s
+```
+
+**Verdict:** the gaps, not the absolute times, are the result — a native binary starts within a
+third of a millisecond of doing nothing, and a dependency compiles once, not on every edit.
+
 ### Reading the output
 
 Step 4's table is the one to read closely. Columns: **step** is the source line in order;
@@ -690,6 +822,13 @@ Step 5's numbers: 4,367,600 bytes of debug binary against 445,112 bytes of relea
 4,367,600 ÷ 445,112 = 9.81, so debug is roughly ten times the size here — almost all of it debug
 info and un-inlined code, on a program whose logic is one `println!`.
 
+Step 7's numbers: the first four lines are Figure 3, one bar each, in milliseconds per run, lower
+is better. The Rust binary costs 1.63 − 1.29 = 0.34 ms over `/bin/true`; precompiled Scala costs
+213.24 ÷ 1.63 = 131 times the Rust run. The six `cold`/`edit` lines are Figure 6: five sorted
+runs in seconds, then their median, which is the middle (third) value and the bar height. For
+`check`, the cold runs 5.983 5.991 **6.124** 6.194 6.297 give 6.124 s, the edit runs 0.109 0.112
+**0.119** 0.132 0.133 give 0.119 s, and 6.124 ÷ 0.119 = 51.5, the "51×" in the text.
+
 **Verdict:** `let` without `mut` is not weaker than `var`; combined with shadowing it covers the
 "transform a value step by step, then stop changing it" pattern that on the JVM tempts you into a
 `var`, and it does so without ever allowing a second write to the same slot.
@@ -728,7 +867,7 @@ info and un-inlined code, on a program whose logic is one `println!`.
 - [Rustlings](https://github.com/rust-lang/rustlings) — the Rust Project — the exercise set this track uses as its running lab, including the `exercises/00_intro` and `exercises/01_variables` directories worked in Step 6 (accessed 2026-10-13)
 - [Rustlings — Setup](https://rustlings.rust-lang.org/setup) — the Rust Project — the official install and initialisation steps quoted in Step 6 (`cargo install rustlings --locked`, `rustlings init`) and the note that cargo installs binaries to `~/.cargo/bin` (accessed 2026-10-13)
 - [Rustlings — home](https://rustlings.rust-lang.org/) — the Rust Project — the one-line description of Rustlings as small exercises for reading and writing Rust, and its status as an official Rust project (accessed 2026-10-13)
-- [The Rust Programming Language, ch. 4.1 What Is Ownership?](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html) — The Rust Project Developers — the quoted "third approach" between garbage collection and manual freeing, the sentence that `drop` runs at the closing curly bracket, and Figure 4-1 (a `String` on the stack and heap) reproduced as Figure 1 (accessed 2026-10-15)
+- [The Rust Programming Language, ch. 4.1 What Is Ownership?](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html) — The Rust Project Developers — the quoted "third approach" between garbage collection and manual freeing, the sentence that `drop` runs at the closing curly bracket, and Figure 4-1 (a `String` on the stack and heap) reproduced as Figure 2 (accessed 2026-10-15)
 - [rust-lang/book, src/img/trpl04-01.svg](https://github.com/rust-lang/book/blob/main/src/img/trpl04-01.svg) — The Rust Project Developers — the source file of Figure 1, used under the repository's MIT OR Apache-2.0 licence (accessed 2026-10-15)
 
 ## Next on this track

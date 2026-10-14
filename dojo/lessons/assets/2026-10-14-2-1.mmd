@@ -1,9 +1,10 @@
-flowchart LR
-  B["Public benchmark: audio + reference file"] -->|"route 1: crawled into training data"| T["Training"]
-  B -->|"route 2: keep the checkpoint with the best score"| S["Model selection"]
+flowchart TD
+  B["Public benchmark:<br/>audio + reference file"]
+  B -->|"route 1: crawled<br/>into training data"| T["Training"]
+  B -->|"route 2: keep the checkpoint<br/>with the best score"| S["Model selection"]
   T --> M["Released model"]
   S --> M
-  M --> P["Leaderboard: low WER"]
-  M --> Q["Probe: file and audio disagree"]
-  Q -->|"output follows the file"| F["Benchmark fitting detected"]
-  Q -->|"output follows the audio"| G["Score reflects the task"]
+  M --> P["Leaderboard:<br/>low WER"]
+  M --> Q["Probe: file and<br/>audio disagree"]
+  Q -->|"output follows<br/>the file"| F["Benchmark fitting<br/>detected"]
+  Q -->|"output follows<br/>the audio"| G["Score reflects<br/>the task"]

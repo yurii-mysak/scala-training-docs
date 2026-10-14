@@ -126,8 +126,11 @@ passages (fresh); the next-rung title (core); and these instructions verbatim:
 > (3) a figure from a primary source you cite — `python3 dojo/engine/fetch_figure.py <raw GitHub
 > URL> <id> --k N --credit … --license … --page … --caption …` when openly licensed and reachable
 > (check the licence on the repo), otherwise replicate it as Mermaid/chart captioned "Adapted from
-> <source>, <URL>". Caption every image `*Figure N: … Source: …*`. Open each PNG with Read to check
-> it before you finish. Follow `dojo/SPEC.md` §4: sections in order — Why this matters
+> <source>, <URL>". Caption every image AND every Mermaid diagram `*Figure N: … Source: …*`. Legibility:
+> the reader sees ~680 px; use `flowchart TD` when a row would hold more than four nodes; `log_x`/`log_y`
+> when values span >2 orders of magnitude; every charted number must also appear in printed output with
+> the command that produced it. Claim a licence only for what the licence file covers. Open each PNG
+> with Read to check it before you finish. Follow `dojo/SPEC.md` §4: sections in order — Why this matters
 > (3 lines) · [Primer, fresh lessons above the reader's level] · The idea (600–1200 words, one or
 > two ```mermaid diagrams: `flowchart LR|TD` or `sequenceDiagram`; quote any label containing
 > parentheses, colons or slashes in double quotes; no HTML inside labels) · Worked example or Lab
@@ -171,10 +174,12 @@ source until it renders (the error text names the line).
 Using the versions from step 1 (re-`list` if you wrote anything since):
 0. Images first. The Dojo cannot load images from the repo, so lesson charts and figures are
    uploaded as Dojo assets: `python3 dojo/engine/sync_db.py missing-assets <id1> <id2>` lists the
-   PNG/JPEG files not uploaded yet. If any, call `Artifact` with `url` = the dashboard URL,
-   `asset: true`, `file_paths` = that list (≤25 per call); add each returned `"<file name>":
-   "/_blob/<id>"` to `dojo/progress/assets.json`; then rerun `python3 dojo/engine/sync_db.py all`
-   so the lesson documents point at the uploaded URLs. Never embed images as base64 in documents
+   PNG/JPEG files not uploaded yet or changed since upload. If any, call `Artifact` with `url` =
+   the dashboard URL, `asset: true`, `file_paths` = that list (≤25 per call); then record them:
+   `python3 dojo/engine/sync_db.py record-assets <file name>=/_blob/<id> …` (it stores the URL and
+   the file's sha256 in `dojo/progress/assets.json` and prints any old URLs it replaced — delete
+   each of those with `Artifact` action `delete`, `url` = the dashboard, `path` = the old id);
+   then rerun `python3 dojo/engine/sync_db.py all` so the lesson documents point at the URLs. Never embed images as base64 in documents
    (a document is capped at 256 KiB).
 1. For every file in `dojo/out/db/lessons/*.json`: `set` collection `lessons`, `doc_id` = id,
    `file_path` = that file, `if_version` when the document already exists. Use `batch` (≤50 writes).

@@ -54,7 +54,7 @@ That works until N changes. Add one server and almost every key moves: with N = 
 In memory the "ring" is a **sorted array of points**, each point a pair (32-bit hash, server). A lookup hashes the key, binary-searches for the first point whose hash is ≥ the key's hash, and returns that point's server; past the last point it wraps to index 0, which turns the line into a circle. Cloudflare draws the same structure as a number line and walks left instead of right; the direction does not matter as long as every machine uses the same one.
 
 ```mermaid
-flowchart LR
+flowchart TD
   K["key = request URL<br/>url-0"] --> H["MurmurHash3, unsigned 32-bit<br/>2,802,085,669"]
   H --> B["binary search in the<br/>sorted array of ring points"]
   B --> P["first point with hash >= key hash<br/>(past the end: wrap to index 0)"]
@@ -69,7 +69,7 @@ flowchart LR
 Put 100 servers on the ring with one point each and you have cut the circle at 100 random places. A point owns the arc that ends at it (from the previous point up to itself), so a server's share of keys equals its arc's width. The *expected* width is 1/100 of the ring; the actual widths differ wildly, because random points clump instead of spacing out. Figure 2 is the first stretch of the real ring from the Lab.
 
 ```mermaid
-flowchart LR
+flowchart TD
   P99["point 99 (last on the ring)"] -->|"arc 1.433%"| P0["point 0<br/>hash 34,502,164<br/>server 37"]
   P0 -->|"arc 0.041%"| P1["point 1<br/>hash 36,260,077<br/>server 89"]
   P1 -->|"arc 0.210%"| P2["point 2<br/>hash 45,268,616<br/>server 69"]
@@ -119,17 +119,17 @@ The same ring, rebuilt with k points per server, against that formula:
 
 ```scala
 // file: VirtualNodes.scala
-import scala.util.hashing.MurmurHash3.stringHash
-def h(s: String): Long = stringHash(s) & 0xFFFFFFFFL
-def cv(k: Int): Double =                                       // 100 servers, k points each
-  val ring = (for s <- 0 until 100; p <- 0 until k yield (h(s"server-$s#$p"), s)).sortBy(_._1)
-  val pos  = ring.map(_._1)
-  val load = (0 until 1_000_000).groupMapReduce(i => ring(pos.search(h(s"url-$i")).insertionPoint % ring.size)._2)(_ => 1)(_ + _)
-  math.sqrt((0 until 100).map(s => math.pow(load.getOrElse(s, 0) - 10000.0, 2)).sum / 100) / 100
+def h(s: String): Long = scala.util.hashing.MurmurHash3.stringHash(s) & 0xFFFFFFFFL
+def cv(k: Int): Double =                                    // 100 servers, k points each
+  val ring = (0 until 100).flatMap(s => (0 until k).map(p => (h(s"server-$s#$p"), s))).sortBy(_._1)
+  val pos = ring.map(_._1)
+  def owner(key: String) = ring(pos.search(h(key)).insertionPoint % ring.size)._2
+  val load = (0 until 1_000_000).groupMapReduce(i => owner(s"url-$i"))(_ => 1)(_ + _)
+  math.sqrt((0 until 100).map(s => math.pow(load.getOrElse(s, 0) - 1e4, 2)).sum / 100) / 100
+def formula(k: Int) = 100 * math.sqrt(99.0 / (100 * k + 1))  // Cloudflare's CV_k, N = 100
 @main def virtualNodes(): Unit =
   for k <- Seq(1, 4, 16, 40, 160, 640) do
-    val formula = 100 * math.sqrt(99.0 / (100 * k + 1))       // Cloudflare's CV_k, N = 100
-    println(f"k=$k%3d points/server   measured CV=${cv(k)}%5.1f%%   formula=$formula%5.1f%%")
+    println(f"k=$k%3d points/server   measured CV=${cv(k)}%5.1f%%   formula=${formula(k)}%5.1f%%")
 ```
 
 ```text
@@ -167,16 +167,16 @@ The ring is a sorted array held in memory on every server: memory = servers × p
 
 ```rust
 // file: main.rs
-use std::mem::{align_of as al, size_of as sz};
-#[allow(dead_code)] struct Wide { hash: u32, server: u32 }   // the original 8-byte entry
-#[allow(dead_code)] struct Narrow { hash: u32, server: u16 } // index shrunk to 16 bits
-struct Packed([u8; 6]);                                       // raw bytes, read via getters
-impl Packed { fn hash(&self) -> u32 { u32::from_le_bytes(self.0[..4].try_into().unwrap()) } }
-impl Packed { fn server(&self) -> u16 { u16::from_le_bytes([self.0[4], self.0[5]]) } }
+struct Wide { _hash: u32, _server: u32 }       // the original 8-byte entry
+struct Narrow { _hash: u32, _server: u16 }     // index shrunk to 16 bits
+struct Packed([u8; 6]);                        // raw bytes, read back field by field
 fn main() {
-    println!("Wide   u32+u32 : size {} align {}\nNarrow u32+u16 : size {} align {}\nPacked [u8; 6] : size {} align {}", sz::<Wide>(), al::<Wide>(), sz::<Narrow>(), al::<Narrow>(), sz::<Packed>(), al::<Packed>());
-    let p = Packed([0x14, 0x76, 0x0E, 0x02, 37, 0]);        // ring point 0 from Figure 2
-    println!("Packed getters : hash {} server {}", p.hash(), p.server());
+    println!("Wide   u32+u32 : size {} align {}", size_of::<Wide>(), align_of::<Wide>());
+    println!("Narrow u32+u16 : size {} align {}", size_of::<Narrow>(), align_of::<Narrow>());
+    println!("Packed [u8; 6] : size {} align {}", size_of::<Packed>(), align_of::<Packed>());
+    let p = Packed([0x14, 0x76, 0x0E, 0x02, 37, 0]);    // ring point 0 from Figure 2
+    let hash = u32::from_le_bytes(p.0[..4].try_into().unwrap());
+    println!("Packed read    : hash {} server {}", hash, u16::from_le_bytes([p.0[4], p.0[5]]));
 }
 ```
 
@@ -184,10 +184,10 @@ fn main() {
 Wide   u32+u32 : size 8 align 4
 Narrow u32+u16 : size 8 align 4
 Packed [u8; 6] : size 6 align 1
-Packed getters : hash 34502164 server 37
+Packed read    : hash 34502164 server 37
 ```
 
-The middle line is the trap: the narrower field saves nothing, because alignment 4 rounds 6 up to 8. Only the byte array reaches 6 bytes, and its getters recover the same point. "This simple (if wordy) change reduces the amount of memory used for consistent hashing by a whopping 25%!" (Cloudflare, 18 September 2026): 1 − 6/8 = 0.25.
+The middle line is the trap: the narrower field saves nothing, because alignment 4 rounds 6 up to 8. Only the byte array reaches 6 bytes, and reading its bytes back (what Cloudflare's getters do) recovers the same point. "This simple (if wordy) change reduces the amount of memory used for consistent hashing by a whopping 25%!" (Cloudflare, 18 September 2026): 1 − 6/8 = 0.25.
 
 **The rollout.** Changing the ring changes which server owns which URL:
 
@@ -198,23 +198,23 @@ How much is "almost all"? Count the keys that change owner under three changes:
 
 ```scala
 // file: Moves.scala
-import scala.util.hashing.MurmurHash3.stringHash
-def h(s: String): Long = stringHash(s) & 0xFFFFFFFFL
-def ring(n: Int, k: Int): String => Int =                     // owner function of a ring
-  val r = (for s <- 0 until n; p <- 0 until k yield (h(s"server-$s#$p"), s)).sortBy(_._1); val pos = r.map(_._1)
-  key => r(pos.search(h(key)).insertionPoint % r.size)._2
+def h(s: String): Long = scala.util.hashing.MurmurHash3.stringHash(s) & 0xFFFFFFFFL
+def modN(n: Int): Int => Int = i => (h(s"url-$i") % n).toInt  // owner of key url-i, mod N
+def ring(n: Int, k: Int): Int => Int =                        // owner of key url-i, ring
+  val r = (0 until n).flatMap(s => (0 until k).map(p => (h(s"server-$s#$p"), s))).sortBy(_._1)
+  val pos = r.map(_._1)
+  i => r(pos.search(h(s"url-$i")).insertionPoint % r.size)._2
+def moved(a: Int => Int, b: Int => Int) = (0 until 100_000).count(i => a(i) != b(i)) / 1e3  // %
 @main def moves(): Unit =
-  val keys = (0 until 100_000).map(i => s"url-$i")
-  def moved(a: String => Int, b: String => Int) = 100.0 * keys.count(k => a(k) != b(k)) / keys.size
-  println(f"hash mod N, 100 -> 101 servers : ${moved(k => (h(k) % 100).toInt, k => (h(k) % 101).toInt)}%5.1f%% of keys change server")
-  println(f"ring, add a 101st server       : ${moved(ring(100, 160), ring(101, 160))}%5.1f%% of keys change server")
-  println(f"ring, retune 160 -> 16 points  : ${moved(ring(100, 160), ring(100, 16))}%5.1f%% of keys change server")
+  println(f"hash mod N, 100 -> 101 servers : ${moved(modN(100), modN(101))}%5.1f%% moved")
+  println(f"ring, add a 101st server       : ${moved(ring(100, 160), ring(101, 160))}%5.1f%% moved")
+  println(f"ring, retune 160 -> 16 points  : ${moved(ring(100, 160), ring(100, 16))}%5.1f%% moved")
 ```
 
 ```text
-hash mod N, 100 -> 101 servers :  99.0% of keys change server
-ring, add a 101st server       :   0.8% of keys change server
-ring, retune 160 -> 16 points  :  89.2% of keys change server
+hash mod N, 100 -> 101 servers :  99.0% moved
+ring, add a 101st server       :   0.8% moved
+ring, retune 160 -> 16 points  :  89.2% moved
 ```
 
 Lines one and two are the case for consistent hashing: adding a server moves 0.8% of keys (near the newcomer's fair share, 1/101) instead of 99.0%. Line three is Cloudflare's problem: retuning the point count moves 89.2% of URLs. About 10% survive because points `#0`–`#15` exist in both rings.

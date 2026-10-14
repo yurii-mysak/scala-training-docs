@@ -17,7 +17,8 @@ Spec:
   "matrix": [[1, 2], [3, 4]], "row_labels": [...], "col_labels": [...],   # heatmap
   "annotate": [{"x": 3, "y": 6.1, "text": "overfitting starts"}],
   "hline": {"y": 0.5, "label": "threshold"},
-  "log_y": false
+  "log_y": false, "log_x": false,               # log axes get plain tick labels (1, 2, 5, 10, 20 …)
+  "value_names": {"0": "rejected", "1": "accepted"}   # heatmap with ≤4 discrete values: legend instead of colour bar
 }
 
 Usage: python3 dojo/engine/chart.py <spec.json> [-o out.png]   (default: same name, .png)
@@ -94,7 +95,14 @@ def render(spec: dict, out: Path) -> Path:
             for c, v in enumerate(row):
                 ax.text(c, r, spec.get("value_fmt", "{:g}").format(v), ha="center", va="center", fontsize=9,
                         color="white" if v > vmax * 0.6 else INK)
-        fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+        values = sorted({v for row in m for v in row})
+        if len(values) <= 4 and spec.get("value_names"):        # categorical cells: a key, not a colour bar
+            from matplotlib.patches import Patch
+            names = spec["value_names"]
+            ax.legend(handles=[Patch(color=im.cmap(im.norm(v)), label=names.get(str(v), str(v))) for v in values],
+                      frameon=False, fontsize=9, loc="upper left", bbox_to_anchor=(1.01, 1))
+        else:
+            fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
     else:
         raise common.DojoError(f"unknown chart type {kind!r}")
 
@@ -107,8 +115,16 @@ def render(spec: dict, out: Path) -> Path:
     for a in spec.get("annotate") or []:
         ax.annotate(a["text"], xy=(a["x"], a["y"]), xytext=(a.get("dx", 20), a.get("dy", 20)), textcoords="offset points",
                     fontsize=9, color=INK, arrowprops={"arrowstyle": "->", "color": MUTED, "linewidth": 1})
+    from matplotlib.ticker import FuncFormatter, LogLocator
+    plain = FuncFormatter(lambda v, _: f"{v:g}")
     if spec.get("log_y"):
         ax.set_yscale("log")
+        ax.yaxis.set_major_locator(LogLocator(base=10, subs=(1, 2, 5)))
+        ax.yaxis.set_major_formatter(plain)
+    if spec.get("log_x"):
+        ax.set_xscale("log")
+        ax.xaxis.set_major_locator(LogLocator(base=10, subs=(1, 2, 5)))
+        ax.xaxis.set_major_formatter(plain)
     ax.set_title(spec.get("title", ""), fontsize=11, color=INK, loc="left", pad=10, fontweight="bold")
     ax.set_xlabel(spec.get("x_label", ""), fontsize=9, color=MUTED)
     ax.set_ylabel(spec.get("y_label", ""), fontsize=9, color=MUTED)

@@ -70,23 +70,46 @@ def lesson_day(fm: dict, lessons: list[dict]) -> int | None:
 _IMG = re.compile(r"!\[([^\]]*)\]\((assets/[^)\s]+\.(?:png|jpe?g|gif|webp))\)")
 
 
-def asset_map() -> dict[str, str]:
-    """dojo/progress/assets.json: image file name -> Dojo asset URL (/_blob/<id>), written by the job
-    after it uploads new images with the Artifact tool (publish, asset: true)."""
+def asset_map() -> dict[str, dict]:
+    """dojo/progress/assets.json: image file name -> {"url": "/_blob/<id>", "sha256": …}, written by
+    the job after it uploads images with the Artifact tool (publish, asset: true). Old entries that
+    are plain URL strings are read as {"url": …} with no hash (treated as stale)."""
     p = common.dojo_dir() / "progress" / "assets.json"
-    return json.loads(p.read_text()) if p.exists() else {}
+    raw = json.loads(p.read_text()) if p.exists() else {}
+    return {k: (v if isinstance(v, dict) else {"url": v}) for k, v in raw.items()}
+
+
+def _sha(path: Path) -> str:
+    import hashlib
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def missing_assets(md_list: list[str]) -> list[str]:
-    """Lesson images not yet uploaded to the Dojo (paths under dojo/lessons/assets/)."""
+    """Lesson images not uploaded yet, or changed since they were uploaded (sha256 differs)."""
     known = asset_map()
-    out = []
+    out: list[str] = []
     for md in md_list:
         for _, ref in _IMG.findall(md):
-            name = Path(ref).name
-            if name not in known and (common.assets_dir() / name).exists() and name not in [Path(x).name for x in out]:
-                out.append(str(common.assets_dir() / name))
+            f = common.assets_dir() / Path(ref).name
+            entry = known.get(f.name)
+            if f.exists() and (entry is None or entry.get("sha256") != _sha(f)) and str(f) not in out:
+                out.append(str(f))
     return out
+
+
+def record_assets(pairs: dict[str, str]) -> dict:
+    """Store uploaded URLs (file name or path -> /_blob/<id>) with the file's current sha256."""
+    p = common.dojo_dir() / "progress" / "assets.json"
+    known = asset_map()
+    replaced = {}
+    for name, url in pairs.items():
+        f = common.assets_dir() / Path(name).name
+        old = known.get(f.name, {}).get("url")
+        if old and old != url:
+            replaced[f.name] = old
+        known[f.name] = {"url": url, "sha256": _sha(f) if f.exists() else None}
+    p.write_text(json.dumps(dict(sorted(known.items())), indent=2) + "\n")
+    return {"recorded": len(pairs), "replaced_old_urls": replaced}
 
 
 def inline_images(md: str) -> str:
@@ -94,7 +117,7 @@ def inline_images(md: str) -> str:
     external images, and documents are capped at 256 KiB, so images are never embedded; an image
     that has not been uploaded yet keeps its repo path (it shows as alt text until it is)."""
     known = asset_map()
-    return _IMG.sub(lambda m: f"![{m.group(1)}]({known[Path(m.group(2)).name]})"
+    return _IMG.sub(lambda m: f"![{m.group(1)}]({known[Path(m.group(2)).name]['url']})"
                     if Path(m.group(2)).name in known else m.group(0), md)
 
 
@@ -233,6 +256,8 @@ def main(argv: list[str] | None = None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     ma = sub.add_parser("missing-assets", help="list lesson images not yet uploaded to the Dojo (absolute paths, JSON)")
     ma.add_argument("ids", nargs="*")
+    ra = sub.add_parser("record-assets", help="record uploaded asset URLs: NAME=/_blob/ID … (prints old URLs that were replaced)")
+    ra.add_argument("pairs", nargs="+")
     p = sub.add_parser("export", help="lessons/<id>.json for the given lesson ids")
     p.add_argument("ids", nargs="*", metavar="LESSON_ID")
     p.add_argument("--all", action="store_true", help="export every lesson")
@@ -241,6 +266,9 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("all", help="every lesson, every track and meta")
     args = ap.parse_args(argv)
 
+    if args.cmd == "record-assets":
+        print(common.dumps(record_assets(dict(x.split("=", 1) for x in args.pairs))))
+        return 0
     if args.cmd == "missing-assets":
         mds = [p.read_text(encoding="utf-8") for p in sorted(common.lessons_dir().glob("*.md"))
                if not args.ids or any(p.name.startswith(i) for i in args.ids)]

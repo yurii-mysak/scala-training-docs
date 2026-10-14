@@ -1,9 +1,9 @@
-flowchart LR
-  A["Audio clip"] --> B{"Recognises the dataset's acoustic cue?"}
-  B -- "no" --> C["Transcribe what the signal says"]
-  B -- "yes" --> D["Emit the stored reference convention"]
-  C --> E["Scored against the reference file"]
+flowchart TD
+  A["Audio clip"] --> B{"Recognises the dataset's<br/>acoustic cue?"}
+  B -- "no" --> C["Transcribe what<br/>the signal says"]
+  B -- "yes" --> D["Emit the stored<br/>reference convention"]
+  C --> G["On new audio:<br/>honest WER"]
+  C --> E["Scored against the<br/>benchmark's reference file"]
   D --> E
+  D --> H["On new audio: errors reappear<br/>(wrong words, invented<br/>numbers, wrong spelling)"]
   E --> F["Low published WER"]
-  C --> G["Honest WER on new audio"]
-  D --> H["Errors reappear: wrong words, invented numbers, wrong spelling"]

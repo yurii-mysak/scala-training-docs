@@ -122,7 +122,7 @@ sources:
 
 ## Why this matters
 ## The idea
-(600–1200 words. 1–4 ```mermaid blocks plus charts/figures per the Visual rule; ≥2 short
+(600–1500 words. 1–4 ```mermaid blocks plus charts/figures per the Visual rule; ≥2 short
 example → output pairs per the Show-by-example rule. Subheadings allowed.)
 ## Worked example
 (or "## Lab" — 5–10 minutes, concrete, copy-pasteable)
@@ -198,7 +198,8 @@ or Node, and a program with a `main` that lacks the `// file:` marker.
 Every key idea in `## The idea` is shown, not only told: explanation → a **short** example →
 its output → one or two sentences on what the output shows. At least two such examples per
 lesson, each next to the paragraph it illustrates.
-- Code examples are Scala or Rust (Language rule), **at most 12 lines**, followed immediately by
+- Code examples are Scala or Rust (Language rule), **at most 12 lines of at most 100
+  characters each, one statement per line**, followed immediately by
   a ```text block with the real output (run them: a `// file:` program via `run_lab.py`, or a
   fragment pasted into the lab program). Short beats complete: show the one call that matters.
 - Tracks without code (Claude Academy) use prompt → response or before → after pairs as
@@ -222,8 +223,16 @@ At least **three visuals** per lesson, each placed next to the text it explains:
    Mermaid or a chart and caption it "Adapted from <source>, <URL>". Well-known figures are
    preferred (CS231n network diagrams, DDIA-style replication timelines, RFC packet diagrams,
    the book's own example drawn out).
-Every image has a caption line directly under it: `*Figure N: what it shows. Source: … (licence)*`
-or `*Figure N: … Generated from the lab output.*`. A lesson may have up to four Mermaid blocks.
+Every visual — image or Mermaid diagram — has a caption line directly under it:
+`*Figure N: what it shows. Source: … (licence)*` or `*Figure N: … Generated from the lab output.*`.
+A lesson may have up to four Mermaid blocks.
+Legibility: lessons are read at ~680 px wide (Dojo, phone). Mermaid diagrams with more than four
+nodes in a row use `flowchart TD` (top-down) or are split; a rendered diagram may not be more than
+4× wider than tall. Charts with values spanning more than two orders of magnitude use `log_x` /
+`log_y`. Every number a chart shows is printed somewhere in the lesson (example output or lab
+output) with the command that produced it, so the reader can reproduce it.
+Licences: claim a licence only for what the licence file actually covers (a code licence does not
+cover a site's artwork); when unsure, replicate and caption "Adapted from".
 `engine/check_lesson.py` enforces: ≥3 visuals, ≥1 image, a caption under every image, a JSON
 spec beside every chart, ≥2 example → output pairs in `The idea`, example code ≤12 lines.
 

@@ -47,21 +47,24 @@ The claim is stated in the article's own first paragraphs:
 
 That sentence is hard to act on as written: a low WER is consistent both with "this model transcribes well" and with "this model has learned this test". The contribution of the work — published as the paper *Towards Quantifying Benchmark Optimization in ASR Models* (arXiv:2608.19936), submitted 2026-08-20 — is a way to separate those two explanations. The trick is to build cases where **the audio does not fully determine the transcript**. If the audio alone cannot tell you what to write, and the model nevertheless writes exactly what the benchmark file says, the information came from somewhere other than the audio.
 
-Here is the whole loop in one picture: two routes by which a public test leaks into a model, and the point where a probe cuts in.
+The whole loop in one picture:
 
 ```mermaid
-flowchart LR
-  B["Public benchmark: audio + reference file"] -->|"route 1: crawled into training data"| T["Training"]
-  B -->|"route 2: keep the checkpoint with the best score"| S["Model selection"]
+flowchart TD
+  B["Public benchmark:<br/>audio + reference file"]
+  B -->|"route 1: crawled<br/>into training data"| T["Training"]
+  B -->|"route 2: keep the checkpoint<br/>with the best score"| S["Model selection"]
   T --> M["Released model"]
   S --> M
-  M --> P["Leaderboard: low WER"]
-  M --> Q["Probe: file and audio disagree"]
-  Q -->|"output follows the file"| F["Benchmark fitting detected"]
-  Q -->|"output follows the audio"| G["Score reflects the task"]
+  M --> P["Leaderboard:<br/>low WER"]
+  M --> Q["Probe: file and<br/>audio disagree"]
+  Q -->|"output follows<br/>the file"| F["Benchmark fitting<br/>detected"]
+  Q -->|"output follows<br/>the audio"| G["Score reflects<br/>the task"]
 ```
 
-The left half is how the benchmark gets in; the right half is the method. Build an input where the reference file and the audio say different things, and watch which one the model follows. Three probes follow from that one move.
+*Figure 1: Two leak routes (top) and the probe that separates them (bottom). Adapted from Hugging Face, https://huggingface.co/blog/asr-benchmark-optimization*
+
+Three probes follow from that one move.
 
 ### Probe 1 — make the reference disagree with the audio
 
@@ -91,7 +94,7 @@ listened (market): WER 0.167
 copied   (marked): WER 0.000
 ```
 
-The model that heard the speaker correctly is charged one error in six words (1 / 6 = 0.167); the model that reproduced the typo is charged nothing. WER cannot tell "transcribed well" from "remembered the file" — which is why every probe has to build a case where the two come apart.
+The model that heard the speaker correctly is charged one error in six words (1 / 6 = 0.167); the model that reproduced the typo is charged nothing. WER cannot tell "transcribed well" from "remembered the file".
 
 ### Probe 2 — remove the words from the audio
 
@@ -113,7 +116,8 @@ Route 1 — benchmark text in the training corpus — has an obvious textual che
 // file: Overlap.scala
 def grams(s: String, n: Int): Set[String] = s.split(" ").sliding(n).map(_.mkString(" ")).toSet
 def overlap(item: String, doc: String, n: Int = 4): Double =
-  val g = grams(item, n); (g & grams(doc, n)).size.toDouble / g.size
+  val g = grams(item, n)
+  (g & grams(doc, n)).size.toDouble / g.size
 
 @main def overlapCheck(): Unit =
   val item = "the budget rose by seven percent last year" // a benchmark reference
@@ -128,26 +132,28 @@ crawled page : 1.00 of the item's 4-grams found
 paraphrase   : 0.00 of the item's 4-grams found
 ```
 
-The page quoting the transcript is caught (all five 4-grams found); a paraphrase scores 0.00. Route 2 leaves no text in the training data at all, so an overlap check passes a model fitted to the test purely by selection. That is why the study probes *behaviour* instead of searching corpora. Second, the behaviour is **conditional**: it switches on when the model recognises the dataset. The authors report that mechanistic probes point to narrow acoustic cues overriding faithful transcription, and that the behaviour can be causally influenced by low-rank linear steering and in some cases by appending audio to the end of a segment (arXiv:2608.19936, submitted 2026-08-20). A behaviour you can steer with a low-rank direction is an internal switch, not a diffuse memory.
+The page quoting the transcript is caught (all five 4-grams found); a paraphrase scores 0.00. Route 2 leaves no text in the training data at all, so an overlap check passes a model fitted to the test purely by selection. That is why the study probes *behaviour* instead of searching corpora. Second, the behaviour is **conditional**: it switches on when the model recognises the dataset. The authors report that mechanistic probes point to narrow acoustic cues overriding faithful transcription, and that the behaviour can be causally influenced by low-rank linear steering and in some cases by appending audio to a segment (arXiv:2608.19936, submitted 2026-08-20). A **mechanistic probe** is a controlled experiment that tests *how* a model reaches its output — which input cue or internal signal drives it — not just whether it is right. **Low-rank linear steering** adds one fixed direction, confined to a few dimensions, to the model's internal activations as it runs, turning one behaviour up or down. A behaviour you can steer with a low-rank direction is an internal switch, not a diffuse memory.
 
 ```mermaid
-flowchart LR
-  A["Audio clip"] --> B{"Recognises the dataset's acoustic cue?"}
-  B -- "no" --> C["Transcribe what the signal says"]
-  B -- "yes" --> D["Emit the stored reference convention"]
-  C --> E["Scored against the reference file"]
+flowchart TD
+  A["Audio clip"] --> B{"Recognises the dataset's<br/>acoustic cue?"}
+  B -- "no" --> C["Transcribe what<br/>the signal says"]
+  B -- "yes" --> D["Emit the stored<br/>reference convention"]
+  C --> G["On new audio:<br/>honest WER"]
+  C --> E["Scored against the<br/>benchmark's reference file"]
   D --> E
+  D --> H["On new audio: errors reappear<br/>(wrong words, invented<br/>numbers, wrong spelling)"]
   E --> F["Low published WER"]
-  C --> G["Honest WER on new audio"]
-  D --> H["Errors reappear: wrong words, invented numbers, wrong spelling"]
 ```
+
+*Figure 2: The cue decides whether the model transcribes or recites. Adapted from arXiv:2608.19936, https://arxiv.org/abs/2608.19936*
 
 The article's cleanest demonstration is a VoxPopuli clip where the speaker audibly says "thank you" but the reference omits it. Eleven models heard four versions of the sentence — the real clip, a clone of the same speaker, a clone of a parliament speaker recorded after every model's training cutoff, and a generic text-to-speech voice. Models that dropped the courtesy (wrote the file, not the speech): 6 of 11, 5 of 11, 1 of 11, and none, since "all eleven models restore the courtesy" in the generic voice (Hugging Face, *Measuring benchmark optimization in speech recognition*, 2026-08-21).
 
 ![Bar chart: models out of 11 that drop "thank you" — real clip 6, same-speaker clone 5, fresh-speaker clone 1, generic TTS voice 0](assets/2026-10-14-2-chart-1.png)
-*Figure 1: The closer the voice is to the benchmark's own recording, the more models reproduce the reference's omission. Adapted from Hugging Face, Measuring benchmark optimization in speech recognition, https://huggingface.co/blog/asr-benchmark-optimization (row "Drops the courtesy (❌) out of 11"; generic-voice bar from the text).*
+*Figure 3: The closer the voice is to the benchmark's own recording, the more models reproduce the reference's omission. Adapted from Hugging Face, https://huggingface.co/blog/asr-benchmark-optimization (row "Drops the courtesy (❌) out of 11"; generic-voice bar from the text).*
 
-Only the voice changes across the bars; a model transcribing from the signal alone would treat them identically. This is the switch in the diagram above, measured.
+Only the voice changes across the bars: this is the switch of Figure 2, measured.
 
 ### What to do instead
 
@@ -175,9 +181,9 @@ memoriser  seen 4/4  perturbed 0/4
 solver     seen 2/4  perturbed 2/4
 ```
 
-The memoriser's 4/4 collapses to 0/4: it had an answer key, not addition. The flawed but honest solver scores 2/4 both times, because its bug (dropping the carry on 8 + 34 and 23 + 19) belongs to the task, not the items. A score that holds under perturbation looks like skill; a cliff looks like a leaked test — the public-versus-fresh contrast of Probe 2.
+The memoriser's 4/4 collapses to 0/4: it had an answer key, not addition. The flawed but honest solver scores 2/4 both times, because its bug (dropping the carry on 8 + 34 and 23 + 19) belongs to the task, not the items. A score that holds under perturbation looks like skill; a cliff looks like a leaked test.
 
-The advice for anyone *building* a benchmark is structural: benchmark developers should "avoid simple independent and identically distributed test splits." (Hugging Face, *Measuring benchmark optimization in speech recognition*, 2026-08-21, https://huggingface.co/blog/asr-benchmark-optimization) — in favour of temporal, speaker, or other metadata-based separation (same article, 2026-08-21). An **i.i.d. split** shuffles all rows and deals them randomly into train and test, as if each row were an independent draw. It is the default because it is one line of code, and it is wrong whenever rows share structure — the same speaker, session or week: that speaker lands on both sides, so the test measures "have you heard this voice" as much as "can you transcribe". Split by speaker or by date and the shortcut is gone.
+The advice for anyone *building* a benchmark is structural: benchmark developers should "avoid simple independent and identically distributed test splits." (Hugging Face, *Measuring benchmark optimization in speech recognition*, 2026-08-21, https://huggingface.co/blog/asr-benchmark-optimization) — in favour of temporal, speaker, or other metadata-based separation (same article, 2026-08-21). An **i.i.d. split** shuffles all rows and deals them randomly into train and test, as if each row were an independent draw. It is the default because it is one line of code, and it is wrong whenever rows share structure — the same speaker, session or week: that speaker lands on both sides, so the test measures "have you heard this voice" as much as "can you transcribe".
 
 ```mermaid
 flowchart TD
@@ -188,6 +194,8 @@ flowchart TD
   C --> C1["Nothing in the test set shares its source with training"]
   C1 --> C2["Score tracks the task you actually care about"]
 ```
+
+*Figure 4: i.i.d. versus structured splits. Adapted from Hugging Face, https://huggingface.co/blog/asr-benchmark-optimization*
 
 Concretely, a "Benchmark fitting" tab was added to the Open ASR Leaderboard, and the scripts and un-normalised model outputs were published (Hugging Face, *Measuring benchmark optimization in speech recognition*, 2026-08-21). The authors also ask for transparency about training data and model selection (same article) — without it, the two explanations cannot be told apart from outside.
 
@@ -404,14 +412,14 @@ The aggregate block, where the ranking flips:
 Trace the middle row. Over the four held-out clips the references total 6 + 6 + 7 + 5 = 24 words. The faithful model makes its one genuine mishearing on `fr-01` and nothing else: 1 edit, WER = 1 / 24 = 0.04166… which prints as 0.0417. The memoriser makes the same mishearing on `fr-01`, then inserts `seven` on `fr-03` and writes `mr.` on `fr-04`: 1 + 1 + 1 = 3 edits, WER = 3 / 24 = 0.125 = 0.1250. Exactly three times worse, from habits that cost it nothing on the benchmark. The third row is the same arithmetic applied to the benchmark audio scored against what the speakers actually said rather than against the shipped transcript; it reproduces the held-out ranking (0.0417 against 0.1250), which tells you the held-out set was not unlucky — the benchmark's reference file was the thing hiding the difference.
 
 ![Grouped bar chart of aggregate WER: faithful 0.160, 0.042, 0.042; memoriser 0.000, 0.125, 0.125](assets/2026-10-14-2-chart-2.png)
-*Figure 2: The memoriser wins only when scored against the benchmark's own file; against held-out audio, or against what the speakers really said, it is three times worse than the faithful model. Generated from the lab output.*
+*Figure 5: The memoriser wins only when scored against the benchmark's own file; against held-out audio, or against what the speakers really said, it is three times worse than the faithful model. Generated from the lab output.*
 
 **Verdict:** the ranking is a property of the scoring target, not of the models. One number, WER on a public benchmark, puts the memoriser first by an infinite margin; the same models on fresh audio put it last by 3×. Any decision made on the first number is wrong.
 
 ### Cause → consequence
 
 1. **Cause.** The benchmark is public: its audio, its reference file and its leaderboard are all downloadable, and teams iterate against it. The reference file is also imperfect, and for some clips the audio does not determine it — because an annotator erred, because a number is inaudible, or because two spellings sound identical.
-2. **Mechanism.** Training and repeated checkpoint selection reward any shortcut that reduces distance to that file. The cheapest available shortcut is to recognise the dataset from narrow acoustic cues and then emit the convention it expects; the study's mechanistic probes point at exactly that, and show the behaviour can be causally influenced by low-rank linear steering and in some cases by appending audio to a segment (arXiv:2608.19936, submitted 2026-08-20).
+2. **Mechanism.** Training and repeated checkpoint selection reward any shortcut that reduces distance to that file. The cheapest available shortcut is to recognise the dataset from narrow acoustic cues and then emit the convention it expects; the study's mechanistic probes (experiments on how the model reaches its output) point at exactly that, and show the behaviour can be causally influenced by low-rank linear steering and in some cases by appending audio to a segment (arXiv:2608.19936, submitted 2026-08-20).
 3. **Consequence.** The metric and the capability come apart, and they come apart *most* at the top of the table: models with the lowest WER reproduced erroneous references most often, 18–30% of the time for the affected models (Hugging Face, *Measuring benchmark optimization in speech recognition*, 2026-08-21). Picking the leaderboard winner can mean picking the most benchmark-fitted model in the field.
 4. **What it means in practice.** The pattern is not about speech. It is about every evaluation you own.
    - **Evaluating agents.** If your agent eval suite lives in the repo the agent can read, or its cases have been pasted into prompts while debugging, your pass rate is partly a lookup score. Keep a sealed set: written after the agent was built, never committed where the agent can reach it, run once per release.

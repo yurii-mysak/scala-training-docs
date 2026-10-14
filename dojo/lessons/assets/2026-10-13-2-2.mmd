@@ -1,5 +1,5 @@
-flowchart LR
-  L39["library built with 3.9 LTS"] --> A39["app on 3.9 LTS: reads it"]
-  L39 --> A310["app on 3.10 Next: reads it"]
-  L310["library built with 3.10 Next"] --> B310["app on 3.10 Next: reads it"]
-  L310 -.-> B39["app on 3.9 LTS: cannot read it"]
+flowchart TD
+  N33["3.3.0"] --> N38["3.4 … 3.8"] --> N39["3.9.0, 2026-09-03"]
+  N39 --> N310["3.10.0, 2026-10-12<br/>first 'Scala Next' release"] --> N311["3.11, ~ Mar/Apr 2027"]
+  N33 --> L33["3.3 LTS line<br/>(3.3.8, Jun 2026)"]
+  N39 --> L39["3.9 LTS line<br/>fixes only, at least 3 years"]

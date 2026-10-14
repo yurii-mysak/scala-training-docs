@@ -1,22 +1,78 @@
 {
-  "2026-10-11-2-chart-1.png": "/_blob/44237612cafa750669cf99b3b1d28c11",
-  "2026-10-11-2-chart-2.png": "/_blob/cf41189a105a5b9f09ffd13636c890de",
-  "2026-10-12-1-chart-1.png": "/_blob/9b45bdcb57dd17640b382097d929937e",
-  "2026-10-12-1-chart-2.png": "/_blob/545ab6fc60f1ba88330613829d82b839",
-  "2026-10-12-1-fig-1.png": "/_blob/b6eb5abf6a182e5413b9181987c06ee6",
-  "2026-10-12-1-fig-2.png": "/_blob/9bad0f57bd32d9c3d78394fc18ffc2fb",
-  "2026-10-12-2-chart-1.png": "/_blob/2c42766a8dff0ca3f047c86ed76a569d",
-  "2026-10-12-2-chart-2.png": "/_blob/91b25432a90cd87046b849bdb62c550b",
-  "2026-10-13-1-chart-1.png": "/_blob/5a6f6fd22027923681833e4da80daaba",
-  "2026-10-13-1-chart-2.png": "/_blob/d09f3ebaf1faa8a65a871b1829b7dee8",
-  "2026-10-13-1-fig-1.png": "/_blob/5aa7244875c435033e3ca65bde08626f",
-  "2026-10-13-2-chart-1.png": "/_blob/79013a91e1f08d1eb02a4c33b3459075",
-  "2026-10-13-2-fig-1.png": "/_blob/0e252151f2d01337b85058caa83acd3b",
-  "2026-10-14-1-chart-1.png": "/_blob/b72333ca127d9c5f70b653bd2812f481",
-  "2026-10-14-1-chart-2.png": "/_blob/0cab7f0900959558205e7da5de44814d",
-  "2026-10-14-1-chart-3.png": "/_blob/aa11706a8090f79a7052e6396f0dcd5f",
-  "2026-10-14-1-fig-1.png": "/_blob/bac3db1c1accc70f5d3ea48fe66646c4",
-  "2026-10-14-1-fig-2.png": "/_blob/6e050e959292e1e4422ce702790305c3",
-  "2026-10-14-2-chart-1.png": "/_blob/aad8260d91aba3ebea658b98ab30b4e4",
-  "2026-10-14-2-chart-2.png": "/_blob/0977c6a2bcb9d29eb9c6e2e6b9327302"
+  "2026-10-11-2-chart-1.png": {
+    "url": "/_blob/44237612cafa750669cf99b3b1d28c11",
+    "sha256": "fd747f92e69d9a789eb54a457e9e35ffd224a7ba791b5e7242c98f73a1ad52d9"
+  },
+  "2026-10-11-2-chart-2.png": {
+    "url": "/_blob/80013cfd6e1669f8dae740e51493f267",
+    "sha256": "62d90fe088192c738e6b8033f9950fa7ae3758c4653baf6829f30df0fd9abb6a"
+  },
+  "2026-10-12-1-chart-1.png": {
+    "url": "/_blob/9b45bdcb57dd17640b382097d929937e",
+    "sha256": "3cb88b65c6925434261faefe26cca12d850d2093fa19dffd67a33bc7eed1544f"
+  },
+  "2026-10-12-1-chart-2.png": {
+    "url": "/_blob/545ab6fc60f1ba88330613829d82b839",
+    "sha256": "26c023829dc63e3428b036644dcfa4083c90ee9c2cfcc4e1d04038054cf1cff9"
+  },
+  "2026-10-12-1-fig-1.png": {
+    "url": "/_blob/b6eb5abf6a182e5413b9181987c06ee6",
+    "sha256": "ebe5951d24744c43f8d8a1b9169656d71e1cc35d3668a478561c3017d76a13f4"
+  },
+  "2026-10-12-1-fig-2.png": {
+    "url": "/_blob/9bad0f57bd32d9c3d78394fc18ffc2fb",
+    "sha256": "f20667ca169b4c3cda4d2fdd00670ca0b03c80e623de74c89ea61f2bb2c34c18"
+  },
+  "2026-10-12-2-chart-1.png": {
+    "url": "/_blob/2c42766a8dff0ca3f047c86ed76a569d",
+    "sha256": "667b3265924154d12c976bfd1e16e8bbe28792240d4fcea5bd2734090ed86686"
+  },
+  "2026-10-12-2-chart-2.png": {
+    "url": "/_blob/4533ab8785eccceb0bcf815cd59378a6",
+    "sha256": "e558cfcb460c5688f89665b64014f12b7b5cc958b8f307e88bfddba876fa8340"
+  },
+  "2026-10-13-1-chart-1.png": {
+    "url": "/_blob/342a1ea1e59ccb66bfc28685a36bd906",
+    "sha256": "ed34ac138a60bc8698ab5f0561b31dc45e4ea9f04c70f1a20961bbbea866ee77"
+  },
+  "2026-10-13-1-chart-2.png": {
+    "url": "/_blob/68c68292c4abcda0e8abdf745e94400f",
+    "sha256": "29466c400994aeccbca3ae67946527c2181027e0d5a4189711f11d42d1ef62b2"
+  },
+  "2026-10-13-1-fig-1.png": {
+    "url": "/_blob/5aa7244875c435033e3ca65bde08626f",
+    "sha256": "2f75cb6491bdbc79f4bf9e6742d5287e603b7456eb71306a68449285710bb328"
+  },
+  "2026-10-13-2-chart-1.png": {
+    "url": "/_blob/3480c54c1b169791a39b316fd6c73a3a",
+    "sha256": "8a58e70e5514f7252f50a08314aa16430132edac5987c51e74622781366c8c4f"
+  },
+  "2026-10-14-1-chart-1.png": {
+    "url": "/_blob/b72333ca127d9c5f70b653bd2812f481",
+    "sha256": "d6dc72b1c46ded7d05e0589136433e00570d5fedde7ec7755af06127d2a93dc6"
+  },
+  "2026-10-14-1-chart-2.png": {
+    "url": "/_blob/0cab7f0900959558205e7da5de44814d",
+    "sha256": "81bacff2ead4abb56df7778c25009999a37847850baf6329cee609bb2ea4f4e8"
+  },
+  "2026-10-14-1-chart-3.png": {
+    "url": "/_blob/aa11706a8090f79a7052e6396f0dcd5f",
+    "sha256": "ad540315ab9794e204add9f3f51d71dbf81c68abadf5a13867bc7c4cd01b0a97"
+  },
+  "2026-10-14-1-fig-1.png": {
+    "url": "/_blob/bac3db1c1accc70f5d3ea48fe66646c4",
+    "sha256": "dd970f8235a3d8cd88abadf56bd698876221aa45fc379339001868e1821b70dd"
+  },
+  "2026-10-14-1-fig-2.png": {
+    "url": "/_blob/6e050e959292e1e4422ce702790305c3",
+    "sha256": "42dfc4f08549be5781458da25ef4ddc06b4bcfa9d93d64c0203db544be20afce"
+  },
+  "2026-10-14-2-chart-1.png": {
+    "url": "/_blob/aad8260d91aba3ebea658b98ab30b4e4",
+    "sha256": "506b86fd64b8284948ca9d4cd687c9c3fff10c477ab70eb605dbbaf2a8f7a7cc"
+  },
+  "2026-10-14-2-chart-2.png": {
+    "url": "/_blob/0977c6a2bcb9d29eb9c6e2e6b9327302",
+    "sha256": "ffe9cd195d09f90fbd61054bc45d01658f72a40c8b8eec08994694ac03dbd648"
+  }
 }

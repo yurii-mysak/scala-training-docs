@@ -32,5 +32,9 @@
   ],
   "cmap": "Greens",
   "value_fmt": "{:g}",
-  "_note": "1 = scalac exit 0 (compiles), 0 = exit 1 with a TASTy version error. Measured 2026-10-15 with the official scala3 release tarballs 3.3.4, 3.9.0, 3.10.0 on Money.scala / Report.scala from the lesson."
+  "_note": "1 = scalac exit 0 (compiles), 0 = exit 1 with a TASTy version error. Measured 2026-10-15 with the official scala3 release tarballs 3.3.4, 3.9.0, 3.10.0 on Money.scala / Report.scala from the lesson.",
+  "value_names": {
+    "0": "rejected: TASTy version error",
+    "1": "accepted: compiles"
+  }
 }

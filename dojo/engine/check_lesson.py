@@ -161,6 +161,21 @@ def check(path: Path, strict: bool = False) -> dict:
             errors.append(f"image {img} has no '*Figure N: …*' caption directly under it (SPEC §4 Visual rule)")
         if "-chart-" in img and not (path.parent / img).with_suffix(".json").exists():
             errors.append(f"chart {img} has no JSON spec beside it (SPEC §4 Visual rule)")
+    # Visual rule: captions under Mermaid diagrams too, and no ultra-wide rendered diagrams.
+    for mm in re.finditer(r"(?ms)^```mermaid[ \t]*\n.*?^```[ \t]*\n", body):
+        tail = body[mm.end():mm.end() + 400].lstrip("\n")
+        if not tail.startswith("*Figure"):
+            errors.append("a Mermaid diagram has no '*Figure N: …*' caption directly under it (SPEC §4 Visual rule)")
+            break
+    lid = str(fm.get("id") or "")
+    for png in sorted(path.parent.joinpath("assets").glob(f"{lid}-[0-9]*.png")) if lid else []:
+        try:
+            import struct
+            w, h = struct.unpack(">II", png.read_bytes()[16:24])
+            if h and w / h > 4:
+                errors.append(f"diagram {png.name} renders {w}×{h} (more than 4× wider than tall): unreadable at 680 px; use flowchart TD or split it (SPEC §4 Visual rule)")
+        except Exception:  # noqa: BLE001
+            pass
     # Show-by-example rule (SPEC §4): >=2 example -> output pairs in The idea, short code.
     idea_txt = section_text(body, "The idea")
     blocks = re.findall(r"(?ms)^```([A-Za-z0-9_+-]*)[ \t]*\n(.*?)^```", idea_txt)
@@ -170,6 +185,9 @@ def check(path: Path, strict: bool = False) -> dict:
     if pairs < 2:
         errors.append(f"'The idea' has {pairs} example → output pair(s); need ≥2 (SPEC §4 Show-by-example rule)")
     for l, code in blocks:
+        if l in ("scala", "rust") and any(len(x) > 100 for x in code.splitlines()):
+            errors.append("an example in 'The idea' has a line over 100 characters; one statement per line (SPEC §4 Show-by-example rule)")
+            break
         if l in ("scala", "rust") and len([x for x in code.splitlines() if x.strip()]) > 12:
             errors.append("an example in 'The idea' is longer than 12 lines; keep inline examples short, move the rest to the Lab (SPEC §4 Show-by-example rule)")
             break

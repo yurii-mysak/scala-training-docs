@@ -1,13 +1,14 @@
 flowchart TD
   A["Four properties (durable)"] --> B["Next-token prediction"]
   A --> C["Knowledge frozen in weights"]
-  A --> D["Working memory: bounded tokens"]
+  A --> D["Working memory: tokens it can hold and spend"]
   A --> E["Steerability: model + tools + loop"]
   B --> B1["2026 boundary: generated code is good enough to ship"]
   C --> C1["2026 boundary: 20.9GB file runs on a laptop"]
-  D --> D1["2026 boundary: 128,000 thinking tokens, then it stops"]
+  D --> D1["2026: 128,000-token output budget spent thinking, no answer"]
   E --> E1["2026 boundary: 7-hour autonomous runs, agent teams"]
   B1 --> F["Property unchanged"]
   C1 --> F
   D1 --> F
   E1 --> F
+  F ~~~ O["Outside the map: Fable 5 pulled and restored = supply chain, not the model"]

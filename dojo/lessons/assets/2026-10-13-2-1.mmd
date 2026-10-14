@@ -1,4 +1,6 @@
-flowchart LR
-  N33["3.3.0"] --> N38["3.4 … 3.8"] --> N39["3.9.0<br/>2026-09-03"] --> N310["3.10.0, 2026-10-12<br/>first 'Scala Next' release"] --> N311["3.11<br/>~ Mar/Apr 2027"]
-  N33 --> L33["3.3 LTS line<br/>(3.3.8, Jun 2026)"]
-  N39 --> L39["3.9 LTS line<br/>fixes only, at least 3 years"]
+flowchart TD
+  R30["3.0"] --> R31["3.1"] --> R32["3.2"] --> R33["3.3, late 2022"] --> R34["3.4"]
+  HERE(["we are here: Aug 2022"]) -.- R31
+  R34 --> RD1["…"] --> R3X["3.X"] --> RD2["… Scala Next continues"]
+  R33 --> L33["3.3 LTS: fixes only<br/>at least 2 years, then at least 1 year<br/>after the next LTS appears"]
+  R3X --> L3X["3.X LTS"]

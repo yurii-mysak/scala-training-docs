@@ -1,11 +1,11 @@
 {
   "type": "heatmap",
-  "title": "9 of 10 events moved a boundary; 0 needed a fifth axis",
-  "x_label": "axis of the four-axis map",
+  "title": "7 of 8 model events moved a boundary; the 2 Fable outages fit no axis",
+  "x_label": "axis of the four-axis map (last column: outside it)",
   "y_label": "kind of event",
-  "matrix": [[1, 4, 0, 4], [0, 0, 1, 0]],
-  "row_labels": ["BOUNDARY\n(reachable moved)", "PROPERTY\n(same limit,\nnew number)"],
-  "col_labels": ["next-token", "knowledge", "working memory", "steerability"],
+  "matrix": [[1, 4, 0, 2, 0], [0, 0, 1, 0, 0], [0, 0, 0, 0, 2]],
+  "row_labels": ["BOUNDARY\n(reachable moved)", "PROPERTY\n(same limit,\nnew number)", "SUPPLY\n(access, not\nthe model)"],
+  "col_labels": ["next-token", "knowledge", "working\nmemory", "steerability", "no axis:\nsupply chain"],
   "value_fmt": "{:g}",
   "cmap": "Blues"
 }

@@ -91,7 +91,7 @@ class VisualAndExampleRuleTests(unittest.TestCase):
 
     def test_complete_lesson_passes(self):
         pair = "```scala\nprintln(1)\n```\n```text\n1\n```\n"
-        idea = ("```mermaid\nflowchart LR\nA-->B\n```\n" + pair + pair +
+        idea = ("```mermaid\nflowchart LR\nA-->B\n```\n*Figure 0: a diagram.*\n\n" + pair + pair +
                 "![c](assets/2026-10-14-1-chart-1.png)\n\n*Figure 1: c. Generated from the lab output.*\n\n"
                 "![f](assets/2026-10-14-1-fig-1.png)\n\n*Figure 2: f. Source: X (MIT).*\n")
         self.assertEqual(self.errs(idea, {"2026-10-14-1-chart-1.json": "{}"}), [])

@@ -39,7 +39,7 @@ A model's error on its own training rows measures how much of that table it mana
 > "Learning the parameters of a prediction function and testing it on the same data is a methodological mistake: a model that would just repeat the labels of the samples that it has just seen would have a perfect score but would fail to predict anything useful on yet-unseen data."
 > — scikit-learn developers, *3.1. Cross-validation: evaluating estimator performance*, scikit-learn 1.9.1 documentation, accessed 2026-10-14, https://scikit-learn.org/stable/modules/cross_validation.html
 
-The fix is procedural, not mathematical: hold rows back. The source courses use Python; the examples here are Scala 3, standard library only.
+The fix is procedural, not mathematical: hold rows back.
 
 ### Three sets, and what each is for
 
@@ -65,7 +65,9 @@ flowchart TB
   TE --> R["the number you report"]
 ```
 
-A split is a seeded shuffle and a slice. Shuffle, because tables arrive sorted — by date, by region, by whoever appended last — so slicing gives you two populations rather than two samples of one. Seed, because the split must be identical for every candidate; otherwise you rank models by the split they happened to get. Ten row ids, sorted by date:
+*Figure 1: Fit on training rows, choose on validation rows, report once on the sealed test set. Adapted from Google for Developers, https://developers.google.com/machine-learning/crash-course/overfitting/dividing-datasets*
+
+A split is a seeded shuffle and a slice. Shuffle, because tables arrive sorted — by date, say — so slicing gives you two populations rather than two samples of one. Seed, because the split must be identical for every candidate; otherwise you rank models by the split they happened to get. Ten row ids, sorted by date:
 
 ```scala
 // file: Split.scala
@@ -92,19 +94,20 @@ Without the shuffle the held-out rows are just the four newest — a different p
 
 ### Capacity decides which way you fail
 
-**Capacity** is how much structure a model can represent. For k-nearest neighbours (k-NN), where a prediction is the average target of the k closest training rows, capacity is 1/k: at k = 1 it reproduces its training rows exactly, at k = N (all rows) it predicts one constant for everything. For a tree, the dial is its number of leaves.
+**Capacity** is how much structure a model can represent. For k-nearest neighbours (k-NN), where a prediction is the average target of the k closest training rows, capacity is 1/k: at k = 1 it reproduces its training rows exactly, at k = N (all rows) it predicts one constant for everything.
 
 **Underfitting** (high **bias**): too little capacity for the real pattern, so the model is wrong in the same direction across whole regions and error is high on training *and* validation rows. **Overfitting** (high **variance**): enough capacity to fit the noise in the rows it happened to see, so training error collapses towards zero while validation error climbs, and a different sample would have produced a visibly different model (StatQuest, "Machine Learning Fundamentals: Bias and Variance"). Forty points on the line y = 2x, each with noise of standard deviation 2, scored by 1-D k-NN:
 
 ```scala
 // file: Overfit.scala
-import scala.util.Random
+type Rows = Vector[(Double, Double)]
 @main def overfit(): Unit =
-  val g = new Random(1)
-  def draw(n: Int) = Vector.fill(n) { val x = g.nextDouble() * 10; (x, 2 * x + g.nextGaussian() * 2) }
-  val (train, valid) = (draw(40), draw(40))     // truth: y = 2x, plus noise with sd 2
+  val g = new scala.util.Random(1)
+  def point(x: Double) = (x, 2 * x + g.nextGaussian() * 2) // truth: y = 2x, noise sd 2
+  def draw(n: Int): Rows = Vector.fill(n)(point(g.nextDouble() * 10))
+  val (train, valid) = (draw(40), draw(40))
   def knn(x: Double, k: Int) = train.sortBy((a, _) => math.abs(a - x)).take(k).map(_._2).sum / k
-  def mae(rows: Vector[(Double, Double)], k: Int) = rows.map((x, y) => math.abs(knn(x, k) - y)).sum / rows.size
+  def mae(rows: Rows, k: Int) = rows.map((x, y) => math.abs(knn(x, k) - y)).sum / rows.size
   for k <- List(40, 10, 3, 1) do
     println(f"k=$k%2d   train MAE ${mae(train, k)}%5.2f   validation MAE ${mae(valid, k)}%5.2f")
 ```
@@ -116,11 +119,11 @@ k= 3   train MAE  1.32   validation MAE  2.35
 k= 1   train MAE  0.00   validation MAE  2.50
 ```
 
-MAE (mean absolute error) averages |predicted − actual|; lower is better. k = 40 predicts one constant for every x: underfit, bad on both sets. k = 1 scores a perfect 0.00 on training rows — each row's nearest neighbour is itself — yet loses on validation (2.50) to k = 10 (2.09), which is near the noise floor of about 1.6. Training error falls monotonically with capacity; validation error is U-shaped, and its bottom is what you ship. The lab runs the same sweep on 300 houses:
+MAE (mean absolute error) averages |predicted − actual|; lower is better. k = 40 predicts one constant for every x: underfit, bad on both sets. k = 1 scores a perfect 0.00 on training rows — each row's nearest neighbour is itself — yet loses on validation (2.50) to k = 10 (2.09). Training error falls monotonically with capacity; validation error is U-shaped, and its bottom is what you ship. The lab runs the same sweep on 300 houses:
 
 ![Train and validation MAE against k for k-NN on 300 houses](assets/2026-10-14-1-chart-1.png)
 
-*Figure 1: Train MAE falls to 0.000 at k = 1; validation MAE bottoms out at k = 3 (18.868) — Kaggle Learn's underfitting/overfitting curve (Intro to ML, Lesson 5) on this lesson's data. Generated from the lab output (Step 4).*
+*Figure 2: Train MAE falls to 0.000 at k = 1; validation MAE bottoms out at k = 3 (18.868) — Kaggle Learn's underfitting/overfitting curve (Intro to ML, Lesson 5) on this lesson's data. Generated from the lab output (Step 4).*
 
 ### k-fold cross-validation: a steadier number
 
@@ -148,13 +151,13 @@ Every row is scored exactly once. scikit-learn draws the same rotation, test set
 
 ![scikit-learn diagram: training data split into 5 folds, each fold held out once, test data kept for final evaluation](assets/2026-10-14-1-fig-1.png)
 
-*Figure 2: 5-fold cross-validation for choosing parameters, with a separate test set for the final evaluation. Source: scikit-learn developers, [3.1. Cross-validation](https://scikit-learn.org/stable/modules/cross_validation.html) (BSD-3-Clause).*
+*Figure 3: 5-fold cross-validation for choosing parameters, with a separate test set for the final evaluation. Source: scikit-learn developers, [3.1. Cross-validation](https://scikit-learn.org/stable/modules/cross_validation.html) (BSD-3-Clause).*
 
-The trade, in the same guide: "This approach can be computationally expensive, but does not waste too much data (as is the case when fixing an arbitrary validation set)" — k fits instead of one, for an estimate averaged over all your rows (Kaggle Learn, Intermediate Machine Learning, Lesson 5 "Cross-Validation"). k = 5 or 10 is usual, and small datasets are where it earns its cost. It replaces the validation split, not the test set. CS231n plots this for choosing the k of k-NN — a dot per fold, a line through the means:
+The trade, in the same guide: "This approach can be computationally expensive, but does not waste too much data (as is the case when fixing an arbitrary validation set)" (scikit-learn 1.9.1 user guide, §3.1 "Cross-validation: evaluating estimator performance") — k fits instead of one, for an estimate averaged over all your rows. k = 5 or 10 is usual, and small datasets are where it earns its cost. It replaces the validation split, not the test set. CS231n plots this for choosing the k of k-NN — a dot per fold, a line through the means:
 
 ![CS231n plot: cross-validation accuracy for each k of k-NN, five points per k, trend line through the means with error bars](assets/2026-10-14-1-fig-2.png)
 
-*Figure 3: "Example of a 5-fold cross-validation run for the parameter k" (accuracy, higher is better); "a value of about k = 7 works best on this particular dataset". Source: Stanford CS231n, Andrej Karpathy, [Image Classification](https://cs231n.github.io/classification/) (MIT). Figure 4 in the lab is the same plot for house prices.*
+*Figure 4: "Example of a 5-fold cross-validation run for the parameter k" (accuracy, higher is better); "a value of about k = 7 works best on this particular dataset". Source: Stanford CS231n, Andrej Karpathy, [Image Classification](https://cs231n.github.io/classification/) (MIT).*
 
 ### Data leakage: the bug that makes all of this worthless
 
@@ -164,14 +167,15 @@ The trade, in the same guide: "This approach can be computationally expensive, b
 
 ```scala
 // file: Leak.scala
-import scala.util.Random
+type Row = (Double, Double, Double) // (size, price, stampDuty paid AFTER the sale)
 @main def leak(): Unit =
-  val g = new Random(3)
-  val rows = Vector.fill(200) { val size = 40 + g.nextDouble() * 160; val price = 3 * size + g.nextGaussian() * 20
-    (size, price, price * 0.02 + g.nextGaussian() * 0.1) }  // (size, price, stampDuty paid AFTER the sale)
-  val (tr, va) = rows.splitAt(150)
-  def mae(feature: ((Double, Double, Double)) => Double) =   // 1-NN on a single feature
-    va.map(r => math.abs(tr.minBy(t => math.abs(feature(t) - feature(r)))._2 - r._2)).sum / va.size
+  val g = new scala.util.Random(3)
+  def house(size: Double): Row =
+    val price = 3 * size + g.nextGaussian() * 20
+    (size, price, price * 0.02 + g.nextGaussian() * 0.1)
+  val (tr, va) = Vector.fill(200)(house(40 + g.nextDouble() * 160)).splitAt(150)
+  def nearest(f: Row => Double, r: Row) = tr.minBy(t => math.abs(f(t) - f(r))) // 1-NN, one feature
+  def mae(f: Row => Double) = va.map(r => math.abs(nearest(f, r)._2 - r._2)).sum / va.size
   println(f"1-NN on size       (known before the sale): validation MAE ${mae(_._1)}%6.2f")
   println(f"1-NN on stampDuty  (known only after it):   validation MAE ${mae(_._3)}%6.2f")
 ```
@@ -183,7 +187,7 @@ import scala.util.Random
 
 The split is clean, yet the leaked model "wins" 7.02 to 24.61 — the column is the price divided by 50. When you must price a house, it is empty; the lab's Step 6 measures the cost.
 
-**Train–test contamination** is a clean split undone by preprocessing fitted on all the rows. Standardise a column by its mean over all 300 rows, then split, and the mean each training row was scaled by is a function of the validation rows too. Hence the order: "Always split the data into train and test subsets first, particularly before any preprocessing steps" (scikit-learn 1.9.1 user guide, §12.2.1 "How to avoid data leakage"). Duplicate rows on both sides do the same, more crudely. Both leak paths beside the honest one:
+**Train–test contamination** is a clean split undone by preprocessing fitted on all the rows. Standardise a column by its mean over all 300 rows, then split, and the mean each training row was scaled by is a function of the validation rows too. Hence the order: "Always split the data into train and test subsets first, particularly before any preprocessing steps" (scikit-learn 1.9.1 user guide, §12.2.1 "How to avoid data leakage"). Both leak paths beside the honest one:
 
 ```mermaid
 flowchart TB
@@ -202,7 +206,9 @@ flowchart TB
   H ~~~ C ~~~ T
 ```
 
-Both leaks share one signature: a validation score that is suspiciously good and a production number that is not. A score that looks too good is a bug report, not a result.
+*Figure 5: The honest pipeline beside both leak paths. Adapted from scikit-learn 1.9.1 user guide §12.2, https://scikit-learn.org/stable/common_pitfalls.html*
+
+Either way validation looks suspiciously good and production does not. A score that looks too good is a bug report, not a result.
 
 ## Lab
 
@@ -394,7 +400,7 @@ validation MAE of k=1: 20.995   <- what it is really worth
 
 ![Per-fold validation MAE for k = 30, 10, 3, 1 with a line through the five-fold means](assets/2026-10-14-1-chart-3.png)
 
-*Figure 4: Each dot is one held-out fold, the line joins the five-fold means; k = 10 (mean 20.170) edges out k = 3 (20.619), whose folds alone span 18.563–22.275 — the CS231n plot of Figure 3, for house prices. k = 100 (mean 51.372) is left off so the spread stays readable. Generated from the lab output (Step 5).*
+*Figure 6: Each dot is one held-out fold, the line joins the five-fold means; k = 10 (mean 20.170) edges out k = 3 (20.619), whose folds alone span 18.563–22.275 — the CS231n plot of Figure 4, for house prices. k = 100 (mean 51.372) is left off so the spread stays readable. Generated from the lab output (Step 5).*
 
 ### Step 6 — the same model with a leaked column
 
@@ -412,7 +418,7 @@ target leakage: feature stampDuty (2% of price) added
 
 ![Honest validation, leaked validation and leaked production MAE for each k](assets/2026-10-14-1-chart-2.png)
 
-*Figure 5: With the leaked column every k looks better on validation (≈11 instead of ≈19–21), and every k is far worse once the column is empty (61–69). Generated from the lab output (Step 6).*
+*Figure 7: With the leaked column every k looks better on validation (≈11 instead of ≈19–21), and every k is far worse once the column is empty (61–69). Generated from the lab output (Step 6).*
 
 **Verdict:** judged by validation MAE the leaked model wins at every k — 10.945 at k = 1 against the honest best of 18.868 — and you would ship it. In production it scores 68.811 at that same k, 3.6 times the honest model's validation error. Nothing in the validation number warned you; only asking "is this column known at prediction time?" does.
 
@@ -447,12 +453,12 @@ target leakage: feature stampDuty (2% of price) added
 3. The pipeline standardises every numeric column by subtracting the column mean and dividing by the standard deviation, then shuffles and splits 80/20. Name the bug, say which direction it moves the validation score, and give the fix. <details><summary>Answer</summary>Train–test contamination, a form of data leakage: the means and standard deviations were computed over all rows, so every training feature was scaled using statistics that encode the held-out rows. The validation score comes out optimistic, because the model was handed information it will not have in production, and the gap shows up only after release. The fix is the order: split first, compute the statistics on training rows only, then apply those same fixed numbers to the validation, test and production rows — what the lab does with `muSize` and `sdSize` from `trainH` alone. Inside cross-validation the scaler must be refitted inside every fold, as the lab's fold loop does.</details>
 
 ## Sources
-- [scikit-learn 1.9.1 user guide — 3.1. Cross-validation: evaluating estimator performance](https://scikit-learn.org/stable/modules/cross_validation.html) — scikit-learn developers — the quoted definition of the "test on the same data" mistake, the k-fold procedure and the "average of the values computed in the loop" rule, and the cost/data trade-off of cross-validation; Figure 2 is the guide's `grid_search_cross_validation.png` from github.com/scikit-learn/scikit-learn `doc/images/` (BSD-3-Clause) (accessed 2026-10-14 and 2026-10-15).
+- [scikit-learn 1.9.1 user guide — 3.1. Cross-validation: evaluating estimator performance](https://scikit-learn.org/stable/modules/cross_validation.html) — scikit-learn developers — the quoted definition of the "test on the same data" mistake, the k-fold procedure and the "average of the values computed in the loop" rule, and the quoted cost/data trade-off of cross-validation ("This approach can be computationally expensive, but does not waste too much data…", §3.1 introduction); Figure 3 is the guide's `grid_search_cross_validation.png` from github.com/scikit-learn/scikit-learn `doc/images/` (BSD-3-Clause) (accessed 2026-10-14 and 2026-10-15).
 - [scikit-learn 1.9.1 user guide — 12. Common pitfalls and recommended practices](https://scikit-learn.org/stable/common_pitfalls.html) — scikit-learn developers — §12.2 "Data leakage": the definition used in this lesson, and §12.2.1 "How to avoid data leakage" for the split-before-preprocessing rule (accessed 2026-10-14).
 - [Google for Developers — Machine Learning Crash Course, "Datasets: Dividing the original dataset"](https://developers.google.com/machine-learning/crash-course/overfitting/dividing-datasets) — Google for Developers, last updated 2025-12-03 — the quoted rule on testing against different examples, the three-way train/validation/test split, and the warning that repeatedly reused test sets wear out (accessed 2026-10-14).
 - [Kaggle Learn — Intro to Machine Learning](https://www.kaggle.com/learn/intro-to-machine-learning) — Lesson 4 "Model Validation" and Lesson 5 "Underfitting and Overfitting": the curriculum shape of this rung — held-out MAE, and tree depth as the capacity dial behind the U-shaped curve (accessed 2026-10-14; the course pages require a logged-in session, so no passage is quoted from them here).
-- [Kaggle Learn — Intermediate Machine Learning](https://www.kaggle.com/learn/intermediate-machine-learning) — Lesson 5 "Cross-Validation" and Lesson 7 "Data Leakage": the k-fold cost argument for small datasets and the target-leakage examples (`took_antibiotics`, a closed-contract date) retold here in Scala terms (accessed 2026-10-14; logged-in session required, so no passage is quoted).
-- [Stanford CS231n — Image Classification](https://cs231n.github.io/classification/) — Andrej Karpathy, CS231n course notes — §"Validation sets for Hyperparameter tuning": the quoted rule that the test set cannot be used to tweak hyper-parameters, and Figure 3 (`assets/cvplot.png` from github.com/cs231n/cs231n.github.io, MIT licence) with its quoted caption (accessed 2026-10-15).
+- [Kaggle Learn — Intermediate Machine Learning](https://www.kaggle.com/learn/intermediate-machine-learning) — Lesson 5 "Cross-Validation" and Lesson 7 "Data Leakage": the advice that k-fold cross-validation earns its cost on small datasets, and the target-leakage examples (`took_antibiotics`, a closed-contract date) retold here in Scala terms (accessed 2026-10-14; logged-in session required, so no passage is quoted).
+- [Stanford CS231n — Image Classification](https://cs231n.github.io/classification/) — Andrej Karpathy, CS231n course notes — §"Validation sets for Hyperparameter tuning": the quoted rule that the test set cannot be used to tweak hyper-parameters, and Figure 4 (`assets/cvplot.png` from github.com/cs231n/cs231n.github.io, MIT licence) with its quoted caption (accessed 2026-10-15).
 - [StatQuest — Machine Learning Fundamentals: Bias and Variance](https://statquest.org/video-index/) — Josh Starmer — the bias/variance vocabulary attached to the two ends of the capacity axis: underfitting as consistent error, overfitting as sensitivity to the particular sample (accessed 2026-10-14, via the video index).
 
 ## Next on this track

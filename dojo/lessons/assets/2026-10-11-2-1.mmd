@@ -1,4 +1,4 @@
-flowchart LR
+flowchart TD
   K["key = request URL<br/>url-0"] --> H["MurmurHash3, unsigned 32-bit<br/>2,802,085,669"]
   H --> B["binary search in the<br/>sorted array of ring points"]
   B --> P["first point with hash >= key hash<br/>(past the end: wrap to index 0)"]

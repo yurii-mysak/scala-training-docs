@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "Same words, four voices: benchmark-like voices trigger the copied omission",
+  "x_label": "audio version of the same VoxPopuli sentence",
+  "y_label": "models (of 11) that drop \"thank you\"",
+  "categories": ["real benchmark clip", "same-speaker clone", "fresh-speaker clone\n(after training cutoff)", "generic TTS voice"],
+  "series": [{"name": null, "y": [6, 5, 1, 0]}],
+  "value_fmt": "%d",
+  "hline": {"y": 11, "label": "all 11 models"},
+  "_source": "Hugging Face, Measuring benchmark optimization in speech recognition, 2026-08-21, https://huggingface.co/blog/asr-benchmark-optimization — row 'Drops the courtesy (❌) out of 11': 6 | 5 | 1; generic TTS: 'all eleven models restore the courtesy' (0)."
+}

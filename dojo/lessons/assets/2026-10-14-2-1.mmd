@@ -1,9 +1,9 @@
 flowchart LR
-  A["Audio clip"] --> B{"Recognises the dataset's acoustic cue?"}
-  B -- "no" --> C["Transcribe what the signal says"]
-  B -- "yes" --> D["Emit the stored reference convention"]
-  C --> E["Scored against the reference file"]
-  D --> E
-  E --> F["Low published WER"]
-  C --> G["Honest WER on new audio"]
-  D --> H["Errors reappear: wrong words, invented numbers, wrong spelling"]
+  B["Public benchmark: audio + reference file"] -->|"route 1: crawled into training data"| T["Training"]
+  B -->|"route 2: keep the checkpoint with the best score"| S["Model selection"]
+  T --> M["Released model"]
+  S --> M
+  M --> P["Leaderboard: low WER"]
+  M --> Q["Probe: file and audio disagree"]
+  Q -->|"output follows the file"| F["Benchmark fitting detected"]
+  Q -->|"output follows the audio"| G["Score reflects the task"]

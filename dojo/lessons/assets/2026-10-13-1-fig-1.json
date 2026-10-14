@@ -1,0 +1,7 @@
+{
+  "url": "https://raw.githubusercontent.com/rust-lang/book/main/src/img/trpl04-01.svg",
+  "page": "https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html",
+  "credit": "The Rust Project Developers, The Rust Programming Language",
+  "license": "MIT OR Apache-2.0",
+  "caption": "Figure 4-1 of the Rust Book: a String holding \"hello\" bound to s1 — pointer, length and capacity on the stack, the bytes on the heap"
+}

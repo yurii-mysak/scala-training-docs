@@ -1,0 +1,66 @@
+{
+  "type": "line",
+  "title": "Training error falls to 0; validation error is U-shaped and bottoms out at k = 3",
+  "x_label": "k-NN neighbours k (capacity rises left to right)",
+  "y_label": "MAE in price units (lower is better)",
+  "series": [
+    {
+      "name": "train MAE (rows the model holds)",
+      "x": [
+        "k=100",
+        "k=30",
+        "k=10",
+        "k=3",
+        "k=1"
+      ],
+      "y": [
+        49.816,
+        22.936,
+        18.805,
+        13.675,
+        0.0
+      ],
+      "style": "dashed"
+    },
+    {
+      "name": "validation MAE (60 unseen rows)",
+      "x": [
+        "k=100",
+        "k=30",
+        "k=10",
+        "k=3",
+        "k=1"
+      ],
+      "y": [
+        51.406,
+        25.661,
+        20.219,
+        18.868,
+        20.995
+      ]
+    }
+  ],
+  "annotate": [
+    {
+      "x": 0,
+      "y": 51.406,
+      "text": "underfitting: both high",
+      "dx": 25,
+      "dy": -8
+    },
+    {
+      "x": 3,
+      "y": 18.868,
+      "text": "sweet spot: 18.868",
+      "dx": -40,
+      "dy": 45
+    },
+    {
+      "x": 4,
+      "y": 0.0,
+      "text": "overfitting: train 0.000,\nvalidation 20.995",
+      "dx": -250,
+      "dy": 6
+    }
+  ]
+}

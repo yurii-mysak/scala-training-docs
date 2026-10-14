@@ -1,0 +1,86 @@
+{
+  "type": "line",
+  "title": "Leaked column: validation MAE drops to ~11, production MAE jumps to 61\u201369",
+  "x_label": "k-NN neighbours k (capacity rises left to right)",
+  "y_label": "MAE in price units (lower is better)",
+  "series": [
+    {
+      "name": "with stampDuty, production (duty not known yet)",
+      "x": [
+        "k=100",
+        "k=30",
+        "k=10",
+        "k=3",
+        "k=1"
+      ],
+      "y": [
+        65.845,
+        60.714,
+        61.388,
+        63.803,
+        68.811
+      ],
+      "color": "#B3261E"
+    },
+    {
+      "name": "honest model, validation",
+      "x": [
+        "k=100",
+        "k=30",
+        "k=10",
+        "k=3",
+        "k=1"
+      ],
+      "y": [
+        51.406,
+        25.661,
+        20.219,
+        18.868,
+        20.995
+      ],
+      "color": "#2F4B8A"
+    },
+    {
+      "name": "with stampDuty, validation (looks better)",
+      "x": [
+        "k=100",
+        "k=30",
+        "k=10",
+        "k=3",
+        "k=1"
+      ],
+      "y": [
+        38.727,
+        16.294,
+        11.056,
+        11.072,
+        10.945
+      ],
+      "style": "dashed",
+      "color": "#C2571A"
+    }
+  ],
+  "annotate": [
+    {
+      "x": 3,
+      "y": 11.072,
+      "text": "11.072",
+      "dx": 18,
+      "dy": 12
+    },
+    {
+      "x": 3,
+      "y": 18.868,
+      "text": "18.868",
+      "dx": -10,
+      "dy": 14
+    },
+    {
+      "x": 3,
+      "y": 63.803,
+      "text": "63.803",
+      "dx": -10,
+      "dy": 14
+    }
+  ]
+}

@@ -14,7 +14,8 @@ Publish `dojo/dashboard/dojo.html` with exactly this capabilities declaration:
 {
   "db": {},
   "user": {},
-  "mcp": { "servers": [ { "server": "Claude Code Remote", "tools": ["fire_trigger"] } ] }
+  "mcp": { "servers": [ { "server": "Claude Code Remote", "tools": ["fire_trigger"] } ] },
+  "assets": {}
 }
 ```
 
@@ -22,6 +23,8 @@ Publish `dojo/dashboard/dojo.html` with exactly this capabilities declaration:
   write. The owner always writes. No custom rules are needed.
 - `user`: only `can("data.write")` is used, to hide the mark buttons from people who can only
   read. No names or emails are read or stored.
+- `assets`: lesson charts and figures are uploaded as artifact assets (`/_blob/<id>` URLs, mapped in
+  `dojo/progress/assets.json`); the page shows them as ordinary `<img>` sources.
 - `mcp`: one connector tool, used by the "Request 2 more" button. A page that declares a
   connector cannot be shared publicly. That is fine for a private dashboard.
 

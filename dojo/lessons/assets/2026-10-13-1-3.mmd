@@ -1,0 +1,18 @@
+sequenceDiagram
+  participant You
+  participant P as cargo on PATH (rustup link)
+  participant C as real cargo (active toolchain)
+  participant IO as crates.io
+  participant R as rustc
+  participant T as target/
+  You->>P: cargo build
+  P->>C: forward to toolchain from rust-toolchain.toml or the default
+  C->>C: read Cargo.toml, pin versions in Cargo.lock
+  C->>IO: download missing crates (first build only)
+  loop each dependency not yet compiled
+    C->>R: compile the crate
+    R->>T: store the compiled library, reused next time
+  end
+  C->>R: compile your crate (after an edit, only this repeats)
+  R->>T: link target/debug/<name>
+  C-->>You: Finished `dev` profile in N s

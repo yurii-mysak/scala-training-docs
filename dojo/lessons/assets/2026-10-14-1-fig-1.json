@@ -1,0 +1,7 @@
+{
+  "url": "https://raw.githubusercontent.com/scikit-learn/scikit-learn/main/doc/images/grid_search_cross_validation.png",
+  "page": "https://scikit-learn.org/stable/modules/cross_validation.html",
+  "credit": "scikit-learn developers",
+  "license": "BSD-3-Clause",
+  "caption": "5-fold cross-validation"
+}

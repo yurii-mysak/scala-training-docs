@@ -116,7 +116,18 @@ passages (fresh); the next-rung title (core); and these instructions verbatim:
 > `python3 dojo/engine/run_lab.py <id>` and paste its real output. If the program needs what this
 > environment cannot reach (Hugging Face downloads, a database server, an API key), add
 > `// run: local` and label the output "Expected output — run locally". A first Rust build with candle
-> takes ~2 minutes in a cold container; that is normal. Follow `dojo/SPEC.md` §4: sections in order — Why this matters
+> takes ~2 minutes in a cold container; that is normal.
+> SHOW, DON'T ONLY TELL (SPEC §4 Show-by-example rule): in "The idea", follow each key concept with
+> a short example (≤12 lines of Scala/Rust, or prompt → response for Claude Academy), then its real
+> output in a ```text block, then one or two sentences on what the output shows — at least two.
+> VISUALS (SPEC §4 Visual rule), at least three, each next to the text it explains: (1) a Mermaid
+> mechanism diagram; (2) a chart of the real numbers from your examples or lab — write the spec to
+> dojo/lessons/assets/<id>-chart-<k>.json, run `python3 dojo/engine/chart.py <spec>`, embed the PNG;
+> (3) a figure from a primary source you cite — `python3 dojo/engine/fetch_figure.py <raw GitHub
+> URL> <id> --k N --credit … --license … --page … --caption …` when openly licensed and reachable
+> (check the licence on the repo), otherwise replicate it as Mermaid/chart captioned "Adapted from
+> <source>, <URL>". Caption every image `*Figure N: … Source: …*`. Open each PNG with Read to check
+> it before you finish. Follow `dojo/SPEC.md` §4: sections in order — Why this matters
 > (3 lines) · [Primer, fresh lessons above the reader's level] · The idea (600–1200 words, one or
 > two ```mermaid diagrams: `flowchart LR|TD` or `sequenceDiagram`; quote any label containing
 > parentheses, colons or slashes in double quotes; no HTML inside labels) · Worked example or Lab
@@ -158,6 +169,13 @@ source until it renders (the error text names the line).
 ## 9. Dashboard database
 
 Using the versions from step 1 (re-`list` if you wrote anything since):
+0. Images first. The Dojo cannot load images from the repo, so lesson charts and figures are
+   uploaded as Dojo assets: `python3 dojo/engine/sync_db.py missing-assets <id1> <id2>` lists the
+   PNG/JPEG files not uploaded yet. If any, call `Artifact` with `url` = the dashboard URL,
+   `asset: true`, `file_paths` = that list (≤25 per call); add each returned `"<file name>":
+   "/_blob/<id>"` to `dojo/progress/assets.json`; then rerun `python3 dojo/engine/sync_db.py all`
+   so the lesson documents point at the uploaded URLs. Never embed images as base64 in documents
+   (a document is capped at 256 KiB).
 1. For every file in `dojo/out/db/lessons/*.json`: `set` collection `lessons`, `doc_id` = id,
    `file_path` = that file, `if_version` when the document already exists. Use `batch` (≤50 writes).
 2. For every `dojo/out/db/tracks/*.json`: `set` collection `tracks`, `doc_id` = track key, same

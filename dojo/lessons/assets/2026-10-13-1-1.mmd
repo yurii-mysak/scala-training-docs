@@ -1,21 +1,14 @@
 flowchart LR
-  subgraph R["Rust"]
-    RU["rustup — toolchains, targets, components"] --> RC["rustc — the compiler"]
-    RU --> CA["cargo — build, test, deps"]
-    RU --> CL["clippy — linter"]
-    RU --> FM["rustfmt — formatter"]
-    CA --> TOML["Cargo.toml and Cargo.lock"]
-    CA --> SRC["src/main.rs"]
-    CA --> TG["target/debug and target/release"]
-    TOML --> IO["crates.io"]
+  subgraph RS["Rust: decided before the program starts"]
+    direction LR
+    A["main.rs"] --> B["rustc<br/>type + borrow check<br/>generics expanded per type<br/>LLVM optimises"]
+    B --> C["native binary<br/>drop calls already<br/>placed in the code"]
+    C --> D["OS process<br/>no VM, no GC thread"]
   end
-  subgraph S["Scala / JVM"]
-    CS["Coursier — JDK and tool install"] --> SCC["scalac, run by the build tool"]
-    CS --> SB["sbt or scala-cli"]
-    CS --> SX["scalafix — linter"]
-    CS --> SF["scalafmt — formatter"]
-    SB --> BS["build.sbt"]
-    SB --> SS["src/main/scala"]
-    SB --> ST["target/scala-3.3.x"]
-    BS --> MC["Maven Central"]
+  subgraph JV["Scala: much decided while it runs"]
+    direction LR
+    E["Main.scala"] --> F["scalac<br/>type check"]
+    F --> G[".class bytecode<br/>+ .tasty"]
+    G --> H["JVM<br/>class loading, interpreter,<br/>JIT, GC threads"]
+    H --> I["OS process"]
   end

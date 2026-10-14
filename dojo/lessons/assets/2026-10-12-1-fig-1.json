@@ -1,0 +1,7 @@
+{
+  "url": "https://raw.githubusercontent.com/dvgodoy/dl-visuals/main/Classification/classification_softmax.png",
+  "page": "https://dvgodoy.github.io/dl-visuals/Classification",
+  "credit": "Daniel Voigt Godoy, Deep Learning Visuals (from Deep Learning with PyTorch Step-by-Step, ch. 5)",
+  "license": "CC BY 4.0",
+  "caption": "A classifier: every input ends in exactly three output units, one per fixed class"
+}

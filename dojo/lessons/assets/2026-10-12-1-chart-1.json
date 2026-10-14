@@ -1,0 +1,8 @@
+{
+  "type": "hbar",
+  "title": "After \"includes\", the toy model bets 40% on \"wax\" — popularity, not truth",
+  "x_label": "P(next token | \"includes\")",
+  "y_label": "candidate next token",
+  "categories": ["tyre", "rinse", "foam", "wax"],
+  "series": [{"name": "share of 5 observed followers", "y": [0.20, 0.20, 0.20, 0.40]}]
+}

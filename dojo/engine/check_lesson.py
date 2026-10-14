@@ -70,8 +70,8 @@ def check(path: Path, strict: bool = False) -> dict:
         errors.append("placeholder text (TODO/TBD/lorem) present")
 
     mermaid = len(re.findall(r"(?m)^```mermaid\s*$", body))
-    if not 1 <= mermaid <= 2:
-        errors.append(f"expected 1–2 mermaid blocks, found {mermaid}")
+    if not 1 <= mermaid <= 4:
+        errors.append(f"expected 1–4 mermaid blocks, found {mermaid}")
 
     idea_words = words(section_text(body, "The idea"))
     if idea_words < 450:
@@ -150,6 +150,29 @@ def check(path: Path, strict: bool = False) -> dict:
                 errors.append(f"{l} program with a main must start with '// file: <name>' so run_lab.py can run it (SPEC §4 Language rule)")
             if re.search(r"(?m)^\s*//\s*run:\s*local\b", code) and "run locally" not in body.lower():
                 errors.append("a '// run: local' program needs its output labelled 'Expected output — run locally' (SPEC §4 Language rule)")
+    # Visual rule (SPEC §4): >=3 visuals, >=1 image, captions, chart specs.
+    images = re.findall(r"(?m)^!\[[^\]]*\]\((assets/[^)\s]+)\)[ \t]*$", body)
+    if mermaid + len(images) < 3:
+        errors.append(f"only {mermaid + len(images)} visual(s); need ≥3: a Mermaid diagram, a chart of real numbers, a source figure (SPEC §4 Visual rule)")
+    if not images:
+        errors.append("no chart or figure image; render one with engine/chart.py or engine/fetch_figure.py (SPEC §4 Visual rule)")
+    for img in images:
+        if not re.search(re.escape(img) + r"\)[ \t]*\n\s*\n?\*Figure \d+", body):
+            errors.append(f"image {img} has no '*Figure N: …*' caption directly under it (SPEC §4 Visual rule)")
+        if "-chart-" in img and not (path.parent / img).with_suffix(".json").exists():
+            errors.append(f"chart {img} has no JSON spec beside it (SPEC §4 Visual rule)")
+    # Show-by-example rule (SPEC §4): >=2 example -> output pairs in The idea, short code.
+    idea_txt = section_text(body, "The idea")
+    blocks = re.findall(r"(?ms)^```([A-Za-z0-9_+-]*)[ \t]*\n(.*?)^```", idea_txt)
+    pairs = sum(1 for (l1, _), (l2, _) in zip(blocks, blocks[1:]) if l1 in ("scala", "rust") and l2 in ("text", "console", "output"))
+    if fm.get("track") == "claude-academy":
+        pairs = max(pairs, sum(1 for l, _ in blocks if l in ("text", "")) // 2)
+    if pairs < 2:
+        errors.append(f"'The idea' has {pairs} example → output pair(s); need ≥2 (SPEC §4 Show-by-example rule)")
+    for l, code in blocks:
+        if l in ("scala", "rust") and len([x for x in code.splitlines() if x.strip()]) > 12:
+            errors.append("an example in 'The idea' is longer than 12 lines; keep inline examples short, move the rest to the Lab (SPEC §4 Show-by-example rule)")
+            break
     stats = {"idea_words": idea_words, "mermaid_blocks": mermaid, "self_check": len(items),
              "source_urls": len(urls), "quotes": len(quote_blocks), "est_min": est}
     ok = not errors and (not strict or not warnings)

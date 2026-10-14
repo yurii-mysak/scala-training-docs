@@ -1,0 +1,14 @@
+flowchart TB
+  subgraph H["honest"]
+    direction LR
+    H1["all rows"] --> H2["split"] --> H3["fit scaler on<br/>training rows only"] --> H4["train"] --> H5["validation score<br/>= production score"]
+  end
+  subgraph C["contamination"]
+    direction LR
+    C1["all rows"] --> C2["fit scaler on<br/>ALL rows"] --> C3["split"] --> C4["training features already<br/>carry validation statistics"]
+  end
+  subgraph T["target leakage"]
+    direction LR
+    T1["column filled in after<br/>the outcome: stampDuty"] --> T2["validation score<br/>too good"] --> T3["column empty at<br/>prediction time"]
+  end
+  H ~~~ C ~~~ T

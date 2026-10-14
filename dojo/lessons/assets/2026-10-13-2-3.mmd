@@ -1,0 +1,5 @@
+flowchart TD
+  S1["Step 1: bump the libraries that read types, before the compiler"] --> S2["Step 2: compile on 3.10 with the migration rewrite"]
+  S2 --> S3["Step 3: fix inaccessible companion givens and arrow DSLs"]
+  S3 --> S4["Step 4: re-baseline signatures with MiMa 1.2.1 or later"]
+  S4 --> S5["Step 5: libraries publish on 3.9 LTS, applications run on 3.10 Next"]

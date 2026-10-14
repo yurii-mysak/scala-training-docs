@@ -16,6 +16,8 @@ JSON (or a path) to stdout. Failures print one `error: ...` line and exit 2.
 | `file_passed.py` | files passed lessons into the KB: section README row, root README link (SPEC §8) |
 | `toolchain.sh` | installs Scala 3 (GitHub release, stdlib only) and checks cargo; run once per job |
 | `run_lab.py` | `<id>`: runs every ```scala/```rust block marked `// file:` and prints the real output (SPEC §4 Language rule) |
+| `chart.py` | `<spec.json>`: renders a lesson chart (line/bar/scatter/hbar/heatmap) from real lab numbers to PNG (SPEC §4 Visual rule) |
+| `fetch_figure.py` | `<url> <id> --k N --credit --license --page --caption`: downloads an openly licensed figure (GitHub-hosted) + provenance JSON, prints the Markdown |
 | `sync_db.py` | `export <id>…\|--all`, `tracks`, `meta`, `all` -> `dojo/out/db/<collection>/<id>.json` |
 
 ## Commands the daily job runs, in order (`D` = today's Kyiv date, `D-1` = lesson id `<D>-1`)

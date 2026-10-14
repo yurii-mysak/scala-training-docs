@@ -1,14 +1,7 @@
 flowchart TD
-  A["AI in production"] --> B["Non-generative — predict, score or rank"]
-  A --> C["Generative — produce new text, token by token"]
-  B --> B1["spam filter — one bit"]
-  B --> B2["recommender — rank a fixed catalogue"]
-  B --> B3["fraud score — one number"]
-  C --> C1["LLM chat"]
-  C --> C2["code agent, e.g. Claude Code"]
-  C1 --> D["Four property axes"]
-  C2 --> D
-  D --> X1["next-token prediction — capability: fluent draft · limitation: confident invention"]
-  D --> X2["knowledge — capability: breadth · limitation: cutoff and blind gaps"]
-  D --> X3["working memory — capability: reason over new material · limitation: finite window"]
-  D --> X4["steerability — capability: specs redirect it · limitation: a tendency, not a guarantee"]
+  P["context so far<br/>'the basic wash includes'"] --> M["model scores every token<br/>in its vocabulary"]
+  M --> D["next-token distribution<br/>wax 0.40 · foam 0.20 · rinse 0.20 · tyre 0.20"]
+  D --> S["pick one token<br/>greedy: the most likely → wax"]
+  S --> A["append it to the context<br/>'… includes wax'"]
+  A -->|"repeat until a stop token"| M
+  A -->|"stop token reached"| O["output text"]

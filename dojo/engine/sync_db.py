@@ -21,7 +21,9 @@ Field notes
 from __future__ import annotations
 
 import argparse
+import json
 import re
+from pathlib import Path
 import datetime as dt
 
 import common
@@ -65,6 +67,37 @@ def lesson_day(fm: dict, lessons: list[dict]) -> int | None:
     return dates.index(d) + 1 if d in dates else None
 
 
+_IMG = re.compile(r"!\[([^\]]*)\]\((assets/[^)\s]+\.(?:png|jpe?g|gif|webp))\)")
+
+
+def asset_map() -> dict[str, str]:
+    """dojo/progress/assets.json: image file name -> Dojo asset URL (/_blob/<id>), written by the job
+    after it uploads new images with the Artifact tool (publish, asset: true)."""
+    p = common.dojo_dir() / "progress" / "assets.json"
+    return json.loads(p.read_text()) if p.exists() else {}
+
+
+def missing_assets(md_list: list[str]) -> list[str]:
+    """Lesson images not yet uploaded to the Dojo (paths under dojo/lessons/assets/)."""
+    known = asset_map()
+    out = []
+    for md in md_list:
+        for _, ref in _IMG.findall(md):
+            name = Path(ref).name
+            if name not in known and (common.assets_dir() / name).exists() and name not in [Path(x).name for x in out]:
+                out.append(str(common.assets_dir() / name))
+    return out
+
+
+def inline_images(md: str) -> str:
+    """Point ![alt](assets/x.png) at the uploaded Dojo asset (/_blob/<id>). The Dojo cannot load
+    external images, and documents are capped at 256 KiB, so images are never embedded; an image
+    that has not been uploaded yet keeps its repo path (it shows as alt text until it is)."""
+    known = asset_map()
+    return _IMG.sub(lambda m: f"![{m.group(1)}]({known[Path(m.group(2)).name]})"
+                    if Path(m.group(2)).name in known else m.group(0), md)
+
+
 def lesson_doc(entry: dict, tracks: dict[str, dict], lessons: list[dict]) -> dict:
     fm, body = entry["fm"], entry["body"]
     rung = common.rung_lookup(tracks).get(str(fm.get("rung") or ""))
@@ -90,7 +123,7 @@ def lesson_doc(entry: dict, tracks: dict[str, dict], lessons: list[dict]) -> dic
         "sent_at": fm.get("sent_at"),
         "marked_at": fm.get("marked_at"),
         "summary": summary,
-        "md": md,
+        "md": inline_images(md),
         "filed_to": fm.get("filed_to"),
         "review_due": fm.get("review_due"),
         "sources": _sources(fm, body),
@@ -198,6 +231,8 @@ def main(argv: list[str] | None = None) -> int:
                "  python3 dojo/engine/sync_db.py all",
         formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
+    ma = sub.add_parser("missing-assets", help="list lesson images not yet uploaded to the Dojo (absolute paths, JSON)")
+    ma.add_argument("ids", nargs="*")
     p = sub.add_parser("export", help="lessons/<id>.json for the given lesson ids")
     p.add_argument("ids", nargs="*", metavar="LESSON_ID")
     p.add_argument("--all", action="store_true", help="export every lesson")
@@ -206,6 +241,11 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("all", help="every lesson, every track and meta")
     args = ap.parse_args(argv)
 
+    if args.cmd == "missing-assets":
+        mds = [p.read_text(encoding="utf-8") for p in sorted(common.lessons_dir().glob("*.md"))
+               if not args.ids or any(p.name.startswith(i) for i in args.ids)]
+        print(common.dumps(missing_assets(mds)))
+        return 0
     if args.cmd == "export":
         if not args.ids and not args.all:
             raise DojoError("give lesson ids or --all")

@@ -1,5 +1,6 @@
-flowchart TD
-  A["1 point per server"] --> B["each server owns 1 random arc"]
-  B --> C["spread as big as the mean: CV about 90%"]
-  D["160 points per server"] --> E["each server owns 160 random arcs"]
-  E --> F["arcs cancel out: CV about 8%"]
+flowchart LR
+  P99["point 99 (last on the ring)"] -->|"arc 1.433%"| P0["point 0<br/>hash 34,502,164<br/>server 37"]
+  P0 -->|"arc 0.041%"| P1["point 1<br/>hash 36,260,077<br/>server 89"]
+  P1 -->|"arc 0.210%"| P2["point 2<br/>hash 45,268,616<br/>server 69"]
+  P2 -->|"arc 3.369%"| P3["point 3<br/>hash 189,974,534<br/>server 90"]
+  P3 -->|"arc 3.354%"| P4["point 4<br/>hash 334,045,886<br/>server 7"]

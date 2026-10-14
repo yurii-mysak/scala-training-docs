@@ -72,3 +72,31 @@ class RunnerParsingTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class VisualAndExampleRuleTests(unittest.TestCase):
+    def errs(self, idea: str, extra_files: dict | None = None) -> list[str]:
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "assets").mkdir()
+            for name, content in (extra_files or {}).items():
+                (Path(d) / "assets" / name).write_text(content)
+            p = Path(d) / "2026-10-14-1-t.md"
+            p.write_text(HEAD.replace("## Lab\n", "") + "## The idea\n" + textwrap.dedent(idea))
+            return [e for e in check_lesson.check(p)["errors"] if "Visual rule" in e or "Show-by-example" in e]
+
+    def test_bare_lesson_fails_both_rules(self):
+        e = self.errs("Words only.\n```mermaid\nflowchart LR\nA-->B\n```\n")
+        self.assertTrue(any("Visual rule" in x for x in e))
+        self.assertTrue(any("Show-by-example" in x for x in e))
+
+    def test_complete_lesson_passes(self):
+        pair = "```scala\nprintln(1)\n```\n```text\n1\n```\n"
+        idea = ("```mermaid\nflowchart LR\nA-->B\n```\n" + pair + pair +
+                "![c](assets/2026-10-14-1-chart-1.png)\n\n*Figure 1: c. Generated from the lab output.*\n\n"
+                "![f](assets/2026-10-14-1-fig-1.png)\n\n*Figure 2: f. Source: X (MIT).*\n")
+        self.assertEqual(self.errs(idea, {"2026-10-14-1-chart-1.json": "{}"}), [])
+
+    def test_uncaptioned_image_and_missing_spec_fail(self):
+        e = self.errs("![c](assets/2026-10-14-1-chart-1.png)\nno caption\n")
+        self.assertTrue(any("caption" in x for x in e))
+        self.assertTrue(any("JSON spec" in x for x in e))

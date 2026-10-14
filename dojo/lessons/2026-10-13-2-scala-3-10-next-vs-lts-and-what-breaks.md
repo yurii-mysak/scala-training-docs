@@ -8,7 +8,7 @@ domain: fp-scala
 rung: null
 level: I
 title: 'Scala 3.10: Next vs LTS and what breaks'
-est_min: 25
+est_min: 30
 files_to: 02-functional-programming
 status: sent
 sent_at: 2026-10-13T06:18:13Z
@@ -25,13 +25,15 @@ sources:
   url: https://contributors.scala-lang.org/t/scala-3-10-0-release-thread/7546
 - title: scala/scala3 releases
   url: https://github.com/scala/scala3/releases
+- title: Long-term compatibility plans for Scala 3
+  url: https://www.scala-lang.org/blog/2022/08/17/long-term-compatibility-plans.html
 ---
 # Scala 3.10: Next vs LTS and what breaks
 
-> Fresh · Functional Programming in Scala (red book) · Intermediate · ~25 min · from today's feeds
+> Fresh · Functional Programming in Scala (red book) · Intermediate · ~30 min · from today's feeds
 
 ## Why this matters
-Scala 3.10.0 was announced yesterday, 2026-10-12, on the official scala-lang.org news page, and it is the first release of a second, parallel release line. That turns "should we upgrade?" into a different and more durable question: which of the two lines does each of your artifacts belong on, and who gets locked out when you choose wrong. For your Scala/Akka services the answer is not a matter of taste — the compiler's own interchange format makes it for you, in one direction only. Twenty-five minutes now saves you an aborted upgrade later, because the expensive mistake is publishing a shared library on the wrong line, not bumping an application's compiler.
+Scala 3.10.0 was announced yesterday, 2026-10-12, on the official scala-lang.org news page, and it is the first release of a second, parallel release line. That turns "should we upgrade?" into a different and more durable question: which of the two lines does each of your artifacts belong on, and who gets locked out when you choose wrong. For your Scala/Akka services the answer is not a matter of taste — the compiler's own interchange format makes it for you, in one direction only. Thirty minutes now saves you an aborted upgrade later, because the expensive mistake is publishing a shared library on the wrong line, not bumping an application's compiler.
 
 ## Primer
 You passed rung fp-scala-01, "What is FP: referential transparency and the substitution model", so you have the language's semantics but not its release machinery. Here is only what this lesson needs.
@@ -58,18 +60,34 @@ Scala Next is the feature line; Scala LTS is the stability line. The 3.9 LTS ann
 > "Scala Next receives regular minor releases with new language features, tooling work, and ecosystem changes."
 > — the Scala programming language, *Scala 3.9 LTS released!*, 2026-09-03, https://www.scala-lang.org/news/3.9/
 
-The LTS line gets the opposite deal: patches and tooling fixes only, under the three-year guarantee quoted in the primer. The 3.10 announcement is unambiguous about where library code belongs: "Scala 3.9 LTS remains the recommended version to build against" (scala-lang.org, *Scala 3.10 released!*, 2026-10-12, https://www.scala-lang.org/news/3.10/). The tooling follows: the `lts` tag now resolves to 3.9, and Scala 3.11 is due around March or April 2027.
+The LTS line gets the opposite deal: patches and tooling fixes only, under the three-year guarantee quoted in the primer. The plan itself is from 2022, and its original picture is still the best way to see the shape:
 
-None of it arrived unannounced; the official release thread opened six weeks earlier:
+![Scala 3 LTS roadmap: a diagonal track of minor releases (Scala Next) with vertical LTS branches](assets/2026-10-13-2-fig-1.png)
+
+*Figure 1: The 2022 LTS / Next roadmap. Red logos = minor releases on the Next track; green bars = LTS lines that branch off and then get only fixes. "3.X LTS" has now become 3.9 LTS; "we are here" is August 2022. Source: Paweł Marks (VirtusLab), "Long-term compatibility plans for Scala 3", scala-lang.org (github.com/scala/scala-lang, resources/img/scala3-lts-roadmap.svg; Apache-2.0 per the repo's license.md).*
+
+The same picture, updated to October 2026:
+
+```mermaid
+flowchart LR
+  N33["3.3.0"] --> N38["3.4 … 3.8"] --> N39["3.9.0<br/>2026-09-03"] --> N310["3.10.0, 2026-10-12<br/>first 'Scala Next' release"] --> N311["3.11<br/>~ Mar/Apr 2027"]
+  N33 --> L33["3.3 LTS line<br/>(3.3.8, Jun 2026)"]
+  N39 --> L39["3.9 LTS line<br/>fixes only, at least 3 years"]
+```
+
+For library code the announcement is unambiguous: "Scala 3.9 LTS remains the recommended version to build against" (scala-lang.org, *Scala 3.10 released!*, 2026-10-12). The `lts` tag now resolves to 3.9, and 3.11 is due around March or April 2027 (same source; 3.3.8 from the scala/scala3 releases page). The release thread opened six weeks earlier:
 
 > "The first release candidate for Scala 3.10.0 is now available for public tests!"
 > — Scala Contributors forum, *Scala 3.10.0 release thread*, 2026-09-03, https://contributors.scala-lang.org/t/scala-3-10-0-release-thread/7546
 
-RC1 went out on 2026-09-03 and the stable post is dated 2026-10-12 (Scala Contributors forum, *Scala 3.10.0 release thread*) — that window is your slot for a trial build.
+RC1 on 2026-09-03, stable on 2026-10-12: for the next minor, that window is your slot for a trial build.
 
 ### TASTy decides for you
 
-Here is the asymmetry that does the real work. A compiler reads TASTy produced by its own minor version or an earlier one. It cannot read TASTy from a later one, which may contain tree shapes it has no case for. Newer consumes older, never the reverse.
+A compiler reads TASTy produced by its own minor version or an earlier one, never by a later one, whose trees may have shapes it has no case for. Newer consumes older, never the reverse. The 2022 plan in one line:
+
+> "That means that Scala `3.b.y` can consume the output of Scala `3.a.x` only if `b` is greater or equal to `a`."
+> — Paweł Marks (VirtusLab), *Long-term compatibility plans for Scala 3*, scala-lang.org, 2022-08-17, https://www.scala-lang.org/blog/2022/08/17/long-term-compatibility-plans.html
 
 ```mermaid
 flowchart LR
@@ -79,9 +97,42 @@ flowchart LR
   L310 -.-> B39["app on 3.9 LTS: cannot read it"]
 ```
 
-The previous line change is the documented proof: "artifacts built with Scala 3.9 cannot be consumed by Scala 3.3 projects" (scala-lang.org, *Scala 3.9 LTS released!*, 2026-09-03, https://www.scala-lang.org/news/3.9/). 3.10 adds one more rung to the same ladder.
+The last line change confirms it: "artifacts built with Scala 3.9 cannot be consumed by Scala 3.3 projects" (scala-lang.org, *Scala 3.9 LTS released!*, 2026-09-03).
 
-Now put the two facts together and the policy writes itself. A **library** has consumers you do not control, so its compiler version is a floor you impose on all of them: publish on Next and every consumer still on LTS is locked out until they move too — which they will not do on your schedule, because they chose LTS precisely to avoid moving. An **application** has no consumers; its compiler version constrains nobody. Libraries publish on LTS, applications ride Next. The lab below counts the blast radius of breaking that rule.
+**Seen on a real compiler.** `Money.scala` compiled with scalac 3.10.0, then `Report.scala` compiled against it with scalac 3.9.0 (official release tarballs):
+
+```scala
+// Money.scala: the library, compiled with scalac 3.10.0
+package domain
+final case class Money(cents: Long):
+  def +(o: Money): Money = Money(cents + o.cents)
+
+// Report.scala: the consumer, compiled with scalac 3.9.0
+import domain.Money
+object Report:
+  val total = Money(150) + Money(250)
+```
+
+```text
+error while loading Money,
+TASTy file lib-3.10.0/domain/Money.tasty could not be read, failing with:
+  Forward incompatible TASTy file has version 28.10, produced by Scala 3.10.0,
+  expected stable TASTy from 28.0 to 28.9.
+  To read this TASTy file, use a newer version of this tool compatible with TASTy 28.10.
+-- [E050] Type Error: Report.scala:3:14 ----------------------------------------
+3 |  val total = Money(150) + Money(250)
+  |              ^^^^^
+  |              object Money in package domain does not take parameters
+2 errors found
+```
+
+The code is fine; the *file format* is refused. TASTy has its own version, 28.N, with N following the compiler's minor, and 3.9.0 accepts 28.0–28.9 only. The second error is fallout: the unreadable class was dropped, so `Money(150)` no longer type-checks. Swap the compilers (library 3.9.0, consumer 3.10.0) and both files compile silently. All nine combinations:
+
+![Heatmap of 3 library compilers by 3 consumer compilers; the lower-left triangle fails](assets/2026-10-13-2-chart-1.png)
+
+*Figure 2: 1 = `scalac` exit 0, 0 = TASTy version error; `Money.scala` built with the row's compiler, `Report.scala` with the column's (scalac 3.3.4, 3.9.0, 3.10.0, run 2026-10-15). Below the diagonal everything fails, however small the gap (3.3.4 says "TASTy signature has wrong version"). Generated from these compiler runs.*
+
+So the policy writes itself. A **library** has consumers you do not control, so its compiler version is a floor imposed on all of them: publish on Next and every LTS consumer is locked out until it moves too — which it will not do on your schedule, having chosen LTS to avoid moving. An **application** has no consumers; its compiler version constrains nobody. Libraries publish on LTS, applications ride Next. The lab counts the blast radius of breaking that rule.
 
 One more boundary moved with 3.10:
 
@@ -97,7 +148,7 @@ The migration headline is reassuring and precisely scoped:
 > "Most projects can upgrade without code changes."
 > — the Scala programming language, *Scala 3.10 released!*, 2026-10-12, https://www.scala-lang.org/news/3.10/
 
-The exceptions cluster in two places: code that reads types at compile time, and syntax retained only for Scala 2. Taken in the wrong order, each hides the next:
+The exceptions cluster in code that reads types at compile time and syntax kept only for Scala 2. In the wrong order, each hides the next:
 
 ```mermaid
 flowchart TD
@@ -107,20 +158,62 @@ flowchart TD
   S4 --> S5["Step 5: libraries publish on 3.9 LTS, applications run on 3.10 Next"]
 ```
 
-**Step 1 — dependencies first.** 3.10 does stronger constant folding during inlining, which breaks libraries whose macros inspect inlined trees. The announcement is direct: "If you use the ZIO ecosystem, upgrade these libraries before upgrading the compiler" (scala-lang.org, *Scala 3.10 released!*, 2026-10-12, https://www.scala-lang.org/news/3.10/). The named versions are ZIO 2.1.26, zio-blocks 0.0.54, izumi-reflect 3.0.10 and neotype 0.7.2 — all four read types at compile time, the surface that moved.
+**Step 1 — dependencies first.** 3.10 does stronger constant folding during inlining, which breaks libraries whose macros inspect inlined trees. The announcement is direct: "If you use the ZIO ecosystem, upgrade these libraries before upgrading the compiler" (scala-lang.org, *Scala 3.10 released!*, 2026-10-12): ZIO 2.1.26, zio-blocks 0.0.54, izumi-reflect 3.0.10 and neotype 0.7.2 — all four read types at compile time, the surface that moved.
 
-**Step 2 — the mechanical rewrite.** Using `A with B` as a *type* is now an error, not a warning — deprecated syntax previously retained for compatibility with Scala 2 (scala-lang.org, *Scala 3.10 released!*, 2026-10-12). It has warned since 3.4, and the fix is a flag, not a code review: compile once with `-source:3.4-migration -rewrite` and every occurrence becomes the intersection type `A & B` in place. In a long-lived Akka codebase this is the largest and dullest diff — run it first, so real errors are not buried under it.
+**Step 2 — the mechanical rewrite.** `A with B` as a *type*, Scala 2 syntax kept for compatibility, is now an error (scala-lang.org, *Scala 3.10 released!*, 2026-10-12). It has warned since 3.4, and the fix is a flag: compile once with `-source:3.4-migration -rewrite` and every occurrence becomes the intersection type `A & B`. In a long-lived Akka codebase this is the largest, dullest diff — run it first so real errors are not buried under it. `With.scala`:
 
-**Step 3 — the small semantic ones.** Implicits in an inaccessible companion object are no longer found — 3.9 only warned under `-deprecation` — so make the companion public or move the `given`. `->` became an inline extension method and `Predef.ArrowAssoc` is deprecated, so your own `->` DSL built on an implicit class should become an extension method (issue #26851). The primitive `Rich*` wrappers are extension methods now, moving `until` and `max` onto the primitives' companions, and `this` is illegal in top-level definitions (PR #26448, scala-lang.org, *Scala 3.10 released!*, 2026-10-12).
+```scala
+trait Reader { def read: String = "r" }
+trait Writer { def write: String = "w" }
+object Io extends Reader, Writer
+val io: Reader with Writer = Io
+```
 
-**Step 4 — the compatibility gate.** Java generic signatures are more precise in 3.10: boxed types are used for primitive type arguments (PR #25944). Signatures change without semantics changing, so MiMa reports `IncompatibleSignatureProblem` (issue #27063); use MiMa 1.2.1 or later, which "adds Scala 3.9 and 3.10 support and fixes several false positives" (scala-lang.org, *Scala 3.10 released!*, 2026-10-12).
+```text
+-- [E003] Syntax Error: With.scala:4:15 ----------------------------------------
+4 |val io: Reader with Writer = Io
+  |               ^^^^
+  |with as a type operator has been deprecated; use & instead
+  |This construct can be rewritten automatically under -rewrite -source 3.4-migration.
+1 error found
+```
 
-The upside is real but modest, and mostly consolidation: SIP-67 is stable, so pattern matching under `strictEquality` no longer needs a `CanEqual` instance while `==` stays strict; three SIPs sit behind `-preview` (SIP-61 `@unroll`, SIP-75 relaxed lambdas, SIP-68 referenceable package objects); and Java records are now matchable (PR #26497, scala-lang.org, *Scala 3.10 released!*, 2026-10-12). The standard library changed too:
+That is scalac 3.10.0. 3.3.4 compiles the file silently (even with `-deprecation`); 3.9.0 prints the same message as a `Syntax Warning` and succeeds: 3.10 changed the severity, not the diagnosis. With `-source:3.4-migration -rewrite`, 3.10.0 prints `[patched file With.scala]`, line 4 becomes `val io: Reader & Writer = Io`, and the next plain compile is silent.
+
+**Step 3 — the small semantic ones.** Implicits in an inaccessible companion object are no longer found — 3.9 only warned under `-deprecation`. In `Comp.scala`, `Box`'s companion is `private` to `shapes`, so `Use` cannot name it, yet older compilers still used its `given`:
+
+```scala
+object shapes:
+  class Box(val n: Int)
+  private object Box:
+    given Ordering[Box] = Ordering.by(_.n)
+object Use:
+  val sorted = List(new shapes.Box(2), new shapes.Box(1)).sorted
+```
+
+```text
+-- Deprecation Warning: Comp.scala:6:64 ----------------------------------------
+  |Usage of implicit given instance given_Ordering_Box defined in object Box,
+  |which is not accessible here. In Scala 3.10, this implicit will no longer be found.
+```
+
+```text
+-- [E172] Type Error: Comp.scala:6:64 ------------------------------------------
+  |No given instance of type Ordering[B] was found for parameter ord of method
+  |sorted in trait StrictOptimizedSeqOps.
+1 error found
+```
+
+First block: scalac 3.9.0 with `-deprecation` (still compiles); second: scalac 3.10.0 (both trimmed, long lines wrapped). 3.3.4 says nothing, so a 3.3 codebase gets no warning unless it passes through 3.9. Deleting `private` makes all three compile. Also: `->` became an inline extension method and `Predef.ArrowAssoc` is deprecated, so your own `->` DSL built on an implicit class should become an extension method (issue #26851). The primitive `Rich*` wrappers are extension methods now, moving `until` and `max` onto the primitives' companions, and `this` is illegal in top-level definitions (PR #26448, scala-lang.org, *Scala 3.10 released!*, 2026-10-12).
+
+**Step 4 — the compatibility gate.** 3.10 uses boxed types for primitive type arguments in Java generic signatures (PR #25944). Signatures change, semantics do not, so MiMa reports `IncompatibleSignatureProblem` (issue #27063); use MiMa 1.2.1 or later, which "adds Scala 3.9 and 3.10 support and fixes several false positives" (scala-lang.org, *Scala 3.10 released!*, 2026-10-12).
+
+The upside is modest consolidation: SIP-67 is stable (matching under `strictEquality` needs no `CanEqual`; `==` stays strict); SIP-61 `@unroll`, SIP-75 relaxed lambdas and SIP-68 referenceable package objects sit behind `-preview`; Java records are matchable (PR #26497, same source). And the standard library:
 
 > "The standard library also starts using more Scala 3 features, such as `inline` and extension methods."
 > — the Scala programming language, *Scala 3.10 released!*, 2026-10-12, https://www.scala-lang.org/news/3.10/
 
-None of that justifies moving a published library off LTS. All of it justifies moving your applications.
+None of that justifies moving a published library off LTS; all of it justifies moving applications.
 
 ## Lab
 
@@ -200,7 +293,7 @@ def checkApp(app: String, on: Line, deps: List[Dep]): Unit =
 
 ### Step 2 — run it
 
-```
+```text
 Table 1: can the consumer read the producer's TASTy?
 producer   consumer   p.minor  c.minor  c - p  reads?
 3.3 LTS    3.3 LTS    3        3        0      yes
@@ -248,6 +341,8 @@ Table 3: two realistic dependency sets
 
 Trace the row that matters most. Producer 3.10 Next, consumer 3.9 LTS: `c - p = 9 - 10 = -1`, which is less than 0, so `canRead` is false and the row prints `NO`. One single minor version of difference, in the wrong direction, is as fatal as the seven-version gap on the 3.10-to-3.3 row. There is no "close enough".
 
+The model is not just a story: its yes/NO column agrees, cell for cell, with the nine real compiler runs in Figure 2 (the three NO rows are exactly the three cells that failed with a TASTy version error).
+
 **Verdict:** TASTy readability is a one-way relation, and the margin does not matter — only the sign does.
 
 **Table 2.** The bracketed word is the line's kind, and `reach` counts how many of the three consumer lines can use a library published on that line; higher is better for a library author.
@@ -282,7 +377,8 @@ Publishing on 3.10 Next drops reach from 2/3 to 1/3 — it cuts the audience to 
 - [Scala 3.10 released!](https://www.scala-lang.org/news/3.10/) — the Scala programming language, 2026-10-12 — primary source: the Scala Next series, the `lts` tag resolving to 3.9, Scala CLI 1.17.1, the breaking-change list (inaccessible companion implicits, stronger constant folding and the ZIO/zio-blocks/izumi-reflect/neotype versions, `Rich*` wrappers as extension methods, `->` as an inline extension method, `A with B` as an error, `this` in top-level definitions, boxed Java generic signatures, `-Xmax-fuel` 550), MiMa 1.2.1, SIP-67 stable, the `-preview` SIPs, and the 3.10.1 / 3.10.2 / 3.11 roadmap; accessed 2026-10-13
 - [Scala 3.9 LTS released!](https://www.scala-lang.org/news/3.9/) — the Scala programming language, 2026-09-03 — the LTS / Next split, what each line receives, the at-least-three-years maintenance guarantee, and the documented precedent that 3.9 artifacts cannot be consumed by 3.3 projects; accessed 2026-10-13
 - [Scala 3.10.0 release thread](https://contributors.scala-lang.org/t/scala-3-10-0-release-thread/7546) — Scala Contributors forum, 2026-09-03 to 2026-10-12 — the release-candidate cadence: RC1 opened for public testing in early September, with the stable tag about six weeks later; accessed 2026-10-13
-- [scala/scala3 releases](https://github.com/scala/scala3/releases) — the Scala 3 repository on GitHub — cross-check of the tags and labels: the 3.10.0-RC1 pre-release, and the `LTS` label on 3.9.0 and 3.3.8; accessed 2026-10-13
+- [scala/scala3 releases](https://github.com/scala/scala3/releases) — the Scala 3 repository on GitHub — cross-check of the tags and labels: the 3.10.0-RC1 pre-release, and the `LTS` label on 3.9.0 and 3.3.8; also the source of the scalac 3.3.4, 3.9.0 and 3.10.0 tarballs that produced every compiler message and Figure 2 in this lesson; accessed 2026-10-15
+- [Long-term compatibility plans for Scala 3](https://www.scala-lang.org/blog/2022/08/17/long-term-compatibility-plans.html) — Paweł Marks (VirtusLab), scala-lang.org, 2022-08-17 — the original LTS / Next plan, the "3.b.y can consume 3.a.x only if b ≥ a" rule, and the roadmap figure (Figure 1, from resources/img/scala3-lts-roadmap.svg in github.com/scala/scala-lang); accessed 2026-10-15
 
 ## Next on this track
 Fresh lessons sit outside the ladder; next on Functional Programming in Scala (red book): **Getting started: tail recursion, higher-order and polymorphic functions** (rung 2 of 26, Beginner).

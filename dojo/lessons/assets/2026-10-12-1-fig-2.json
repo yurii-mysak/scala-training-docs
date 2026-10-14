@@ -1,0 +1,7 @@
+{
+  "url": "https://raw.githubusercontent.com/dvgodoy/dl-visuals/main/Decoder/decoder.png",
+  "page": "https://dvgodoy.github.io/dl-visuals/Decoder",
+  "credit": "Daniel Voigt Godoy, Deep Learning Visuals (from Deep Learning with PyTorch Step-by-Step, ch. 9)",
+  "license": "CC BY 4.0",
+  "caption": "A decoder feeds its own prediction back in as the next input"
+}

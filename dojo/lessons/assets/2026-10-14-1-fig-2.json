@@ -1,0 +1,7 @@
+{
+  "url": "https://raw.githubusercontent.com/cs231n/cs231n.github.io/master/assets/cvplot.png",
+  "page": "https://cs231n.github.io/classification/",
+  "credit": "Stanford CS231n, Andrej Karpathy",
+  "license": "MIT",
+  "caption": "5-fold cross-validation accuracy for each k of k-NN"
+}

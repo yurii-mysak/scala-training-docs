@@ -1,14 +1,10 @@
-flowchart LR
-  subgraph UF["underfitting: high bias"]
-    A["k=100 — train MAE 49.8, validation 51.4"]
-    B["k=30 — train MAE 22.9, validation 25.7"]
-  end
-  subgraph SW["sweet spot: bottom of the U"]
-    C["k=10 — train MAE 18.8, validation 20.2"]
-    D["k=3 — train MAE 13.7, validation 18.9 (best)"]
-  end
-  subgraph OF["overfitting: high variance"]
-    E["k=1 — train MAE 0.0, validation 21.0"]
-  end
-  A --> B --> C --> D --> E
-  F["capacity rises left to right (1/k)"] -.-> A
+flowchart TB
+  D["all labelled rows"] --> S["seeded shuffle, then split"]
+  S --> TR["training set 60–80%"]
+  S --> VA["validation set 10–20%"]
+  S --> TE["test set 10–20%, sealed"]
+  TR -->|"fit parameters and scalers"| M["candidate models k = 100 … 1"]
+  M -->|"score each, many times"| VA
+  VA -->|"keep the best"| C["chosen model"]
+  C -->|"score once"| TE
+  TE --> R["the number you report"]

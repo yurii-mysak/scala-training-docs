@@ -1,0 +1,36 @@
+{
+  "type": "heatmap",
+  "title": "Measured: TASTy only reads forward (1 = compiles, 0 = error)",
+  "x_label": "consumer compiler (scalac compiling Report.scala)",
+  "y_label": "library compiled with",
+  "matrix": [
+    [
+      1,
+      1,
+      1
+    ],
+    [
+      0,
+      1,
+      1
+    ],
+    [
+      0,
+      0,
+      1
+    ]
+  ],
+  "row_labels": [
+    "3.3.4 LTS (TASTy 28.3)",
+    "3.9.0 LTS (TASTy 28.9)",
+    "3.10.0 Next (TASTy 28.10)"
+  ],
+  "col_labels": [
+    "3.3.4 LTS",
+    "3.9.0 LTS",
+    "3.10.0 Next"
+  ],
+  "cmap": "Greens",
+  "value_fmt": "{:g}",
+  "_note": "1 = scalac exit 0 (compiles), 0 = exit 1 with a TASTy version error. Measured 2026-10-15 with the official scala3 release tarballs 3.3.4, 3.9.0, 3.10.0 on Money.scala / Report.scala from the lesson."
+}

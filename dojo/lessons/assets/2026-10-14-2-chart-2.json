@@ -1,0 +1,13 @@
+{
+  "type": "bar",
+  "title": "The memoriser wins only when scored against the benchmark's own file",
+  "x_label": "scoring run (lab aggregate)",
+  "y_label": "word error rate (lower is better)",
+  "categories": ["public benchmark,\nscored vs its file", "held-out audio,\nscored vs its file", "public benchmark,\nscored vs what was said"],
+  "series": [
+    {"name": "faithful", "y": [0.16, 0.0417, 0.0417]},
+    {"name": "memoriser", "y": [0.0, 0.125, 0.125]}
+  ],
+  "value_fmt": "%.3f",
+  "_source": "Lab.scala aggregate block: 4/25, 1/24, 1/24 (faithful); 0/25, 3/24, 3/24 (memoriser)."
+}

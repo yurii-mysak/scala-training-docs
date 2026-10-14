@@ -1,7 +1,9 @@
-flowchart TD
-  A["All recordings"] --> B["i.i.d. split: shuffle rows at random"]
-  A --> C["Structured split: hold out whole speakers or a later time window"]
-  B --> B1["Same speaker, room and session on both sides"]
-  B1 --> B2["Test score inflated by recognising the source"]
-  C --> C1["Nothing in the test set shares its source with training"]
-  C1 --> C2["Score tracks the task you actually care about"]
+flowchart LR
+  A["Audio clip"] --> B{"Recognises the dataset's acoustic cue?"}
+  B -- "no" --> C["Transcribe what the signal says"]
+  B -- "yes" --> D["Emit the stored reference convention"]
+  C --> E["Scored against the reference file"]
+  D --> E
+  E --> F["Low published WER"]
+  C --> G["Honest WER on new audio"]
+  D --> H["Errors reappear: wrong words, invented numbers, wrong spelling"]

@@ -1,0 +1,8 @@
+{
+  "type": "bar",
+  "title": "5 of 12 AI touch-points are not generative; the other 7 spread over all four axes",
+  "x_label": "kind / dominant axis",
+  "y_label": "touch-points (count)",
+  "categories": ["non-generative", "next-token prediction", "knowledge", "working memory", "steerability"],
+  "series": [{"name": "touch-points", "y": [5, 2, 1, 2, 2]}]
+}

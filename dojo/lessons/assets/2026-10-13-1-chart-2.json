@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "Same Hello, world: Rust binary ~2 ms, JVM ~0.2 s, scala Lab.scala ~3 s",
+  "x_label": "how the program is started",
+  "y_label": "wall-clock milliseconds per run (log scale)",
+  "categories": ["/bin/true\n(process-spawn floor)", "Rust, release binary\n(./target/release/...)", "Scala, precompiled\n(java -cp out lab)", "Scala script\n(scala Lab.scala)"],
+  "series": [
+    {"y": [1.67, 1.88, 212, 3050]}
+  ],
+  "value_fmt": "%g ms",
+  "log_y": true
+}

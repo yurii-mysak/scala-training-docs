@@ -1,0 +1,8 @@
+flowchart TD
+  R["request"] --> M["migration framework:<br/>choice stable per request hash"]
+  M -->|"not yet migrated"| O["old ketama ring<br/>base 160 points/server, 8-byte entries"]
+  M -->|"migrated share"| N["new ring<br/>90% fewer points, 6-byte entries"]
+  O --> S["cache server"]
+  N --> S
+  L["rollout order: small validation locations,<br/>then larger groups of data centres, then the world"] -.-> M
+  X["rollback: send new requests back<br/>through the old ring, no redeploy"] -.-> M

@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "At ~5 bits per weight, both models ship at under a third of their 16-bit size",
+  "x_label": "model (file sizes from Willison, 2026 in LLMs (so far); 16-bit size computed)",
+  "y_label": "file size, GB",
+  "categories": ["Qwen3.6-35B-A3B (35B params)", "Qwen 3.8 27B (27B params)"],
+  "series": [
+    {"name": "same weights at 16 bits (2 bytes each)", "y": [70, 54]},
+    {"name": "as downloaded: 4.78 and 5.04 bits/param", "y": [20.9, 17.0]}
+  ],
+  "value_fmt": "%g GB"
+}

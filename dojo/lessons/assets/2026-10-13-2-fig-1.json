@@ -1,0 +1,7 @@
+{
+  "url": "https://raw.githubusercontent.com/scala/scala-lang/HEAD/resources/img/scala3-lts-roadmap.svg",
+  "page": "https://www.scala-lang.org/blog/2022/08/17/long-term-compatibility-plans.html",
+  "credit": "Paweł Marks, VirtusLab / scala-lang.org (scala/scala-lang repo)",
+  "license": "Apache-2.0 (as declared in the repo's license.md)",
+  "caption": "The Scala 3 LTS / Next roadmap as drawn in 2022"
+}

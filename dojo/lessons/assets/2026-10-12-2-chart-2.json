@@ -1,0 +1,11 @@
+{
+  "type": "heatmap",
+  "title": "9 of 10 events moved a boundary; 0 needed a fifth axis",
+  "x_label": "axis of the four-axis map",
+  "y_label": "kind of event",
+  "matrix": [[1, 4, 0, 4], [0, 0, 1, 0]],
+  "row_labels": ["BOUNDARY\n(reachable moved)", "PROPERTY\n(same limit,\nnew number)"],
+  "col_labels": ["next-token", "knowledge", "working memory", "steerability"],
+  "value_fmt": "{:g}",
+  "cmap": "Blues"
+}

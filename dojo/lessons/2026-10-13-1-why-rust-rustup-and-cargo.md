@@ -8,7 +8,7 @@ domain: rust
 rung: rust-01
 level: B
 title: Why Rust, rustup and cargo
-est_min: 20
+est_min: 28
 files_to: 26-rust
 status: sent
 sent_at: 2026-10-13T05:55:05Z
@@ -25,7 +25,7 @@ sources:
 ---
 # Why Rust, rustup and cargo
 
-> Rust basics · Beginner · ~20 min · rung 1 of 10 · needs: —
+> Rust basics · Beginner · ~28 min · rung 1 of 10 · needs: —
 
 ## Why this matters
 
@@ -41,80 +41,123 @@ genuinely new to you.
 
 ### The deal Rust offers, stated against the JVM
 
-On the JVM you allocate whenever you like and never write down how long anything lives; the
-collector works that out at run time by tracing reachability. You pay in pause times, a heap you
+On the JVM you allocate freely and never write down how long anything lives; the collector works
+it out at run time by tracing which objects are still reachable. You pay in pause times, a heap you
 size, a JIT you warm, a per-object header.
 
-Rust takes the opposite trade. Every value has exactly one owner; when the owner's scope ends the
-value is dropped, and "dropped" means the compiler put the deallocation at that exact point in the
-machine code. No tracing, no pause, no runtime to ship — a Rust binary is the program. The safety
-you lose with the GC (use-after-free, double free, data races) comes back as a compile-time check,
-the borrow checker, which rejects any program it cannot prove safe. That is rung 2.
+Rust takes the opposite trade. Every value has exactly one owner, the variable that holds it; when
+the owner's scope ends the value is *dropped*, and the compiler puts the deallocation at that exact
+point in the machine code. No tracing, no pause, no runtime to ship — the binary is the program.
 
-Price the costs now. The compiler rejects code that is correct but unprovable, and you restructure
-rather than argue. Builds are slow: lifetime analysis, generics expanded per concrete type
-(monomorphisation) and optimisation all happen ahead of time instead of in a JIT. You trade
-developer latency for runtime predictability. The entry point itself is small, though — chapter 1 of
-the book is install, a `Hello, world!` program, and cargo (The Rust Programming Language, ch. 1
-"Getting Started").
+> "Some languages have garbage collection that regularly looks for no-longer-used memory as the program runs; in other languages, the programmer must explicitly allocate and free the memory. Rust uses a third approach: Memory is managed through a system of ownership with a set of rules that the compiler checks."
+> — The Rust Project Developers, *The Rust Programming Language, ch. 4.1 "What Is Ownership?"*, accessed 2026-10-15, https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html
+
+Rust decides everything in the compiler box; the JVM leaves loading, optimising and freeing to
+the running process:
+
+```mermaid
+flowchart LR
+  subgraph RS["Rust: decided before the program starts"]
+    direction LR
+    A["main.rs"] --> B["rustc<br/>type + borrow check<br/>generics expanded per type<br/>LLVM optimises"]
+    B --> C["native binary<br/>drop calls already<br/>placed in the code"]
+    C --> D["OS process<br/>no VM, no GC thread"]
+  end
+  subgraph JV["Scala: much decided while it runs"]
+    direction LR
+    E["Main.scala"] --> F["scalac<br/>type check"]
+    F --> G[".class bytecode<br/>+ .tasty"]
+    G --> H["JVM<br/>class loading, interpreter,<br/>JIT, GC threads"]
+    H --> I["OS process"]
+  end
+```
+
+You can watch the drop happen. `Drop` is Rust's destructor hook — a trait (Rust's interface) whose
+`drop` method the compiler calls when a value goes away; here it prints. `Noisy` wraps a heap
+`String`:
+
+```rust
+// file: main.rs
+struct Noisy(String);
+impl Drop for Noisy {
+    fn drop(&mut self) { println!("  drop {:?}: free {} heap bytes", self.0, self.0.capacity()) }
+}
+fn main() {
+    let _a = Noisy(String::from("hello"));
+    { let _b = Noisy(String::from("tmp")); println!("inner block ends"); }
+    println!("main ends");
+}
+```
+
+```text
+inner block ends
+  drop "tmp": free 3 heap bytes
+main ends
+  drop "hello": free 5 heap bytes
+```
+
+`"tmp"` is freed at its block's `}`, before `main ends` prints; `"hello"` when `main` returns. No
+collector ran. On the JVM an unreachable object waits for the next GC cycle, which is why Scala
+reaches for `scala.util.Using` when a file must close on time. What gets freed is clearest in the
+book's own picture:
+
+![s1 holds ptr, len 5, capacity 5; ptr points to heap bytes h e l l o](assets/2026-10-13-1-fig-1.png)
+
+*Figure 1: The book's Figure 4-1, "The representation in memory of a `String` holding the value `"hello"` bound to `s1`". Source: The Rust Project Developers, The Rust Programming Language, ch. 4.1, [What Is Ownership?](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html) (MIT OR Apache-2.0).*
+
+Left: pointer, length, capacity, on the stack. Right: the heap allocation. "Rust calls `drop`
+automatically at the closing curly bracket" (ch. 4.1), and `String`'s drop releases the right-hand table — the `free 5 heap bytes` line above. The safety the
+GC gave you (no use-after-free, no double free) comes back as a compile-time check, the borrow
+checker, which rejects any program it cannot prove safe. That is rung 2.
+
+Price the costs now. The compiler rejects code that is correct but unprovable. Builds are slow:
+lifetime analysis, monomorphisation (`Vec<i32>` and `Vec<String>` each get their own machine code,
+where the JVM erases both to one class) and optimisation all happen ahead of time instead of in a
+JIT. You trade developer latency for runtime predictability — and get this back:
+
+![Startup time per run: /bin/true 1.67 ms, Rust 1.88 ms, precompiled Scala 212 ms, scala Lab.scala 3050 ms](assets/2026-10-13-1-chart-2.png)
+
+*Figure 2: Time to run the same `Hello, world!`, measured in this lesson's build environment (Linux x86-64, OpenJDK 21, Scala 3.3.4, rustc 1.97); Rust and `/bin/true` averaged over 500 runs, JVM rows median of 7. Generated from the lesson's own measurements.*
+
+The Rust binary takes 1.88 ms against 1.67 ms for `/bin/true`, which does nothing — so nearly all
+of it is the OS creating a process. Precompiled Scala needs 212 ms to start a JVM and load the
+Scala library; `scala Lab.scala`, how this course runs Scala labs, needs 3050 ms because it also
+compiles the script every time.
 
 ### rustup is Coursier plus a JVM switcher; cargo is sbt
-
-Two tools, two jobs, split more cleanly than on the JVM.
 
 > "We'll download Rust through `rustup`, a command line tool for managing Rust versions and associated tools."
 > — The Rust Project Developers, *The Rust Programming Language, ch. 1.1 "Installation"*, accessed 2026-10-13, https://doc.rust-lang.org/book/ch01-01-installation.html
 
-`rustup` installs and switches *toolchains* (stable, beta, nightly), adds cross-compilation targets
-and adds *components* — on day one, `clippy` the linter and `rustfmt` the formatter. Both ship from
-the compiler's own release, so there is no plugin-version matrix: `rustup component add clippy
-rustfmt` and you are done. A project pins its toolchain in `rust-toolchain.toml`, which `rustup`
-honours silently, the way `.java-version` pins a JDK. `rustc` you rarely invoke by hand.
+`rustup` installs and switches *toolchains* (stable, beta, nightly), cross-compilation targets and
+*components* — on day one `clippy` the linter and `rustfmt` the formatter, released with the
+compiler, so there is no plugin-version matrix. A project pins its toolchain in
+`rust-toolchain.toml`, as `.java-version` pins a JDK. The mechanism is visible on disk: the
+`cargo` and `rustc` on your `PATH` are links to `rustup`, which picks the toolchain and forwards
+the call:
 
-`cargo` is the build tool, and unlike the JVM there is only one of them — sbt and the dependency
-resolver in one binary (The Rust Programming Language, ch. 1.3 "Hello, Cargo!"):
+```bash
+ls -l ~/.cargo/bin/cargo ~/.cargo/bin/rustc
+rustup which cargo
+```
+
+```text
+lrwxrwxrwx 1 root root 6 Oct  2 15:38 /root/.cargo/bin/cargo -> rustup
+lrwxrwxrwx 1 root root 6 Oct  2 15:38 /root/.cargo/bin/rustc -> rustup
+/root/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo
+```
+
+Both are links to `rustup` (output from the lesson's build environment); the last line is the
+real cargo of the active toolchain. Switch toolchains and the same command reaches another
+directory — no `JAVA_HOME` juggling.
 
 > "Cargo is Rust's build system and package manager."
 > — The Rust Project Developers, *The Rust Programming Language, ch. 1.3 "Hello, Cargo!"*, accessed 2026-10-13, https://doc.rust-lang.org/stable/book/ch01-03-hello-cargo.html
 
-The mapping: `Cargo.toml` is `build.sbt`, but declarative TOML, so a build file cannot contain
-arbitrary code; `Cargo.lock` is the resolved version set, committed for binaries; crates.io is Maven
-Central and `cargo add serde` is your `libraryDependencies +=` line; `target/` is `target/`. One
-difference trips the muscle memory: sbt is a shell you keep open, cargo a one-shot CLI keeping
-incremental state in `target/`, so staying in the sbt shell becomes leaving `cargo check` under a
-file watcher.
-
-### The cargo loop
-
-Five commands carry the whole day:
-
-- `cargo new hello_iaido` — scaffolds `Cargo.toml`, `src/main.rs`, a git repo.
-- `cargo check` — type-checks and borrow-checks, emits no binary. Your fast inner loop: "This
-  command quickly checks your code to make sure it compiles but doesn't produce an executable"
-  (ch. 1.3 "Hello, Cargo!").
-- `cargo run` — builds the unoptimised *debug* profile into `target/debug/` and runs it.
-- `cargo build --release` — the optimised profile; it "will create an executable in target/release
-  instead of target/debug" (ch. 1.3 "Hello, Cargo!"). Slower to build, faster to run, far smaller.
-- `cargo test` — compiles a test profile and runs every `#[test]` function; the runner is in the box,
-  no ScalaTest-shaped dependency to choose.
-
-Add `cargo clippy` and `cargo fmt` and that is the whole toolchain.
-
-### Three syntax facts, in Scala terms
-
-`let` is `val`: "by default, variables are immutable" and "once a value is bound to a name, you
-can't change that value" (ch. 3.1 "Variables and Mutability"). `let mut` is `var`. Rust then goes
-further than Scala with *shadowing* — you may reuse a name with a second `let`:
-
-> "We can shadow a variable by using the same variable's name and repeating the use of the `let` keyword"
-> — The Rust Project Developers, *The Rust Programming Language, ch. 3.1 "Variables and Mutability"*, accessed 2026-10-13, https://doc.rust-lang.org/book/ch03-01-variables-and-mutability.html
-
-A shadow is a new binding that takes the old name, so it may change type; `mut` mutates one slot and
-cannot ("The error says we're not allowed to mutate a variable's type", ch. 3.1). Third, Rust is
-expression-oriented exactly as Scala is: "Statements do not return values" while "Expressions
-evaluate to a resultant value", a curly-brace block is an expression whose value is its last
-semicolon-free line, and `if` and `match` are expressions — hence no ternary operator and no need
-for one (ch. 3.3 "Functions").
+So `cargo` is sbt and the dependency resolver in one binary. `Cargo.toml` is `build.sbt`, but
+declarative TOML that cannot contain code; `Cargo.lock` is the resolved version set; crates.io is
+Maven Central and `cargo add serde` your `libraryDependencies +=`. sbt is a shell you keep open;
+cargo is a one-shot CLI keeping incremental state in `target/`. Tool for tool:
 
 ```mermaid
 flowchart LR
@@ -139,6 +182,208 @@ flowchart LR
     BS --> MC["Maven Central"]
   end
 ```
+
+### The cargo loop
+
+- `cargo new hello_iaido` — scaffolds `Cargo.toml`, `src/main.rs`, a git repo.
+- `cargo check` — type- and borrow-checks, no binary: "This command quickly checks your code to
+  make sure it compiles but doesn't produce an executable" (ch. 1.3 "Hello, Cargo!").
+- `cargo run` — builds the unoptimised *debug* profile into `target/debug/` and runs it.
+- `cargo build --release` — the optimised profile, "in target/release instead of target/debug"
+  (ch. 1.3). Slower to build, faster to run, far smaller.
+- `cargo test` — runs every `#[test]` function; the runner is built in.
+
+Plus `cargo clippy` and `cargo fmt`. What one `cargo build` does — note the loop over dependencies
+not yet in `target/`:
+
+```mermaid
+sequenceDiagram
+  participant You
+  participant P as cargo on PATH (rustup link)
+  participant C as real cargo (active toolchain)
+  participant IO as crates.io
+  participant R as rustc
+  participant T as target/
+  You->>P: cargo build
+  P->>C: forward to toolchain from rust-toolchain.toml or the default
+  C->>C: read Cargo.toml, pin versions in Cargo.lock
+  C->>IO: download missing crates (first build only)
+  loop each dependency not yet compiled
+    C->>R: compile the crate
+    R->>T: store the compiled library, reused next time
+  end
+  C->>R: compile your crate (after an edit, only this repeats)
+  R->>T: link target/debug/<name>
+  C-->>You: Finished `dev` profile in N s
+```
+
+That loop makes the first build slow and later ones fast. Measured on a crate using `serde` and
+`serde_json`:
+
+![Cold builds 5.9 to 7.4 s; builds after an edit 0.094 to 0.288 s](assets/2026-10-13-1-chart-1.png)
+
+*Figure 3: Each command from an empty `target/` and again after touching `src/main.rs`; median of 5 runs, measured in this lesson's build environment (Linux x86-64, 2 shared cores, cargo 1.97). Generated from the lesson's own measurements.*
+
+From clean, every command spends 6–7 s compiling 11 dependencies plus your crate. After an edit
+only your crate recompiles: 5.90 ÷ 0.094 = 63× faster for `check`, 6.44 ÷ 0.166 = 39× for debug,
+7.40 ÷ 0.288 = 26× for release. `check` stays cheapest (0.094 s against 0.166 s) because it skips
+machine code — keep it under a file watcher as your sbt shell.
+
+Tests need no setup. In a `cargo new --lib calc` project, one test wrong on purpose:
+
+```rust
+// src/lib.rs
+pub fn double(x: i32) -> i32 { x * 2 }
+
+#[cfg(test)]
+mod tests {
+    use super::double;
+    #[test]
+    fn doubles_21() { assert_eq!(double(21), 42); }
+    #[test]
+    fn doubles_2() { assert_eq!(double(2), 5); }
+}
+```
+
+```text
+$ cargo test
+running 2 tests
+test tests::doubles_21 ... ok
+test tests::doubles_2 ... FAILED
+
+---- tests::doubles_2 stdout ----
+thread 'tests::doubles_2' (26666) panicked at src/lib.rs:9:22:
+assertion `left == right` failed
+  left: 4
+ right: 5
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+```
+
+`left` is what the code computed, `right` what the test expected, plus file, line and column —
+ScalaTest's `shouldBe` with nothing added to `Cargo.toml`.
+
+### Three syntax facts, in Scala terms
+
+**`let` is `val`, `let mut` is `var`.** "By default, variables are immutable" (ch. 3.1 "Variables
+and Mutability"). Rust adds *shadowing*:
+
+> "We can shadow a variable by using the same variable's name and repeating the use of the `let` keyword"
+> — The Rust Project Developers, *The Rust Programming Language, ch. 3.1 "Variables and Mutability"*, accessed 2026-10-13, https://doc.rust-lang.org/book/ch03-01-variables-and-mutability.html
+
+**A shadow is a new binding that takes the old name**, so it may change type:
+
+```rust
+// file: main.rs
+fn main() {
+    let x = 5;
+    let x = x * 2;             // shadow: a new `x`, built from the old one
+    let spaces = "   ";        // &str
+    let spaces = spaces.len(); // shadow with a different type: usize
+    println!("x = {x}, spaces = {spaces}");
+}
+```
+
+```text
+x = 10, spaces = 3
+```
+
+Two bindings per name, and `spaces` went from text to number. Scala refuses this in one scope
+(body of `@main def lab()` in `Lab.scala`):
+
+```scala
+  val x = 5
+  val x = x * 2
+```
+
+```text
+-- [E161] Naming Error: Lab.scala:3:6 ------------------------------
+3 |  val x = x * 2
+  |  ^^^^^^^^^^^^^
+  |x is already defined as value x
+```
+
+**`mut` mutates one slot, so its type is fixed.** "The error says we're not allowed to mutate a
+variable's type" (ch. 3.1). The same trick with `mut`, inside `fn main`:
+
+```rust
+let mut spaces = "   ";
+spaces = spaces.len();
+```
+
+```text
+error[E0308]: mismatched types
+ --> src/main.rs:3:14
+  |
+2 |     let mut spaces = "   ";
+  |                      ----- expected due to this value
+3 |     spaces = spaces.len();
+  |              ^^^^^^^^^^^^ expected `&str`, found `usize`
+```
+
+rustc points at the line that fixed the type and the assignment that breaks it.
+
+**Rust is expression-oriented, as Scala is.** "Statements do not return values" while
+"Expressions evaluate to a resultant value"; a block's value is its last semicolon-free line, and
+`if` and `match` are expressions, so there is no ternary (ch. 3.3 "Functions"):
+
+```rust
+// file: main.rs
+fn grade(score: u32) -> &'static str {
+    if score >= 90 { "A" } else if score >= 75 { "B" } else { "C" }
+}
+fn main() {
+    let y = {
+        let half = 12;
+        half * 3              // no `;` -> this is the block's value
+    };
+    println!("y = {y}, grade(80) = {}", grade(80));
+}
+```
+
+```text
+y = 36, grade(80) = B
+```
+
+The same program in Scala 3:
+
+```scala
+// file: Lab.scala
+def grade(score: Int): String =
+  if score >= 90 then "A" else if score >= 75 then "B" else "C"
+
+@main def lab(): Unit =
+  val y = { val half = 12; half * 3 }
+  println(s"y = $y, grade(80) = ${grade(80)}")
+```
+
+```text
+y = 36, grade(80) = B
+```
+
+Where they part: in Rust a `;` turns an expression into a statement worth `()` (Rust's `Unit`).
+The book's `plus_one` (ch. 3.3) with one stray semicolon:
+
+```rust
+fn plus_one(x: i32) -> i32 {
+    x + 1;
+}
+```
+
+```text
+error[E0308]: mismatched types
+ --> src/main.rs:1:24
+  |
+1 | fn plus_one(x: i32) -> i32 {
+  |    --------            ^^^ expected `i32`, found `()`
+  |    |
+  |    implicitly returns `()` as its body has no tail or `return` expression
+2 |     x + 1;
+  |          - help: remove this semicolon to return this value
+```
+
+The body now ends in a statement, so its value is `()`, not the declared `i32`; the `help` line is
+the fix. In Scala a trailing `;` changes nothing — the one habit to unlearn.
 
 ## Lab
 
@@ -359,15 +604,16 @@ du -sh target/debug target/release
 cargo test
 ```
 
-Expected output — run locally (byte counts on an Apple silicon Mac will be close but not identical):
+Expected output — run locally. The lines below were measured in this lesson's Linux x86-64 build
+environment; on an Apple silicon Mac the byte counts will be close but not identical:
 
 ```text
    Compiling hello_iaido v0.1.0 (/Users/yuriy/code/hello_iaido)
-    Finished `release` profile [optimized] target(s) in 0.07s
+    Finished `release` profile [optimized] target(s) in 0.08s
 
--rwxr-xr-x  2  4370896 Oct 13 06:33 target/debug/hello_iaido
--rwxr-xr-x  2   445144 Oct 13 06:33 target/release/hello_iaido
-4.7M    target/debug
+-rwxr-xr-x 2 root root 4367600 Oct 14 22:13 target/debug/hello_iaido
+-rwxr-xr-x 2 root root  445112 Oct 14 22:13 target/release/hello_iaido
+4.4M    target/debug
 488K    target/release
 
     Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
@@ -440,8 +686,8 @@ The arithmetic, traced with the digits:
 - Mutation (3a–3d): one slot, 0 + 1 = 1, 1 + 2 = 3, 3 + 3 = 6. Sum 1 + 2 + 3 = 6 matches the final
   line.
 
-Step 5's numbers: 4,370,896 bytes of debug binary against 445,144 bytes of release binary,
-4,370,896 ÷ 445,144 = 9.82, so debug is roughly ten times the size here — almost all of it debug
+Step 5's numbers: 4,367,600 bytes of debug binary against 445,112 bytes of release binary,
+4,367,600 ÷ 445,112 = 9.81, so debug is roughly ten times the size here — almost all of it debug
 info and un-inlined code, on a program whose logic is one `println!`.
 
 **Verdict:** `let` without `mut` is not weaker than `var`; combined with shadowing it covers the
@@ -482,6 +728,8 @@ info and un-inlined code, on a program whose logic is one `println!`.
 - [Rustlings](https://github.com/rust-lang/rustlings) — the Rust Project — the exercise set this track uses as its running lab, including the `exercises/00_intro` and `exercises/01_variables` directories worked in Step 6 (accessed 2026-10-13)
 - [Rustlings — Setup](https://rustlings.rust-lang.org/setup) — the Rust Project — the official install and initialisation steps quoted in Step 6 (`cargo install rustlings --locked`, `rustlings init`) and the note that cargo installs binaries to `~/.cargo/bin` (accessed 2026-10-13)
 - [Rustlings — home](https://rustlings.rust-lang.org/) — the Rust Project — the one-line description of Rustlings as small exercises for reading and writing Rust, and its status as an official Rust project (accessed 2026-10-13)
+- [The Rust Programming Language, ch. 4.1 What Is Ownership?](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html) — The Rust Project Developers — the quoted "third approach" between garbage collection and manual freeing, the sentence that `drop` runs at the closing curly bracket, and Figure 4-1 (a `String` on the stack and heap) reproduced as Figure 1 (accessed 2026-10-15)
+- [rust-lang/book, src/img/trpl04-01.svg](https://github.com/rust-lang/book/blob/main/src/img/trpl04-01.svg) — The Rust Project Developers — the source file of Figure 1, used under the repository's MIT OR Apache-2.0 licence (accessed 2026-10-15)
 
 ## Next on this track
 Next on Rust basics: **Ownership and moves** (rung 2 of 10, Beginner).

@@ -122,7 +122,8 @@ sources:
 
 ## Why this matters
 ## The idea
-(600–1200 words. Exactly one or two ```mermaid blocks. Subheadings allowed.)
+(600–1200 words. 1–4 ```mermaid blocks plus charts/figures per the Visual rule; ≥2 short
+example → output pairs per the Show-by-example rule. Subheadings allowed.)
 ## Worked example
 (or "## Lab" — 5–10 minutes, concrete, copy-pasteable)
 ## Self-check
@@ -191,6 +192,40 @@ and says so).
   the Mac (`scala Lab.scala`, `cargo run`).
 `engine/check_lesson.py` rejects code blocks in other languages, shell blocks that call Python
 or Node, and a program with a `main` that lacks the `// file:` marker.
+
+### Show-by-example rule (hard requirement, every lesson)
+
+Every key idea in `## The idea` is shown, not only told: explanation → a **short** example →
+its output → one or two sentences on what the output shows. At least two such examples per
+lesson, each next to the paragraph it illustrates.
+- Code examples are Scala or Rust (Language rule), **at most 12 lines**, followed immediately by
+  a ```text block with the real output (run them: a `// file:` program via `run_lab.py`, or a
+  fragment pasted into the lab program). Short beats complete: show the one call that matters.
+- Tracks without code (Claude Academy) use prompt → response or before → after pairs as
+  ```text blocks instead.
+- The longer, step-by-step program stays in the Lab; the inline examples are the small pieces
+  that make the explanation concrete.
+
+### Visual rule (hard requirement, every lesson)
+
+At least **three visuals** per lesson, each placed next to the text it explains:
+1. **A mechanism diagram** (Mermaid: flowchart, sequence, state) of how the thing works.
+2. **A chart of real numbers** from the lesson's own examples or lab: save the numbers as a
+   spec `dojo/lessons/assets/<id>-chart-<k>.json` and render it with `engine/chart.py`
+   (line, bar, scatter, hbar, heatmap). Embed as `![alt](assets/<id>-chart-<k>.png)`. Choose
+   the chart that makes the lesson's point visible (loss curve, before/after bars, latency
+   distribution, confusion heatmap…), with a title that states the finding.
+3. **A figure from a primary source** the lesson cites: download it with
+   `engine/fetch_figure.py` when it is openly licensed (CC BY/BY-SA, CC0, MIT, Apache, BSD —
+   check the licence on the source repo) and hosted where the job can reach it (GitHub raw
+   files: many course sites and docs are GitHub repos); otherwise **replicate** it faithfully as
+   Mermaid or a chart and caption it "Adapted from <source>, <URL>". Well-known figures are
+   preferred (CS231n network diagrams, DDIA-style replication timelines, RFC packet diagrams,
+   the book's own example drawn out).
+Every image has a caption line directly under it: `*Figure N: what it shows. Source: … (licence)*`
+or `*Figure N: … Generated from the lab output.*`. A lesson may have up to four Mermaid blocks.
+`engine/check_lesson.py` enforces: ≥3 visuals, ≥1 image, a caption under every image, a JSON
+spec beside every chart, ≥2 example → output pairs in `The idea`, example code ≤12 lines.
 
 ### Lab rule (hard requirement, every lesson with code or numbers)
 

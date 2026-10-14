@@ -1,6 +1,6 @@
 flowchart LR
-  K["key = request URL"] --> H["hash(key) to a 32-bit number"]
-  H --> R["walk clockwise on the ring"]
-  R --> P["first point you meet"]
-  P --> S["the server that point belongs to"]
-  S --> C["cache hit or fetch from origin"]
+  K["key = request URL<br/>url-0"] --> H["MurmurHash3, unsigned 32-bit<br/>2,802,085,669"]
+  H --> B["binary search in the<br/>sorted array of ring points"]
+  B --> P["first point with hash >= key hash<br/>(past the end: wrap to index 0)"]
+  P --> S["server that point belongs to"]
+  S --> C["cache hit, or fetch from origin"]

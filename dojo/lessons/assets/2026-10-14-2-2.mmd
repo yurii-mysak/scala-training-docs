@@ -1,0 +1,7 @@
+flowchart TD
+  A["All recordings"] --> B["i.i.d. split: shuffle rows at random"]
+  A --> C["Structured split: hold out whole speakers or a later time window"]
+  B --> B1["Same speaker, room and session on both sides"]
+  B1 --> B2["Test score inflated by recognising the source"]
+  C --> C1["Nothing in the test set shares its source with training"]
+  C1 --> C2["Score tracks the task you actually care about"]

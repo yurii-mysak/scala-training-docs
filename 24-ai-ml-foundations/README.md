@@ -13,6 +13,7 @@ Machine-learning foundations: what models optimise, how they are trained and eva
 | # | Topic | File | Interview Focus |
 |---|-------|------|-----------------|
 | 2 | Decision models: when an LLM answers with probabilities, not text | [decision-models-when-an-llm-answers-with-probabilities-not.md](decision-models-when-an-llm-answers-with-probabilities-not.md) | "Decision models" are a new kind of LLM API: you send text plus typed questions… |
+| 3 | Hard budget caps: the kill switch your agents need | [hard-budget-caps-the-kill-switch-your-agents-need.md](hard-budget-caps-the-kill-switch-your-agents-need.md) | Simon Willison published this on 2026-10-03: a short argument that pay-by-usage… |
 
 ## Advanced
 

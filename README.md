@@ -146,8 +146,8 @@ Lessons marked *passed* are filed into the numbered sections below (new ones app
 ### [10 — Networking](10-networking/)
 | Level | Topics |
 |-------|--------|
-| B | [Network Models](10-networking/Networking-Network-Models.md), [IP Addressing](10-networking/Networking-IP-Addressing.md), [Network Tools](10-networking/Networking-Network-Tools.md) |
-| I | [DNS & DHCP](10-networking/Networking-DNS-DHCP.md), [IPv4 vs IPv6](10-networking/Networking-IPV4-vs-IPV6.md), [NAT, DMZ, VPN](10-networking/Networking-NAT-DMZ-VPN.md) |
+| B | [Network Models](10-networking/Networking-Network-Models.md), [IP Addressing](10-networking/Networking-IP-Addressing.md), [Network Tools](10-networking/Networking-Network-Tools.md), [What really happens in a TCP handshake and teardown](10-networking/what-really-happens-in-a-tcp-handshake-and-teardown.md) |
+| I | [DNS & DHCP](10-networking/Networking-DNS-DHCP.md), [IPv4 vs IPv6](10-networking/Networking-IPV4-vs-IPV6.md), [NAT, DMZ, VPN](10-networking/Networking-NAT-DMZ-VPN.md), [Repeat DNS queries: why a second nameserver helps](10-networking/repeat-dns-queries-why-a-second-nameserver-helps.md) |
 | A | [Routing & Reverse Proxy](10-networking/Networking-Routing-Reverse-Proxy.md), [HTTPS & TLS](10-networking/Networking-HTTPS-TLS.md) |
 
 ### [11 — Security](11-security/)
@@ -192,7 +192,7 @@ Lessons marked *passed* are filed into the numbered sections below (new ones app
 | Level | Topics |
 |-------|--------|
 | B | [What machine learning actually optimises](24-ai-ml-foundations/what-machine-learning-actually-optimises.md) |
-| I | [Decision models: when an LLM answers with probabilities, not text](24-ai-ml-foundations/decision-models-when-an-llm-answers-with-probabilities-not.md) |
+| I | [Decision models: when an LLM answers with probabilities, not text](24-ai-ml-foundations/decision-models-when-an-llm-answers-with-probabilities-not.md), [Hard budget caps: the kill switch your agents need](24-ai-ml-foundations/hard-budget-caps-the-kill-switch-your-agents-need.md) |
 ## Domain-Specific
 
 ### [16 — AdTech](16-adtech/)

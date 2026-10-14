@@ -10,10 +10,10 @@ level: B
 title: What really happens in a TCP handshake and teardown
 est_min: 20
 files_to: 10-networking
-status: sent
+status: passed
 sent_at: 2026-10-09T05:55:20Z
-marked_at: null
-filed_to: null
+marked_at: 2026-10-13T22:10:19Z
+filed_to: 10-networking/what-really-happens-in-a-tcp-handshake-and-teardown.md
 review_due: null
 sources:
 - title: High Performance Browser Networking, ch. 2 "Building Blocks of TCP"

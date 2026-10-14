@@ -10,10 +10,10 @@ level: I
 title: 'Repeat DNS queries: why a second nameserver helps'
 est_min: 22
 files_to: 10-networking
-status: sent
+status: passed
 sent_at: 2026-10-08T06:13:13Z
-marked_at: null
-filed_to: null
+marked_at: 2026-10-13T21:07:11Z
+filed_to: 10-networking/repeat-dns-queries-why-a-second-nameserver-helps.md
 review_due: null
 primer_needed: true
 sources: []

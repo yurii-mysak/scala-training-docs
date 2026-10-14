@@ -9,6 +9,7 @@ Network models, protocols, addressing, DNS, routing, and transport security.
 | 1 | Network models | [Networking-Network-Models.md](Networking-Network-Models.md) | OSI 7 layers, TCP/IP 4 layers, encapsulation |
 | 2 | IP addressing | [Networking-IP-Addressing.md](Networking-IP-Addressing.md) | IPv4, CIDR notation, subnetting |
 | 3 | Network tools | [Networking-Network-Tools.md](Networking-Network-Tools.md) | ping, traceroute, netstat, nslookup, tcpdump |
+| 10 | What really happens in a TCP handshake and teardown | [what-really-happens-in-a-tcp-handshake-and-teardown.md](what-really-happens-in-a-tcp-handshake-and-teardown.md) | SYN, SYN-ACK, ACK: what each side learns (initial sequence numbers, MSS, window scale… |
 
 ## Intermediate
 
@@ -17,6 +18,7 @@ Network models, protocols, addressing, DNS, routing, and transport security.
 | 4 | DNS & DHCP | [Networking-DNS-DHCP.md](Networking-DNS-DHCP.md) | DNS resolution, record types, DHCP lease process |
 | 5 | IPv4 vs IPv6 | [Networking-IPV4-vs-IPV6.md](Networking-IPV4-vs-IPV6.md) | Address space, header differences, migration |
 | 6 | NAT, DMZ, VPN | [Networking-NAT-DMZ-VPN.md](Networking-NAT-DMZ-VPN.md) | NAT types, DMZ architecture, VPN tunneling |
+| 9 | Repeat DNS queries: why a second nameserver helps | [repeat-dns-queries-why-a-second-nameserver-helps.md](repeat-dns-queries-why-a-second-nameserver-helps.md) | Today's item is "One or two nameservers?" by Geoff Huston, published on the… |
 
 ## Advanced
 

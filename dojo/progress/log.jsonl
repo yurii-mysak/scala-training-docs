@@ -34,3 +34,11 @@
 {"ts": "2026-10-13T05:55:05Z", "event": "sent", "lesson": "2026-10-13-1", "by": "job", "note": "core · rust-01"}
 {"ts": "2026-10-13T06:18:13Z", "event": "sent", "lesson": "2026-10-13-2", "by": "job", "note": "fresh · fp-scala"}
 {"ts": "2026-10-13T06:42:44Z", "event": "sent", "lesson": null, "by": "job", "note": "day 8: 2026-10-13-1, 2026-10-13-2"}
+{"ts": "2026-10-14T05:55:08Z", "event": "passed", "lesson": "2026-10-07-2", "by": "dashboard", "note": "was sent"}
+{"ts": "2026-10-14T05:55:09Z", "event": "passed", "lesson": "2026-10-08-2", "by": "dashboard", "note": "was sent"}
+{"ts": "2026-10-14T05:55:09Z", "event": "passed", "lesson": "2026-10-09-1", "by": "dashboard", "note": "was sent"}
+{"ts": "2026-10-14T05:55:22Z", "event": "filed", "lesson": "2026-10-07-2", "by": "job", "note": "24-ai-ml-foundations/hard-budget-caps-the-kill-switch-your-agents-need.md"}
+{"ts": "2026-10-14T05:55:22Z", "event": "filed", "lesson": "2026-10-08-2", "by": "job", "note": "10-networking/repeat-dns-queries-why-a-second-nameserver-helps.md"}
+{"ts": "2026-10-14T05:55:23Z", "event": "filed", "lesson": "2026-10-09-1", "by": "job", "note": "10-networking/what-really-happens-in-a-tcp-handshake-and-teardown.md"}
+{"ts": "2026-10-14T05:55:55Z", "event": "sent", "lesson": "2026-10-14-1", "by": "job", "note": "core · ai-ml-03"}
+{"ts": "2026-10-14T06:03:16Z", "event": "sent", "lesson": "2026-10-14-2", "by": "job", "note": "fresh · ai-ml"}

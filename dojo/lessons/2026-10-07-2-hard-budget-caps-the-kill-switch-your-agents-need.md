@@ -10,10 +10,10 @@ level: I
 title: 'Hard budget caps: the kill switch your agents need'
 est_min: 20
 files_to: 24-ai-ml-foundations
-status: sent
+status: passed
 sent_at: 2026-10-07T06:18:04Z
-marked_at: null
-filed_to: null
+marked_at: 2026-10-13T20:31:26Z
+filed_to: 24-ai-ml-foundations/hard-budget-caps-the-kill-switch-your-agents-need.md
 review_due: null
 primer_needed: true
 sources:

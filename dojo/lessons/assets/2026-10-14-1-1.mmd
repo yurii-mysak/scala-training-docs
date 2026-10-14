@@ -1,0 +1,14 @@
+flowchart LR
+  subgraph UF["underfitting: high bias"]
+    A["k=100 — train MAE 49.8, validation 51.4"]
+    B["k=30 — train MAE 22.9, validation 25.7"]
+  end
+  subgraph SW["sweet spot: bottom of the U"]
+    C["k=10 — train MAE 18.8, validation 20.2"]
+    D["k=3 — train MAE 13.7, validation 18.9 (best)"]
+  end
+  subgraph OF["overfitting: high variance"]
+    E["k=1 — train MAE 0.0, validation 21.0"]
+  end
+  A --> B --> C --> D --> E
+  F["capacity rises left to right (1/k)"] -.-> A

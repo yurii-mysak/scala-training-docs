@@ -74,5 +74,17 @@
   "2026-10-14-2-chart-2.png": {
     "url": "/_blob/0977c6a2bcb9d29eb9c6e2e6b9327302",
     "sha256": "ffe9cd195d09f90fbd61054bc45d01658f72a40c8b8eec08994694ac03dbd648"
+  },
+  "2026-10-15-1-chart-1.png": {
+    "url": "/_blob/812d2d6b1cb39b6cec7c0ae0c6e4afe8",
+    "sha256": "544fbc432e724d1af0af820aa40aaa65899e0e25d9e1a9a76e3985c4f7a9f834"
+  },
+  "2026-10-15-2-chart-1.png": {
+    "url": "/_blob/7b2f0caa45174516736f2b79a5fb6302",
+    "sha256": "7107fbd948169a2c50f66c4a3e305eb7f9c71ef1ae645462353ec931e289f6ca"
+  },
+  "2026-10-15-2-chart-2.png": {
+    "url": "/_blob/2d5872f3a0309d24e7e19cd4efd4797d",
+    "sha256": "7374bc3f1acab199baa998db7d5024b9fdbc78320c9e718bcabe8901b8278332"
   }
 }

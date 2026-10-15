@@ -1,0 +1,15 @@
+{
+  "type": "bar",
+  "title": "52.8% clears an assumed 27.5% floor — but would lose to a 55.2% one",
+  "y_label": "accuracy on the 335 test photos (%)",
+  "categories": [
+    "majority class\n(even classes)\n95% CI 23.0-32.5",
+    "majority class\n(one class 55%)\n95% CI 49.9-60.5",
+    "base model\nzero-shot\n95% CI 11.5-19.1",
+    "fine-tuned\n\n95% CI 47.5-58.1"
+  ],
+  "series": [
+    {"y": [27.5, 55.2, 14.9, 52.8], "x": [0, 1, 2, 3]}
+  ],
+  "value_fmt": "%.1f"
+}

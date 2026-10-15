@@ -43,3 +43,9 @@
 {"ts": "2026-10-14T05:55:55Z", "event": "sent", "lesson": "2026-10-14-1", "by": "job", "note": "core · ai-ml-03"}
 {"ts": "2026-10-14T06:03:16Z", "event": "sent", "lesson": "2026-10-14-2", "by": "job", "note": "fresh · ai-ml"}
 {"ts": "2026-10-14T06:20:36Z", "event": "sent", "lesson": null, "by": "job", "note": "day 9: 2026-10-14-1, 2026-10-14-2"}
+{"ts": "2026-10-15T05:54:33Z", "event": "passed", "lesson": "2026-10-09-2", "by": "dashboard", "note": "was sent"}
+{"ts": "2026-10-15T05:54:34Z", "event": "passed", "lesson": "2026-10-11-1", "by": "dashboard", "note": "was sent"}
+{"ts": "2026-10-15T05:54:38Z", "event": "filed", "lesson": "2026-10-09-2", "by": "job", "note": "24-ai-ml-foundations/tokenizers-v1-what-a-tokenizer-does-and-why-it-got-3-30x.md"}
+{"ts": "2026-10-15T05:54:39Z", "event": "filed", "lesson": "2026-10-11-1", "by": "job", "note": "24-ai-ml-foundations/your-first-model-pandas-in-predictions-out.md"}
+{"ts": "2026-10-15T05:54:51Z", "event": "sent", "lesson": "2026-10-15-1", "by": "job", "note": "core · fp-scala-02"}
+{"ts": "2026-10-15T06:02:10Z", "event": "sent", "lesson": "2026-10-15-2", "by": "job", "note": "fresh · ai-ml"}

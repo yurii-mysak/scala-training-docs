@@ -1,0 +1,12 @@
+flowchart TD
+  A["Reported score"] --> B{"Same metric,<br/>same held-out set?"}
+  B -- no --> X["Not a gain:<br/>two measurements"]
+  B -- yes --> D{"Beats zero-shot<br/>base model?"}
+  D -- no --> Y["Training bought<br/>nothing"]
+  D -- yes --> E{"Beats majority<br/>class?"}
+  E -- no --> Z["Worse than a<br/>constant"]
+  E -- yes --> F{"Gap bigger than<br/>the interval?"}
+  F -- no --> W["Inside the noise:<br/>no finding"]
+  F -- yes --> G{"Checkpoint chosen<br/>on this set?"}
+  G -- yes --> V["Optimistic: use<br/>a fresh set"]
+  G -- no --> OK["A gain you<br/>can act on"]

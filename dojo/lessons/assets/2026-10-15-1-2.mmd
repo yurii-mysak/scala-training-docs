@@ -1,0 +1,5 @@
+flowchart LR
+    P["partial1(a: A, f: (A, B) => C): B => C"] -->|"types force"| PB["(b: B) => f(a, b)"]
+    C1["curry(f: (A, B) => C): A => (B => C)"] -->|"types force"| CB["a => b => f(a, b)"]
+    U["uncurry(f: A => B => C): (A, B) => C"] -->|"types force"| UB["(a, b) => f(a)(b)"]
+    K["compose(f: B => C, g: A => B): A => C"] -->|"types force"| KB["a => f(g(a))"]

@@ -1,0 +1,36 @@
+{
+  "type": "line",
+  "title": "Naive recursion grows one stack frame per call; the tail-recursive go stays flat",
+  "x_label": "n (factorial argument)",
+  "y_label": "live JVM stack frames at the deepest point",
+  "log_y": true,
+  "log_x": true,
+  "series": [
+    {
+      "name": "factorialNaive(n): n * factorialNaive(n-1)",
+      "x": [1, 2, 4, 8, 16, 32, 64, 128, 256],
+      "y": [5, 6, 8, 12, 20, 36, 68, 132, 260]
+    },
+    {
+      "name": "factorial(n) via @tailrec go(n, acc)",
+      "x": [1, 2, 4, 8, 16, 32, 64, 128, 256],
+      "y": [6, 6, 6, 6, 6, 6, 6, 6, 6]
+    }
+  ],
+  "annotate": [
+    {
+      "x": 256,
+      "y": 260,
+      "text": "n + 4 frames",
+      "dx": -70,
+      "dy": 12
+    },
+    {
+      "x": 128,
+      "y": 6,
+      "text": "6 frames, any n",
+      "dx": -40,
+      "dy": 18
+    }
+  ]
+}

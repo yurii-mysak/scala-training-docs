@@ -191,8 +191,8 @@ Lessons marked *passed* are filed into the numbered sections below (new ones app
 ### [24 — AI / ML Foundations](24-ai-ml-foundations/)
 | Level | Topics |
 |-------|--------|
-| B | [What machine learning actually optimises](24-ai-ml-foundations/what-machine-learning-actually-optimises.md) |
-| I | [Decision models: when an LLM answers with probabilities, not text](24-ai-ml-foundations/decision-models-when-an-llm-answers-with-probabilities-not.md), [Hard budget caps: the kill switch your agents need](24-ai-ml-foundations/hard-budget-caps-the-kill-switch-your-agents-need.md) |
+| B | [What machine learning actually optimises](24-ai-ml-foundations/what-machine-learning-actually-optimises.md), [Your first model: pandas in, predictions out](24-ai-ml-foundations/your-first-model-pandas-in-predictions-out.md) |
+| I | [Decision models: when an LLM answers with probabilities, not text](24-ai-ml-foundations/decision-models-when-an-llm-answers-with-probabilities-not.md), [Hard budget caps: the kill switch your agents need](24-ai-ml-foundations/hard-budget-caps-the-kill-switch-your-agents-need.md), [Tokenizers v1: what a tokenizer does, and why it got 3-30x faster](24-ai-ml-foundations/tokenizers-v1-what-a-tokenizer-does-and-why-it-got-3-30x.md) |
 ## Domain-Specific
 
 ### [16 — AdTech](16-adtech/)

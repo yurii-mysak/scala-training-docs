@@ -1,0 +1,11 @@
+{
+  "type": "line",
+  "title": "Why n = 335 is small: the 95% interval only narrows as sqrt(n)",
+  "x_label": "test-set size n (log scale)",
+  "y_label": "Wilson half-width (percentage points)",
+  "series": [
+    {"name": "half-width at p-hat = 0.528", "x": [50, 100, 335, 1000, 5000], "y": [13.34, 9.60, 5.32, 3.09, 1.38]}
+  ],
+  "log_x": true,
+  "annotate": [{"x": 335, "y": 5.32, "text": "n = 335: +/- 5.3 pt", "dx": 25, "dy": 25}]
+}

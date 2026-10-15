@@ -10,10 +10,10 @@ level: I
 title: 'Tokenizers v1: what a tokenizer does, and why it got 3-30x faster'
 est_min: 25
 files_to: 24-ai-ml-foundations
-status: sent
+status: passed
 sent_at: 2026-10-09T06:07:43Z
-marked_at: null
-filed_to: null
+marked_at: 2026-10-14T21:22:48Z
+filed_to: 24-ai-ml-foundations/tokenizers-v1-what-a-tokenizer-does-and-why-it-got-3-30x.md
 review_due: null
 primer_needed: true
 sources:

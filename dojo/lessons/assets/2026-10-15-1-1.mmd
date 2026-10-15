@@ -1,0 +1,21 @@
+flowchart TD
+    subgraph naive["naive: factorial(4) calls itself, then multiplies"]
+        direction TB
+        N0["frame 1: factorial(4), waiting on 4 * _"]
+        N1["frame 2: factorial(3), waiting on 3 * _"]
+        N2["frame 3: factorial(2), waiting on 2 * _"]
+        N3["frame 4: factorial(1) returns 1"]
+        N0 --> N1 --> N2 --> N3
+        N3 -.->|"unwind, multiplying: 1, 2, 6, 24"| N0
+    end
+    subgraph tail["tail-recursive: factorial(4) = go(4, 1)"]
+        direction TB
+        T0["one frame: go(n, acc)"]
+        T1{"n <= 0 ?"}
+        T2["return acc"]
+        T0 --> T1
+        T1 -->|"no: jump back with n - 1 and n * acc"| T0
+        T1 -->|"yes"| T2
+    end
+    G["@annotation.tailrec on go: if the call is not in tail position the build fails"]
+    tail --- G

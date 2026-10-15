@@ -10,10 +10,10 @@ level: B
 title: 'Your first model: pandas in, predictions out'
 est_min: 25
 files_to: 24-ai-ml-foundations
-status: sent
+status: passed
 sent_at: 2026-10-11T05:55:30Z
-marked_at: null
-filed_to: null
+marked_at: 2026-10-14T21:35:25Z
+filed_to: 24-ai-ml-foundations/your-first-model-pandas-in-predictions-out.md
 review_due: null
 sources:
 - title: Kaggle Learn — Intro to Machine Learning

@@ -86,5 +86,21 @@
   "2026-10-15-2-chart-2.png": {
     "url": "/_blob/2d5872f3a0309d24e7e19cd4efd4797d",
     "sha256": "7374bc3f1acab199baa998db7d5024b9fdbc78320c9e718bcabe8901b8278332"
+  },
+  "2026-10-16-1-chart-1.png": {
+    "url": "/_blob/8651b768b5be08bdaf689f9a8a5da738",
+    "sha256": "545a2ff4232c009bbb983081715b11256db639dd5bdd38b1c44e59ef93daa75b"
+  },
+  "2026-10-16-1-chart-2.png": {
+    "url": "/_blob/0800315e330ea60907113839e8f17511",
+    "sha256": "30c222edeb9f41b5919c4e2a9c29607dc6961fad4cd9f61e4ff6239a21575a64"
+  },
+  "2026-10-16-2-chart-1.png": {
+    "url": "/_blob/fb2f121e22ed00093c7af2c4fd30a963",
+    "sha256": "4655d6a7171c4448bdb80d21681d2a0bf5932aee88643598104ed3f5b74f3640"
+  },
+  "2026-10-16-2-chart-2.png": {
+    "url": "/_blob/944597dd8d943c0b10cbdebb9d6e10b6",
+    "sha256": "07afdff6b25f507dfd70b59eea74d4b16430eb45b472348719a442e8458c6ece"
   }
 }

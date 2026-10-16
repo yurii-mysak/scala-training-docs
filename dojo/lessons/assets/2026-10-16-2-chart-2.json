@@ -1,0 +1,75 @@
+{
+  "type": "line",
+  "title": "Too tight an SLA throws away good rows; too loose lets stale prices through",
+  "x_label": "freshness SLA, max age in minutes (log scale)",
+  "y_label": "questions out of 10",
+  "series": [
+    {
+      "name": "answers right",
+      "x": [
+        5,
+        15,
+        60,
+        120,
+        360,
+        1440
+      ],
+      "y": [
+        1,
+        3,
+        3,
+        4,
+        4,
+        4
+      ]
+    },
+    {
+      "name": "silent WRONG answers",
+      "x": [
+        5,
+        15,
+        60,
+        120,
+        360,
+        1440
+      ],
+      "y": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "visible refusals",
+      "x": [
+        5,
+        15,
+        60,
+        120,
+        360,
+        1440
+      ],
+      "y": [
+        9,
+        7,
+        7,
+        6,
+        5,
+        5
+      ]
+    }
+  ],
+  "log_x": true,
+  "annotate": [
+    {
+      "x": 120,
+      "y": 4,
+      "text": "120m: 4 right, 0 wrong",
+      "dx": -110,
+      "dy": 28
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "The gate does not create right answers - it converts 6 silent wrong ones into refusals",
+  "y_label": "questions out of 10",
+  "categories": ["answered", "answers right", "silent WRONG answers", "visible refusals"],
+  "series": [
+    {"name": "A: no gate", "y": [10, 4, 6, 0]},
+    {"name": "B: contract + quarantine", "y": [3, 3, 0, 7]}
+  ],
+  "value_fmt": "%d"
+}

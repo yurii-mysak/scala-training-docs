@@ -1,0 +1,8 @@
+flowchart TD
+  S["Source system: price changes to 59.99"] --> B["Bronze tier: raw landing"]
+  B --> C{"Data contract gate<br/>schema · quality · freshness SLA"}
+  C -- "fails any rule" --> Q["Dead-letter queue<br/>alert to the owning team"]
+  C -- "passes every rule" --> G["Gold tier: certified rows"]
+  G --> L["Semantic layer<br/>domain · metrics · capabilities"]
+  L --> A["Agent answers: 'the price is 59.99'"]
+  Q --> N["Agent has no row<br/>it says it lacks current pricing"]

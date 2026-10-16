@@ -1,0 +1,27 @@
+flowchart TD
+    subgraph rel["normalised: one row per thing, references by id"]
+      direction TB
+      U["users: id, first_name, last_name, region_id, summary"]
+      P["positions: id, user_id, job_title, organisation_id"]
+      E["education: id, user_id, school_name, start, end"]
+      R["regions: id, region_name"]
+      O["organisations: id, org_name"]
+      U -->|"one-to-many"| P
+      U -->|"one-to-many"| E
+      U -->|"many-to-one"| R
+      P -->|"many-to-one"| O
+    end
+    subgraph doc["one JSON document: the whole tree, one read"]
+      direction TB
+      D["user 251: first_name, last_name, summary"]
+      DP["positions array: job_title plus the organisation NAME as text"]
+      DE["education array: school_name, start, end"]
+      DR["region: the region NAME as text, no id"]
+      D --> DP
+      D --> DE
+      D --> DR
+    end
+    R -. "name copied into every document" .-> DR
+    O -. "name copied into every position entry" .-> DP
+    classDef dup fill:#f3d7b0,stroke:#b5751a,color:#000
+    class DR,DP dup

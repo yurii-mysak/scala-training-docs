@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "Renaming a many-to-one value: one row, or every copy in every document",
+  "x_label": "rename applied to 3 car-wash customer profiles",
+  "y_label": "places that must be edited",
+  "categories": ["package \"Premium Wax\"", "plan \"Gold Unlimited\"", "site \"Podil\""],
+  "series": [
+    {"name": "normalised tables (rows to update)", "y": [1, 1, 1]},
+    {"name": "documents (JSON paths to rewrite)", "y": [4, 2, 4]}
+  ]
+}

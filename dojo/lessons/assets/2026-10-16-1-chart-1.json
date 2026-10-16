@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "One profile read: 13 joined accesses out of tables, 1 out of a document",
+  "x_label": "customer (number of washes in the profile)",
+  "y_label": "storage accesses for one full profile read",
+  "categories": ["Olena, 4 washes", "Taras, 2 washes", "Iryna, 2 washes"],
+  "series": [
+    {"name": "normalised tables (keyed fetches + scans)", "y": [13, 9, 9]},
+    {"name": "one document (fetch by primary key)", "y": [1, 1, 1]}
+  ]
+}

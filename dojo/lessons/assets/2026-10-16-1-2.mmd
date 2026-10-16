@@ -1,0 +1,11 @@
+flowchart TD
+    A["IMS, hierarchical, 1968: one tree, child records nested inside parents"]
+    A --> A1["one-to-many is natural; many-to-many needs duplication or hand-written pointers"]
+    B["CODASYL, network, 1970s: a record may have several parents, linked by pointers"]
+    B --> B1["a query is an access path: start at a root and follow pointers, by hand"]
+    B1 --> B2["change the access path and the application code is rewritten"]
+    C["relational, 1970: a relation is a set of tuples, open to any query"]
+    C --> C1["the query says WHAT it wants; the optimiser builds the access path"]
+    C1 --> C2["add an index and the plan changes; the query text does not move"]
+    A1 -.-> C
+    B2 -.-> C

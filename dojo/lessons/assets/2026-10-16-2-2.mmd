@@ -1,0 +1,8 @@
+flowchart TD
+  B2["Bronze: raw, as it landed"] --> S2["Silver: validated against the contract"]
+  S2 --> G2["Gold: certified, the lowest tier an agent may read"]
+  G2 --> AG["Adaptive Gold: views the agent materialises for itself"]
+  G2 --> DM["Domain model: entities and relationships"]
+  DM --> SM["Semantic model: one governed metric per concept, compiled to SQL"]
+  SM --> CM["Capability model: permitted reads and permitted actions"]
+  CM --> AGT["Agent"]

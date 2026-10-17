@@ -1,17 +1,17 @@
 {
   "schema": 1,
-  "day": 11,
+  "day": 12,
   "credits": {
-    "ai-ml": 3,
-    "fp-scala": -3,
-    "ddia": -3,
-    "architecture": 4,
-    "networking": 4,
-    "rust": -7,
-    "claude-academy": 2
+    "ai-ml": -10,
+    "fp-scala": 0,
+    "ddia": 0,
+    "architecture": 6,
+    "networking": 6,
+    "rust": -6,
+    "claude-academy": 4
   },
   "next_rung": {
-    "ai-ml": 3,
+    "ai-ml": 4,
     "fp-scala": 2,
     "ddia": 2,
     "architecture": 1,
@@ -19,7 +19,7 @@
     "rust": 1,
     "claude-academy": 1
   },
-  "lessons_sent": 22,
+  "lessons_sent": 24,
   "lessons_passed": 11,
   "open": [
     "2026-10-11-2",
@@ -32,18 +32,20 @@
     "2026-10-15-1",
     "2026-10-15-2",
     "2026-10-16-1",
-    "2026-10-16-2"
+    "2026-10-16-2",
+    "2026-10-17-1",
+    "2026-10-17-2"
   ],
   "last_run_at": "2026-10-16T06:35:18Z",
   "last_fresh_domains": [
-    "networking",
     "ai-ml",
     "architecture",
     "ai-ml",
     "fp-scala",
     "ai-ml",
     "ai-ml",
-    "architecture"
+    "architecture",
+    "ai-ml"
   ],
   "trigger_id": "trig_011DeXPBJ6EdXFc3orcBxeSd",
   "reminder_trigger_id": "trig_015yUreb23kdT2rv2bG7vLhT",

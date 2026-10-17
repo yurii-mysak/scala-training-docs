@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "One matrix-vector product, four predictions: h3 lands at 398.5, h4 at 102.5",
+  "x_label": "house row of X  (size m2, rooms, age years)",
+  "y_label": "X @ w  (predicted price, thousands)",
+  "categories": ["h1 (55, 2, 30)", "h2 (80, 3, 12)", "h3 (120, 4, 3)", "h4 (40, 1, 55)"],
+  "value_fmt": "%.1f",
+  "series": [
+    {"name": "X @ w", "y": [170.0, 264.0, 398.5, 102.5]}
+  ]
+}

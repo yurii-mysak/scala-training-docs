@@ -1,0 +1,13 @@
+{
+  "type": "bar",
+  "title": "One million vectors: index bytes scale linearly with the retained dimension",
+  "x_label": "retained dimensions",
+  "y_label": "MB for 1,000,000 vectors",
+  "categories": ["768", "512", "256", "128"],
+  "series": [
+    {"name": "float32 (4 bytes per value)", "y": [3072.0, 2048.0, 1024.0, 512.0]},
+    {"name": "bfloat16 (2 bytes per value)", "y": [1536.0, 1024.0, 512.0, 256.0]}
+  ],
+  "value_fmt": "%.0f",
+  "hline": {"y": 1536.0, "label": "1536 MB = the guide's 'roughly 1.5 GB' at 768 dims"}
+}

@@ -1,0 +1,13 @@
+flowchart TD
+  T["text"] --> E
+  C["code"] --> E
+  I["image"] --> E
+  V["video"] --> E
+  A["audio"] --> E
+  E["modular encoders, 270M for text and code up to 740M for all modalities"]
+  E --> S["one vector of 768 floats, normalised to length 1"]
+  S --> K["optional: keep the first 512, 256 or 128 coordinates"]
+  K --> N["renormalise the shortened vector to length 1"]
+  N --> X["index: a matrix of n rows by d columns"]
+  X --> Q["query vector times index matrix, then argmax"]
+  Q --> R["top-k nearest items, whatever modality they came from"]

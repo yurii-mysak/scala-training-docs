@@ -1,0 +1,12 @@
+{
+  "type": "line",
+  "title": "Truncation only survives when the leading dimensions carry the information",
+  "x_label": "dimensions kept (out of 64)",
+  "y_label": "recall@3 against the full-dimension ranking",
+  "series": [
+    {"name": "flat corpus (every dimension equally loaded)", "x": [16, 32, 48, 64], "y": [0.120, 0.260, 0.480, 1.000]},
+    {"name": "front-loaded corpus (dimension j scaled by exp(-0.09j))", "x": [16, 32, 48, 64], "y": [0.720, 0.913, 0.987, 1.000]}
+  ],
+  "hline": {"y": 0.75, "label": "about 75%: the guide's figure at 128 of 768 dims"},
+  "annotate": [{"x": 32, "y": 0.913, "text": "0.913 at half the dims", "dx": -30, "dy": -45}]
+}

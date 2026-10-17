@@ -1,0 +1,9 @@
+{
+  "type": "bar",
+  "title": "MTEB (Code): 68.76 to 78.68, a 9.92-point gain",
+  "x_label": "model",
+  "y_label": "MTEB (Code) score",
+  "categories": ["EmbeddingGemma 1", "EmbeddingGemma 2"],
+  "series": [{"name": "MTEB (Code)", "y": [68.76, 78.68]}],
+  "value_fmt": "%.2f"
+}

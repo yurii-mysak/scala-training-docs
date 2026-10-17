@@ -1,0 +1,5 @@
+flowchart TD
+  X["X: dataset, 4 rows by 3 features"] --> P["X @ w: dot every row of X with w"]
+  W["w: weights, length 3"] --> P
+  P --> Y["y-hat: 4 predictions, length 4"]
+  Y --> S["inner 3 must match and cancels; outer 4 survives"]

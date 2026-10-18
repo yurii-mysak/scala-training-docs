@@ -1,0 +1,10 @@
+flowchart TD
+  A["Fibre cut above the OLT"] --> B["OLT is L2: BNG link stays up"]
+  B --> C["BNG keeps the subscriber binding"]
+  A --> D["CPE: RENEW at T1 gets no REPLY"]
+  D --> E["CPE: REBIND at T2 gets no REPLY"]
+  E --> F["CPE falls back to SOLICIT"]
+  F --> G["Path returns: CPE re-solicits"]
+  C --> G
+  G --> H["Vendor DBOR deletes the live binding"]
+  H --> I["Session torn down, subscriber offline"]

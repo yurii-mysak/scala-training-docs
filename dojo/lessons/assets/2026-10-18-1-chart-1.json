@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "Moving one trait into the domain drops its instability from 0.33 to 0.00",
+  "x_label": "package (ring 0 = innermost)",
+  "y_label": "instability  I = Ce / (Ca + Ce)",
+  "categories": ["domain (ring 0)", "infra (ring 1)", "app (ring 2)"],
+  "series": [
+    {"name": "before: domain imports infra", "y": [0.33, 0.33, 1.00]},
+    {"name": "after: PriceRepo trait in domain", "y": [0.00, 0.50, 1.00]}
+  ]
+}

@@ -1,0 +1,12 @@
+sequenceDiagram
+  participant C as CPE
+  participant B as BNG, the DHCPv6 server
+  C->>B: SOLICIT, multicast
+  B->>C: ADVERTISE
+  C->>B: REQUEST
+  B->>C: REPLY with prefix, T1, T2
+  Note over C: T1 reached
+  C-xB: RENEW, unicast, lost above the OLT
+  Note over C: T2 reached, no REPLY
+  C-xB: REBIND, multicast, still lost
+  Note over C: back to SOLICIT, RT reset to IRT

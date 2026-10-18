@@ -56,3 +56,5 @@
 {"ts": "2026-10-17T05:54:49Z", "event": "sent", "lesson": "2026-10-17-1", "by": "job", "note": "core · ai-ml-04"}
 {"ts": "2026-10-17T06:01:49Z", "event": "sent", "lesson": "2026-10-17-2", "by": "job", "note": "fresh · ai-ml"}
 {"ts": "2026-10-17T06:17:14Z", "event": "sent", "lesson": null, "by": "job", "note": "day 12: 2026-10-17-1, 2026-10-17-2"}
+{"ts": "2026-10-18T05:55:09Z", "event": "sent", "lesson": "2026-10-18-1", "by": "job", "note": "core · architecture-02"}
+{"ts": "2026-10-18T06:02:08Z", "event": "sent", "lesson": "2026-10-18-2", "by": "job", "note": "fresh · networking"}

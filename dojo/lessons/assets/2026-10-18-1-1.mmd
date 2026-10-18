@@ -1,0 +1,14 @@
+flowchart TD
+    subgraph r4["Frameworks and Drivers: Web, DB, Devices, External Interfaces"]
+      direction TB
+      subgraph r3["Interface Adapters: Controllers, Gateways, Presenters"]
+        direction TB
+        subgraph r2["Application Business Rules: Use Cases"]
+          direction TB
+          subgraph r1["Enterprise Business Rules: Entities"]
+            E["Money, Order, Price"]
+          end
+        end
+      end
+    end
+    D["source-code dependencies point inward, and only inward"] --> E

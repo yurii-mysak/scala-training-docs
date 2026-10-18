@@ -1,0 +1,4 @@
+flowchart TD
+    P1["domain.Pricing"] -->|"imports"| R1["infra.PostgresPriceRepo"]
+    R1 -->|"imports Money"| M1["domain.Money"]
+    M1 -. "same package as Pricing: the loop closes" .-> P1

@@ -1,0 +1,6 @@
+flowchart TD
+    P2["domain.Pricing"] -->|"imports"| T2["domain.PriceRepo (trait)"]
+    R2["infra.PostgresPriceRepo"] -->|"implements"| T2
+    A2["app: the composition root"] -->|"constructs"| R2
+    A2 -->|"injects into"| P2
+    P2 -. "calls at run time" .-> R2

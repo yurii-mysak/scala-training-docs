@@ -1,0 +1,9 @@
+{
+  "type": "bar",
+  "title": "Why /64 was the regret: usable /64 LANs per delegated prefix",
+  "x_label": "prefix delegated to the customer",
+  "y_label": "number of /64 LANs (log scale)",
+  "categories": ["/64", "/60", "/56", "/48"],
+  "series": [{"name": "/64 LANs available", "y": [1, 16, 256, 65536]}],
+  "log_y": true
+}

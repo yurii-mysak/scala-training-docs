@@ -1,0 +1,9 @@
+{
+  "type": "bar",
+  "title": "Vendor speedup claims, each at the context length it was measured at",
+  "x_label": "claim (as reported by Lockwood, 2026-09-18)",
+  "y_label": "claimed speedup (x)",
+  "categories": ["load vs recompute\n112,000 tokens", "prefill\n128,000 tokens, 70B model", "time to first token\n128,000 tokens"],
+  "series": [{"name": "claimed speedup", "y": [27.1, 75.0, 20.0]}],
+  "value_fmt": "%gx"
+}

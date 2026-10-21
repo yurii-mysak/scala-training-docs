@@ -1,0 +1,13 @@
+{
+  "type": "bar",
+  "title": "Vacuum, fibre and round trip: the physics floor per route (HPBN Table 1-1)",
+  "x_label": "route (great-circle distance)",
+  "y_label": "latency, ms",
+  "categories": ["New York - San Francisco\n4,148 km", "New York - London\n5,585 km", "New York - Sydney\n15,993 km"],
+  "series": [
+    {"name": "one way, light in vacuum", "y": [14, 19, 53]},
+    {"name": "one way, light in fibre", "y": [21, 28, 80]},
+    {"name": "round-trip time in fibre", "y": [42, 56, 160]}
+  ],
+  "value_fmt": "%g"
+}

@@ -1,0 +1,17 @@
+{
+  "type": "line",
+  "title": "Loading a KV cache only wins past about 4,126 tokens",
+  "x_label": "prefix length (tokens)",
+  "y_label": "seconds",
+  "log_x": true,
+  "log_y": true,
+  "series": [
+    {"name": "recompute the prefix (quadratic)",
+     "x": [512, 1024, 2048, 4096, 4126, 8192, 16384, 32768, 65536, 112000, 128000],
+     "y": [0.0012, 0.0048, 0.0191, 0.0762, 0.0774, 0.3049, 1.2198, 4.8791, 19.5164, 57.0, 74.4490]},
+    {"name": "load it from storage (linear)",
+     "x": [512, 1024, 2048, 4096, 4126, 8192, 16384, 32768, 65536, 112000, 128000],
+     "y": [0.0096, 0.0192, 0.0384, 0.0768, 0.0774, 0.1536, 0.3072, 0.6144, 1.2288, 2.1, 2.4]}
+  ],
+  "annotate": [{"x": 4126, "y": 0.0774, "text": "break-even: 4,126 tokens, 0.0774 s", "dx": 18, "dy": -52}]
+}

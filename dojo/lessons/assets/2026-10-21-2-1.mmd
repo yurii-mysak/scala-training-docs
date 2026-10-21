@@ -1,0 +1,9 @@
+flowchart TD
+  A["Prompt: n tokens"] --> B["PREFILL: one pass over all n tokens"]
+  B --> C["KV cache in GPU HBM: one key and one value per token, per layer"]
+  B -.-> T1["sets TTFT (time to first token)"]
+  C --> D["DECODE step: read every cached key and value"]
+  D --> E["emit one new token"]
+  E --> F["append its key and value to the cache"]
+  F --> C
+  D -.-> T2["sets TBT (time between tokens)"]

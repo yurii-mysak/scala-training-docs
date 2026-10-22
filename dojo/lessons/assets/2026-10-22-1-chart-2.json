@@ -1,0 +1,51 @@
+{
+  "type": "bar",
+  "title": "Leading ask buys agreement; neutral ask buys risks",
+  "x_label": "answer (A1, A3 = leading ask; A2, A4 = neutral ask)",
+  "y_label": "marker count",
+  "categories": [
+    "A1 leading",
+    "A2 neutral",
+    "A3 leading",
+    "A4 neutral"
+  ],
+  "series": [
+    {
+      "name": "agreement markers",
+      "y": [
+        4,
+        0,
+        4,
+        0
+      ]
+    },
+    {
+      "name": "hedge words",
+      "y": [
+        3,
+        0,
+        6,
+        0
+      ]
+    },
+    {
+      "name": "caveat sentences",
+      "y": [
+        1,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "name": "risks named",
+      "y": [
+        0,
+        10,
+        1,
+        8
+      ]
+    }
+  ],
+  "value_fmt": "%.0f"
+}

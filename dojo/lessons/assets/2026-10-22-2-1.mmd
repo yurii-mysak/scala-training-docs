@@ -1,0 +1,9 @@
+flowchart TD
+  B["Application brief: BFF, 202 deferred creation, Kafka publish, exact error codes"] --> G
+  G["Guides: OpenAPI spec, AsyncAPI spec, request-response examples, API skill"] --> A
+  A["Agent inner loop: read, edit, run"] --> S
+  S["Sensors: contract conformance, API tests, mock-call and Kafka assertions"] --> A
+  G -. "examples validate: specs and examples must agree" .-> S
+  A --> D["Agent declares done"]
+  D --> E["Outer loop: 178 automated acceptance tests, fresh Docker container"]
+  E --> V["Accepted only if it starts AND all 178 pass"]

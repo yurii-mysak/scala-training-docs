@@ -62,3 +62,5 @@
 {"ts": "2026-10-21T05:54:54Z", "event": "sent", "lesson": "2026-10-21-1", "by": "job", "note": "core · networking-02"}
 {"ts": "2026-10-21T06:07:43Z", "event": "sent", "lesson": "2026-10-21-2", "by": "job", "note": "fresh · ai-ml"}
 {"ts": "2026-10-21T06:19:54Z", "event": "sent", "lesson": null, "by": "job", "note": "day 14: 2026-10-21-1, 2026-10-21-2"}
+{"ts": "2026-10-22T05:55:09Z", "event": "sent", "lesson": "2026-10-22-1", "by": "job", "note": "core · claude-academy-02"}
+{"ts": "2026-10-22T06:02:27Z", "event": "sent", "lesson": "2026-10-22-2", "by": "job", "note": "fresh · architecture"}

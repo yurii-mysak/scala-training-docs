@@ -1,0 +1,20 @@
+{
+  "type": "bar",
+  "title": "Raters preferred the sycophantic answer 95% of the time",
+  "x_label": "which answer the human rater preferred",
+  "y_label": "share of comparisons, %",
+  "categories": [
+    "sycophantic answer",
+    "baseline truthful answer"
+  ],
+  "series": [
+    {
+      "name": "preference share",
+      "y": [
+        95,
+        5
+      ]
+    }
+  ],
+  "value_fmt": "%.0f"
+}

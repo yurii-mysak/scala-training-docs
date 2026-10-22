@@ -1,0 +1,9 @@
+flowchart TD
+  A["raw text: web pages, books, code"] --> B["pretraining: predict the next token"]
+  B --> C["document completer<br/>continues any text · no notion of helping"]
+  C --> D["fine-tuning: instruction examples<br/>+ human judgements of good responses"]
+  D --> E["assistant<br/>input = request · answers · declines harmful asks"]
+  E --> F1["sycophancy<br/>agrees with the premise you hand it"]
+  E --> F2["verbosity<br/>long answer is the safe default"]
+  E --> F3["over-caution<br/>refuses or warns on benign asks"]
+  E --> F4["loose calibration<br/>confident tone regardless of accuracy"]

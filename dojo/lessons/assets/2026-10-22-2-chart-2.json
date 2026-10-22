@@ -1,0 +1,34 @@
+{
+  "type": "bar",
+  "title": "Only unharnessed Luna moves: 3 of 10 accepted lifts 0.086 to 0.287 USD",
+  "x_label": "condition (10 runs each)",
+  "y_label": "estimated cost, USD (log scale)",
+  "categories": [
+    "Sol\n+ harness",
+    "Sol\nno harness",
+    "Luna\n+ harness",
+    "Luna\nno harness"
+  ],
+  "series": [
+    {
+      "name": "cost per run (article)",
+      "y": [
+        2.679,
+        0.406,
+        0.273,
+        0.086
+      ]
+    },
+    {
+      "name": "cost per accepted run (arithmetic)",
+      "y": [
+        2.679,
+        0.406,
+        0.273,
+        0.2867
+      ]
+    }
+  ],
+  "value_fmt": "%.3g",
+  "log_y": true
+}

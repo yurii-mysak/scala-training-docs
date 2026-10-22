@@ -1,0 +1,8 @@
+flowchart TD
+  R["Brief: deferred creation returns 202 plus a monitor URL"] --> I["Agent implements; the 202 path is dropped"]
+  I --> NS["No sensor: nothing contradicts the agent"]
+  NS --> SH["Ships; outer loop finds 503 instead of 202"]
+  SH --> F["Run rejected: that one gap also fails the monitor-URL checks"]
+  I --> WS["Sensor runs: contract check fails on the 202 path"]
+  WS --> FX["Agent reads the failure and implements the requirement"]
+  FX --> OK["Run accepted"]

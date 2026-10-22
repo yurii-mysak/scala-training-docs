@@ -1,0 +1,10 @@
+{
+  "type": "bar",
+  "title": "Failures cluster: 3 clean runs, 7 runs each losing a block of checks",
+  "x_label": "unharnessed GPT-6 Luna run (reconstructed, seed 178)",
+  "y_label": "checks failed of 178",
+  "categories": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+  "series": [{"name": "checks failed", "y": [0, 0, 0, 13, 11, 14, 12, 15, 14, 14]}],
+  "value_fmt": "%g",
+  "hline": {"y": 34, "label": "article's floor: each failing app passed >= 144 of 178"}
+}

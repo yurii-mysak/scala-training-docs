@@ -1,0 +1,10 @@
+{
+  "type": "bar",
+  "title": "Acceptance is conjunctive: 94.8% per check means 0.007% per run",
+  "x_label": "per-check pass rate",
+  "y_label": "P(all 178 checks pass), %  (log scale)",
+  "categories": ["94.80%", "99.00%", "99.50%", "99.90%", "99.99%"],
+  "series": [{"name": "expected per-run acceptance", "y": [0.0074, 16.7134, 40.9740, 83.6868, 98.2357]}],
+  "value_fmt": "%.4g",
+  "log_y": true
+}

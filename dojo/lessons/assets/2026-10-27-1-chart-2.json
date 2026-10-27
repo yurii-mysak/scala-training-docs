@@ -1,0 +1,12 @@
+{
+  "type": "line",
+  "title": "init costs n-1 new cells; tail and drop cost none at any length",
+  "x_label": "list length n",
+  "y_label": "new cells allocated",
+  "series": [
+    {"name": "init(l)", "x": [4, 8, 16, 32, 64], "y": [3, 7, 15, 31, 63]},
+    {"name": "drop(l, n/2)", "x": [4, 8, 16, 32, 64], "y": [0, 0, 0, 0, 0]},
+    {"name": "tail(l)", "x": [4, 8, 16, 32, 64], "y": [0, 0, 0, 0, 0], "style": "dashed"}
+  ],
+  "annotate": [{"x": 64, "y": 63, "text": "63 = n - 1", "dx": -70, "dy": 12}]
+}

@@ -1,0 +1,7 @@
+flowchart TD
+  A["CI job or agent needs a working copy"] --> B["scion-daemon on the node, bounded cache"]
+  B -->|"miss: request missing trees, then blobs"| C["Regional scion-cache, over 99 percent hits"]
+  C -->|"miss"| S["Authoritative scion-server"]
+  S --> SP["Spanner: changeset log and metadata"]
+  S --> CS["Cloud storage: content-addressed blobs"]
+  CS --> W["Objects stream back down the tiers; working copy in seconds"]

@@ -1,0 +1,9 @@
+{
+  "type": "bar",
+  "title": "12x in four months: 2,500 merges/day in May, 30,000 in September",
+  "x_label": "2026",
+  "y_label": "code changes merged per day",
+  "categories": ["May 2026", "September 2026"],
+  "series": [{"name": "merges per day", "y": [2500, 30000]}],
+  "value_fmt": "%d"
+}

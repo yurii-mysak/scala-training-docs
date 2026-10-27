@@ -1,0 +1,8 @@
+{
+  "type": "bar",
+  "title": "On a 16-cell list: tail and drop allocate nothing, init rebuilds 15 cells",
+  "x_label": "operation on big = List(1..16)",
+  "y_label": "new cells allocated",
+  "categories": ["tail", "drop(.,4)", "dropWhile(_<9)", "setHead(.,99)", "init", "append(.,other)"],
+  "series": [{"name": "new cells", "y": [0, 0, 0, 1, 15, 16]}]
+}

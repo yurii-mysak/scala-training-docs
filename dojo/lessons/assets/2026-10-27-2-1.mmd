@@ -1,0 +1,7 @@
+flowchart TD
+  C1["changeset 1: four blobs, 1816 bytes"] --> C2["changeset 2: edits src/Main.scala, 1 new blob"]
+  C2 --> C3["changeset 3: edits src/Parser.scala, 1 new blob"]
+  C3 --> C4["changeset 4: edits src/Main.scala, 1 new blob"]
+  C4 --> C5["changeset 5: edits docs/README.md, 1 new blob"]
+  C5 --> D["Derived: history of src/Main.scala = 1, 2, 4"]
+  D --> E["Folded from the parent value, not by scanning all five trees"]

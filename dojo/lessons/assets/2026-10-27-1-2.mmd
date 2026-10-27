@@ -1,0 +1,5 @@
+flowchart TD
+    A["init on Cons(1, Cons(2, Cons(3, Nil)))"] --> B["cell 3 is last: return Nil"]
+    B --> C["rebuild cell 2 as Cons(2, Nil) - new"]
+    C --> D["rebuild cell 1 as Cons(1, that) - new"]
+    D --> E["result shares only the terminal Nil"]

@@ -1,0 +1,8 @@
+flowchart TD
+    XS["xs"] --> C1["Cons(1, .)"]
+    ZS["zs = setHead(xs, 9)"] --> C9["Cons(9, .) - the one new cell"]
+    C1 --> C2["Cons(2, .)"]
+    C9 --> C2
+    YS["ys = tail(xs)"] --> C2
+    C2 --> C3["Cons(3, .)"]
+    C3 --> N["Nil - one object, a List[Nothing], ending every list"]

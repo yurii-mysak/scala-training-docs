@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "Structural sharing: 9,310 bytes of naive copies, 4,131 bytes actually stored",
+  "x_label": "after changeset n",
+  "y_label": "cumulative bytes",
+  "categories": ["1", "2", "3", "4", "5"],
+  "series": [
+    {"name": "naive: a full copy per snapshot", "y": [1816, 3655, 5517, 7402, 9310]},
+    {"name": "content-addressed store", "y": [1816, 2415, 3258, 3880, 4131]}
+  ],
+  "value_fmt": "%d"
+}

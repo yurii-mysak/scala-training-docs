@@ -1,0 +1,27 @@
+{
+  "type": "hbar",
+  "title": "Reported: same accuracy, ~300x spread in cost per workflow",
+  "x_label": "cost per workflow, USD (log scale) \u2014 TypeSafe's reported figures",
+  "y_label": "",
+  "log_x": true,
+  "categories": [
+    "Jev, 67.8%",
+    "GPT-5.6 Terra, 67.9%",
+    "Claude Sonnet 5, 67.8%"
+  ],
+  "series": [
+    {
+      "x": [
+        0,
+        1,
+        2
+      ],
+      "y": [
+        0.0004,
+        0.0304,
+        0.1174
+      ]
+    }
+  ],
+  "value_fmt": "$%.4f"
+}

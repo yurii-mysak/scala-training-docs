@@ -1,0 +1,33 @@
+{
+  "type": "bar",
+  "title": "The sign carries the direction: + same way, 0 orthogonal, - opposite",
+  "x_label": "b relative to a = (1, 0)",
+  "y_label": "value",
+  "categories": [
+    "same way\nb = (2, 0)",
+    "orthogonal\nb = (0, 2)",
+    "opposite\nb = (-2, 0)"
+  ],
+  "series": [
+    {
+      "name": "dot product a . b",
+      "y": [
+        2.0,
+        0.0,
+        -2.0
+      ]
+    },
+    {
+      "name": "cosine similarity",
+      "y": [
+        1.0,
+        0.0,
+        -1.0
+      ]
+    }
+  ],
+  "value_fmt": "%.2f",
+  "hline": {
+    "y": 0.0
+  }
+}

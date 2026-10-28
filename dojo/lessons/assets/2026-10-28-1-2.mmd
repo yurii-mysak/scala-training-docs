@@ -1,0 +1,9 @@
+flowchart TD
+  Q["Q: queries, one row per token"] --> M["MatMul: every query against every key, one dot product each"]
+  K["K: keys, one row per token"] --> M
+  M --> SC["Scale: divide each score by the square root of d_k"]
+  SC --> MK["Mask, optional"]
+  MK --> SM["SoftMax across each row of scores"]
+  SM --> MV["MatMul with V: weighted sum of the value rows"]
+  V["V: values, one row per token"] --> MV
+  MV --> O["attention output"]

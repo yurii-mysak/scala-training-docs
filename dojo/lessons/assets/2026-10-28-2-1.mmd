@@ -1,0 +1,8 @@
+flowchart TD
+  S["Incoming state: one customer message"] --> Q["Cheap model: fixed questions, fixed answer options"]
+  Q --> J["Judgment: one answer per question, each with a probability"]
+  J --> G{"probability at or above the threshold?"}
+  G -->|"yes"| A["Act on the typed answer: route, filter, allow the tool call"]
+  G -->|"no"| L["Escalate: full LLM call, free-form output"]
+  A --> LOG["Log answer, probability and route for governance"]
+  L --> LOG

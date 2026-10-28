@@ -1,0 +1,30 @@
+{
+  "type": "bar",
+  "title": "The same tenfold repetition leaves every cosine similarity unchanged",
+  "x_label": "document pair",
+  "y_label": "cosine similarity",
+  "categories": [
+    "cats . dogs",
+    "cats . taxes",
+    "dogs . taxes"
+  ],
+  "series": [
+    {
+      "name": "original counts",
+      "y": [
+        0.2916,
+        0.1048,
+        0.0856
+      ]
+    },
+    {
+      "name": "cats text x10",
+      "y": [
+        0.2916,
+        0.1048,
+        0.0856
+      ]
+    }
+  ],
+  "value_fmt": "%.4f"
+}

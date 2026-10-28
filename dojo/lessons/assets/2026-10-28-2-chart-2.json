@@ -1,0 +1,72 @@
+{
+  "type": "line",
+  "title": "The gate's trade-off: spend on 20 tasks vs end-to-end accuracy",
+  "x_label": "total cost for the 20-task batch, USD (log scale)",
+  "y_label": "end-to-end accuracy, %",
+  "log_x": true,
+  "series": [
+    {
+      "name": "confidence threshold swept 0.00 \u2192 1.00",
+      "x": [
+        0.00162,
+        0.0155,
+        0.05714,
+        0.12654,
+        0.19594,
+        0.27922
+      ],
+      "y": [
+        80,
+        85,
+        85,
+        90,
+        95,
+        90
+      ]
+    }
+  ],
+  "annotate": [
+    {
+      "x": 0.00162,
+      "y": 80,
+      "text": "0.00 \u2014 never escalate",
+      "dx": 14,
+      "dy": 22
+    },
+    {
+      "x": 0.0155,
+      "y": 85,
+      "text": "0.50",
+      "dx": -4,
+      "dy": 18
+    },
+    {
+      "x": 0.05714,
+      "y": 85,
+      "text": "0.70",
+      "dx": -6,
+      "dy": -26
+    },
+    {
+      "x": 0.12654,
+      "y": 90,
+      "text": "0.85",
+      "dx": -10,
+      "dy": -30
+    },
+    {
+      "x": 0.19594,
+      "y": 95,
+      "text": "0.95 \u2014 best accuracy,\n70% of the always-LLM bill",
+      "dx": -185,
+      "dy": -14
+    },
+    {
+      "x": 0.27922,
+      "y": 90,
+      "text": "1.00 \u2014 always LLM",
+      "dx": -62,
+      "dy": -42
+    }
+  ]
+}

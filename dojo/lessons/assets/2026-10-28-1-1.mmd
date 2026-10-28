@@ -1,0 +1,10 @@
+flowchart TD
+  A["a = (3, 4)"] --> P["pair the slots: 3 x 4, then 4 x 3"]
+  B["b = (4, 3)"] --> P
+  P --> S["add the products: 12 + 12"]
+  S --> D["dot product a . b = 24"]
+  D --> C["divide by |a| x |b| = 5 x 5 = 25"]
+  C --> K["cosine = 0.96, angle = 16.26 degrees"]
+  K --> T0["cos 0 deg = 1, same direction"]
+  K --> T90["cos 90 deg = 0, orthogonal"]
+  K --> T180["cos 180 deg = -1, opposite"]

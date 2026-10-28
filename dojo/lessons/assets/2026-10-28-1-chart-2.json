@@ -1,0 +1,30 @@
+{
+  "type": "bar",
+  "title": "Repeat the cat text ten times: every dot product it appears in multiplies by ten",
+  "x_label": "document pair",
+  "y_label": "dot product",
+  "categories": [
+    "cats . dogs",
+    "cats . taxes",
+    "dogs . taxes"
+  ],
+  "series": [
+    {
+      "name": "original counts",
+      "y": [
+        5.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "name": "cats text x10",
+      "y": [
+        50.0,
+        20.0,
+        2.0
+      ]
+    }
+  ],
+  "value_fmt": "%.1f"
+}

@@ -68,3 +68,5 @@
 {"ts": "2026-10-27T06:56:26Z", "event": "sent", "lesson": "2026-10-27-1", "by": "job", "note": "core · fp-scala-03"}
 {"ts": "2026-10-27T07:03:01Z", "event": "sent", "lesson": "2026-10-27-2", "by": "job", "note": "fresh · ai-ml"}
 {"ts": "2026-10-27T07:22:02Z", "event": "sent", "lesson": null, "by": "job", "note": "day 16: 2026-10-27-1, 2026-10-27-2"}
+{"ts": "2026-10-28T06:55:56Z", "event": "sent", "lesson": "2026-10-28-1", "by": "job", "note": "core · ai-ml-05"}
+{"ts": "2026-10-28T07:03:47Z", "event": "sent", "lesson": "2026-10-28-2", "by": "job", "note": "fresh · fp-scala"}

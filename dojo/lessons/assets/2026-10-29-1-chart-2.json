@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "The working table empties after 2 steps from 'United States', 3 from 'Europe'",
+  "x_label": "recursion depth (WITHIN steps from the root vertex)",
+  "y_label": "rows the recursive term produced",
+  "categories": ["depth 0", "depth 1", "depth 2"],
+  "series": [
+    {"name": "within 'United States'", "y": [1, 1, 0]},
+    {"name": "within 'Europe'", "y": [1, 2, 2]}
+  ]
+}

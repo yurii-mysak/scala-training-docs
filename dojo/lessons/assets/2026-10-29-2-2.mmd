@@ -1,0 +1,7 @@
+flowchart TD
+  Q["Query sparse vector: latents 13 and 14 active"] --> L13["Posting list for latent 13"]
+  Q --> L14["Posting list for latent 14"]
+  L13 --> A["Accumulator keyed by document id"]
+  L14 --> A
+  L20["Posting list for latent 20: never opened"] -.-> A
+  A --> TOP["Top-k documents by accumulated score"]

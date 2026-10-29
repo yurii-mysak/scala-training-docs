@@ -1,0 +1,10 @@
+{
+  "type": "hbar",
+  "title": "BEIR-15 against DenseOn (56.20), the model SlideOn came from",
+  "x_label": "BEIR-15 nDCG@10, difference from DenseOn (higher is better)",
+  "categories": ["SPARSEUP 188M, sparse", "DenseOn 149M, dense", "SlideOn 174M, sparse", "LateOn 149M, late interaction", "LACONIC-8B 8.03B, sparse"],
+  "series": [
+    {"y": [-1.74, 0.0, 0.48, 1.02, 3.86]}
+  ],
+  "value_fmt": "%+.2f"
+}

@@ -1,0 +1,27 @@
+{
+  "type": "bar",
+  "title": "One query, 40 documents: sparse scores 7, dense scores all 40",
+  "x_label": "work done to answer one query",
+  "y_label": "count (log scale)",
+  "categories": [
+    "documents scored",
+    "multiply-add operations"
+  ],
+  "series": [
+    {
+      "name": "sparse: inverted index",
+      "y": [
+        7,
+        25
+      ]
+    },
+    {
+      "name": "dense: full scan",
+      "y": [
+        40,
+        240
+      ]
+    }
+  ],
+  "log_y": true
+}

@@ -1,0 +1,6 @@
+flowchart TD
+  T["Tokens of one query or document"] --> E["Token embeddings, lifted through a residual MLP"]
+  E --> S["Top-K SAE encoder: 32 largest latents per token, then ReLU"]
+  S --> P["Latent-wise max pool across tokens: ONE sparse vector per text"]
+  P --> I["Inverted index: one posting list per active latent"]
+  I --> D["Score = raw dot product over the shared latents"]

@@ -1,0 +1,10 @@
+flowchart TD
+    Q["the question: who was born in the US and now lives in Europe?"]
+    Q --> I["imperative: my code walks the edges"]
+    Q --> D["declarative: I state the pattern and the condition"]
+    I --> I1["I choose direction, loop, frontier and stopping rule"]
+    I1 --> I2["the access path is frozen inside my code"]
+    I2 --> I3["a new index changes nothing until I rewrite the walk"]
+    D --> D1["the optimiser picks indexes, join order and direction"]
+    D1 --> D2["independent parts may run on many cores or machines"]
+    D2 --> D3["a new index changes the plan; the query text does not move"]

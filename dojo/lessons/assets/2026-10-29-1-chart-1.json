@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "Same question, same answer: 29 lines of recursive SQL vs 4 lines of Cypher",
+  "x_label": "size of the query text (log scale)",
+  "y_label": "count",
+  "categories": ["lines", "characters"],
+  "series": [
+    {"name": "SQL WITH RECURSIVE", "y": [29, 959]},
+    {"name": "Cypher (DDIA Example 2-4)", "y": [4, 185]}
+  ],
+  "log_y": true
+}

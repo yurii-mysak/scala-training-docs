@@ -1,0 +1,23 @@
+flowchart TD
+    Lucy["Lucy — Person"]
+    Alain["Alain — Person"]
+    Idaho["Idaho — Location, state"]
+    USA["United States — Location, country"]
+    NAm["North America — Location, continent"]
+    Beaune["Beaune — Location, city"]
+    France["France — Location, country"]
+    London["London — Location, city"]
+    England["England — Location, country"]
+    Europe["Europe — Location, continent"]
+    Lucy -->|BORN_IN| Idaho
+    Alain -->|BORN_IN| Beaune
+    Lucy -->|LIVES_IN| London
+    Alain -->|LIVES_IN| London
+    Idaho ==>|WITHIN| USA
+    USA ==>|WITHIN| NAm
+    Beaune -->|WITHIN| France
+    France -->|WITHIN| Europe
+    London ==>|WITHIN| England
+    England ==>|WITHIN| Europe
+    classDef hop fill:#f3d7b0,stroke:#b5751a,color:#000
+    class Idaho,USA,London,England,Europe hop

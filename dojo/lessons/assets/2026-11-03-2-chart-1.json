@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "Measured: dependability nearly tripled, coverage slipped",
+  "x_label": "ThinkingBox-Bench, 507 tasks x 20 attempts (Kundu et al., 2026-10-22)",
+  "y_label": "% of 507 tasks",
+  "categories": ["observed 20/20", "pass@1", "pass@20"],
+  "series": [
+    {"name": "Qwen3.8-27B base", "y": [7.50, 51.70, 89.35]},
+    {"name": "Qwen3.8-27B RL fine-tuned", "y": [21.10, 60.78, 87.97]}
+  ],
+  "value_fmt": "%.2f"
+}

@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "Simulated: sharpening alone moves 20/20 up and pass@20 down",
+  "x_label": "507 simulated tasks x 20 seeded attempts, log-odds x 1.30 + 0.87",
+  "y_label": "% of 507 tasks",
+  "categories": ["observed 20/20", "pass@1", "pass@20"],
+  "series": [
+    {"name": "simulated base", "y": [8.28, 50.14, 91.52]},
+    {"name": "simulated sharpened", "y": [23.67, 59.44, 90.34]}
+  ],
+  "value_fmt": "%.2f"
+}

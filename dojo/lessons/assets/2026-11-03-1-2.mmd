@@ -1,0 +1,11 @@
+flowchart TD
+  subgraph CV["convex loss: one bowl"]
+    A1["start anywhere"] --> B1["follow the slope down"]
+    B1 --> M1["the one minimum, w = 3"]
+  end
+  CV --> NC
+  subgraph NC["non-convex loss: several valleys"]
+    C1["start left"] --> N1["local minimum A"]
+    C2["start right"] --> N2["local minimum B, lower"]
+    P1["start on a plateau"] --> Q1["slope near zero: stalls"]
+  end

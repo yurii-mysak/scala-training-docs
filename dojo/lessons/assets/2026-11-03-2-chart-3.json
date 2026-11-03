@@ -1,0 +1,90 @@
+{
+  "type": "scatter",
+  "title": "Nine models: pass@1 does not rank dependability",
+  "x_label": "pass@1 (%) over 507 tasks x 20 attempts",
+  "y_label": "tasks passed on all 20 attempts (%)",
+  "series": [
+    {
+      "x": [
+        51.7,
+        57.37,
+        58.31,
+        59.19,
+        60.78,
+        61.91,
+        65.36,
+        66.5,
+        67.16
+      ],
+      "y": [
+        7.5,
+        13.41,
+        45.56,
+        20.12,
+        21.1,
+        16.17,
+        25.25,
+        47.53,
+        47.53
+      ]
+    }
+  ],
+  "annotate": [
+    {
+      "x": 51.7,
+      "y": 7.5,
+      "text": "Qwen3.8-27B base",
+      "dx": 14,
+      "dy": 26
+    },
+    {
+      "x": 57.37,
+      "y": 13.41,
+      "text": "Kimi-K3",
+      "dx": -8,
+      "dy": -30
+    },
+    {
+      "x": 58.31,
+      "y": 45.56,
+      "text": "GPT-6 Astra",
+      "dx": -70,
+      "dy": 22
+    },
+    {
+      "x": 59.19,
+      "y": 20.12,
+      "text": "Claude Sonnet 4.6",
+      "dx": -30,
+      "dy": -34
+    },
+    {
+      "x": 60.78,
+      "y": 21.1,
+      "text": "Qwen3.8-27B RL fine-tuned",
+      "dx": -40,
+      "dy": 26
+    },
+    {
+      "x": 61.91,
+      "y": 16.17,
+      "text": "GPT-5.6 Sol",
+      "dx": 22,
+      "dy": -24
+    },
+    {
+      "x": 65.36,
+      "y": 25.25,
+      "text": "GPT-5.4",
+      "dx": 10,
+      "dy": -24
+    },
+    {
+      "x": 66.5,
+      "y": 47.53,
+      "text": "Claude Opus 5 / 5.5",
+      "dx": -56,
+      "dy": 20
+    }
+  ]
+}

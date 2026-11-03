@@ -1,0 +1,8 @@
+flowchart TD
+  A["Task from the fixed 187-task pool"] --> B["Fresh database, isolated MCP session, simulated user (GPT-5 Chat)"]
+  B --> C["Agent episode: the policy calls tools until the run ends"]
+  C --> D["Terminal database state, checked against the expected end state"]
+  D --> E["Reward 1 or 0"]
+  E --> F["Group of 8 rollouts: advantage = reward minus group mean"]
+  F --> G["GRPO update, AdamW at 1e-6"]
+  G -.-> A

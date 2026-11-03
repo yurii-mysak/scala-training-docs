@@ -1,0 +1,6 @@
+flowchart TD
+  I["start: w = 0, eta = 0.1"] --> G["compute the slope: dL/dw = 2(w - 3)"]
+  G --> U["step against it: w becomes w - eta * dL/dw"]
+  U --> C{"stop? small gradient, small step, or budget spent"}
+  C -->|"no"| G
+  C -->|"yes"| D["done: report w"]

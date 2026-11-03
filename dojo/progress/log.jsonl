@@ -74,3 +74,5 @@
 {"ts": "2026-10-29T06:55:35Z", "event": "sent", "lesson": "2026-10-29-1", "by": "job", "note": "core · ddia-03"}
 {"ts": "2026-10-29T07:08:06Z", "event": "sent", "lesson": "2026-10-29-2", "by": "job", "note": "fresh · ai-ml"}
 {"ts": "2026-10-29T07:33:17Z", "event": "sent", "lesson": null, "by": "job", "note": "day 18: 2026-10-29-1, 2026-10-29-2"}
+{"ts": "2026-11-03T06:54:32Z", "event": "sent", "lesson": "2026-11-03-1", "by": "job", "note": "core · ai-ml-06"}
+{"ts": "2026-11-03T07:07:02Z", "event": "sent", "lesson": "2026-11-03-2", "by": "job", "note": "fresh · ai-ml"}

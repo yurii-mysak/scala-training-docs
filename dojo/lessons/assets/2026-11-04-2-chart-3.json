@@ -1,0 +1,30 @@
+{
+  "type": "hbar",
+  "title": "Cloudflare's reported saving per lever, spring to fall 2026 (GB/s compressed)",
+  "x_label": "compressed GB/s removed from the backbone",
+  "y_label": "",
+  "categories": [
+    "aggregating",
+    "sampling",
+    "load balancing",
+    "total removed"
+  ],
+  "series": [
+    {
+      "name": "",
+      "x": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "y": [
+        7.0,
+        25.0,
+        38.0,
+        70.0
+      ]
+    }
+  ],
+  "value_fmt": "%g"
+}

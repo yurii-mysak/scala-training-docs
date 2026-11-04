@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "filter then map pays for an extra pass and 500 throwaway cells (n = 1000)",
+  "x_label": "",
+  "y_label": "list cells",
+  "categories": ["cells read", "cells built", "garbage cells"],
+  "series": [
+    {"name": "filter, then map", "y": [1500, 1000, 500]},
+    {"name": "one fused fold", "y": [1000, 500, 0]}
+  ],
+  "value_fmt": "%d"
+}

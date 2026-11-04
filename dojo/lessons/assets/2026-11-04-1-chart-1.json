@@ -1,0 +1,47 @@
+{
+  "type": "line",
+  "title": "foldRight adds one JVM stack frame per element; foldLeft adds none",
+  "x_label": "list length n",
+  "y_label": "deepest stack frames measured while folding",
+  "series": [
+    {
+      "name": "foldRight",
+      "x": [
+        100,
+        250,
+        500,
+        1000
+      ],
+      "y": [
+        117,
+        267,
+        517,
+        1017
+      ]
+    },
+    {
+      "name": "foldLeft (@tailrec)",
+      "x": [
+        100,
+        250,
+        500,
+        1000
+      ],
+      "y": [
+        18,
+        18,
+        18,
+        18
+      ]
+    }
+  ],
+  "annotate": [
+    {
+      "x": 1000,
+      "y": 1017,
+      "text": "1017 frames at n = 1000",
+      "dx": -230,
+      "dy": -18
+    }
+  ]
+}

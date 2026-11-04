@@ -1,0 +1,11 @@
+flowchart TD
+  A["foldRight: f(1, f(2, f(3, 0)))"] --> B["frame 1 holds 1, waits on the tail"]
+  B --> C["frame 2 holds 2, waits on the tail"]
+  C --> D["frame 3 holds 3, waits on the tail"]
+  D --> E["frame 4 matches Nil, returns acc = 0"]
+  E --> F["unwinding: 3 + 0 = 3, then 2 + 3 = 5, then 1 + 5 = 6"]
+  F --> G["result 6, after n frames were live at once"]
+  H["foldLeft: f(f(f(0, 1), 2), 3)"] --> I["acc = 0 + 1 = 1, then tail call"]
+  I --> J["acc = 1 + 2 = 3, then tail call"]
+  J --> K["acc = 3 + 3 = 6, then tail call"]
+  K --> L["Nil: return acc = 6, one frame reused throughout"]

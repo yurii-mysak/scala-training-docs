@@ -1,0 +1,9 @@
+flowchart TD
+  A["Edge servers in every colo: Workers, FL"] --> B["Logfwdr, the edge forwarder"]
+  B -->|"compressed bytes over the backbone"| C["Centralized receivers in the core data centres"]
+  C --> D["Buftee, the buffering system"]
+  D --> E["Consumers"]
+  E --> F["ClickHouse, the columnar store behind the dashboards"]
+  L12["Levers 1 and 2: narrower schemas, zstd instead of LZ4"] -.-> B
+  L34["Levers 3 and 4: send each event once, sample and aggregate at the source"] -.-> B
+  L4b["Lever 4b again: partial aggregates combined further downstream"] -.-> D

@@ -1,0 +1,13 @@
+flowchart TD
+  B1["Before: Logfwdr sends two copies over wide-area transit"] --> B2["Receiver, region A"]
+  B1 --> B3["Receiver, region B"]
+  B2 --> B4["ClickHouse A"]
+  B3 --> B5["ClickHouse B"]
+  B4 -.-> C["The 2026 change: send once, replicate late"]
+  B5 -.-> C
+  C --> A1["After: Logfwdr sends one copy to whichever receiver is up"]
+  A1 --> A2["Any available central receiver"]
+  A2 --> A3["Buftee, with a retention buffer"]
+  A3 --> A4["ClickHouse, local region"]
+  A3 --> A5["Remote inserter, cross data centre"]
+  A5 --> A6["ClickHouse, other region"]

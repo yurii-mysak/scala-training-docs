@@ -1,0 +1,10 @@
+{
+  "type": "bar",
+  "title": "Rows to store: sampling and pre-aggregation compose, 200000 -> 782",
+  "x_label": "strategy",
+  "y_label": "rows written (log scale)",
+  "categories": ["raw events", "sampled only\n(1 in 64)", "pre-aggregated\nonly", "sampled +\naggregated"],
+  "series": [{"name": "rows", "x": [0, 1, 2, 3], "y": [200000, 3125, 11139, 782]}],
+  "log_y": true,
+  "value_fmt": "%d"
+}

@@ -1,0 +1,41 @@
+{
+  "type": "bar",
+  "title": "Sampling error lands entirely on the low-volume keys",
+  "x_label": "keys bucketed by true event count",
+  "y_label": "mean |relative error| of surviving keys, % (log scale)",
+  "categories": [
+    ">= 10000",
+    "1000-9999",
+    "100-999",
+    "10-99",
+    "3-9",
+    "1-2"
+  ],
+  "series": [
+    {
+      "name": "",
+      "x": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "y": [
+        4.8,
+        13.4,
+        38.0,
+        231.2,
+        1329.7,
+        4761.1
+      ]
+    }
+  ],
+  "log_y": true,
+  "value_fmt": "%g",
+  "hline": {
+    "y": 100,
+    "label": "100%"
+  }
+}

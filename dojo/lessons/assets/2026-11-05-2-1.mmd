@@ -1,0 +1,7 @@
+flowchart TD
+  T["one attention layer, new token arrives"] --> A["full attention: cache K and V for every past token"]
+  T --> B["sliding window: keep only the last W tokens"]
+  T --> C["linear mixer: fold every token into one fixed-size state"]
+  A --> A2["grows without bound: 144 KiB per token over 36 layers"]
+  B --> B2["capped at W tokens; older ones gone; needs an attention sink"]
+  C --> C2["capped at one 128x128 FP32 matrix per head; everything blurred"]

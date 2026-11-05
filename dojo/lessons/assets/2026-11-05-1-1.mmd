@@ -1,0 +1,33 @@
+flowchart LR
+    subgraph MEM["in-memory hash map: key to byte offset"]
+        direction TB
+        M1["42 to 280"]
+        M2["123456 to 224"]
+        M3["7 to 389"]
+        M4["9 to 341"]
+        M1 ~~~ M2
+        M2 ~~~ M3
+        M3 ~~~ M4
+    end
+    subgraph DISK["data file db.log, append-only"]
+        direction TB
+        R1["offset 0 - 42,San Francisco v1"]
+        R2["offset 58 - 123456,London v1"]
+        R3["offset 115 - 42,San Francisco v2"]
+        R4["offset 175 - 7,Kyiv v1"]
+        R5["offset 224 - 123456,London v2"]
+        R6["offset 280 - 42,San Francisco v3"]
+        R7["offset 341 - 9,Lviv v1"]
+        R8["offset 389 - 7,Kyiv v2"]
+        R1 ~~~ R2
+        R2 ~~~ R3
+        R3 ~~~ R4
+        R4 ~~~ R5
+        R5 ~~~ R6
+        R6 ~~~ R7
+        R7 ~~~ R8
+    end
+    M1 --> R6
+    M2 --> R5
+    M3 --> R8
+    M4 --> R7

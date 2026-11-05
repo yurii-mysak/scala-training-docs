@@ -1,0 +1,15 @@
+flowchart TD
+    W["write: set key, value"] --> WAL["append to the write-ahead log on disk"]
+    WAL --> MT["insert into the memtable, a sorted in-memory tree"]
+    MT -->|"memtable past a few MB"| FL["flush it as a new SSTable segment, start an empty memtable"]
+    FL --> SN["SSTable, newest"]
+    SN --> CO["background compaction: merge-sort segments, drop overwritten keys and tombstones"]
+    SO["SSTable, older"] --> CO
+    CO --> SM["merged SSTable, old files deleted"]
+    R["read: get key"] --> RM["look in the memtable"]
+    RM -->|"not there"| RB["next segment, newest first: ask its Bloom filter"]
+    RB -->|"filter says no"| RS["skip the segment, zero disk reads"]
+    RS --> RB
+    RB -->|"filter says maybe"| RD["sparse index, read one block, scan it"]
+    RD -->|"found"| RV["return the value, or nothing if it is a tombstone"]
+    RD -->|"not in this segment"| RB

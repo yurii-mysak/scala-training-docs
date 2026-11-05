@@ -1,0 +1,7 @@
+flowchart TD
+  X["layer input"] --> S["sliding window attention over the last 448 tokens"]
+  X --> M["mLSTM recurrence: one 128x128 FP32 state per KV head"]
+  X --> G["gate: linear projection then sigmoid, one scalar o per head"]
+  S --> O["output = o times mLSTM plus 1 minus o times SWA"]
+  M --> O
+  G --> O

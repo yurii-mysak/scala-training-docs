@@ -1,0 +1,11 @@
+{
+  "type": "line",
+  "title": "A window is a cliff; a fixed-size state is a slope (toy model, lab Step 3)",
+  "x_label": "distance back from the current token (tokens)",
+  "y_label": "relative recall of a token that far back",
+  "series": [
+    {"name": "exact window, W = 576 (all budget to the window)", "x": [0, 100, 400, 447, 448, 576, 1000, 2000, 4000, 7599], "y": [1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]},
+    {"name": "exact window, W = 448 (Bifocal's window)", "x": [0, 100, 400, 447, 448, 576, 1000, 2000, 4000, 7599], "y": [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]},
+    {"name": "fixed-size state, effective length 2000", "x": [0, 100, 400, 447, 448, 576, 1000, 2000, 4000, 7599], "y": [1.0, 0.951, 0.819, 0.8, 0.799, 0.75, 0.606, 0.368, 0.135, 0.022]}
+  ]
+}

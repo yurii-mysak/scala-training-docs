@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "Decode throughput at a 128K prompt, one H100, batch size 1 (tokens/s)",
+  "x_label": "layer design",
+  "y_label": "decode throughput (tokens/s)",
+  "categories": ["SWA", "Bifocal", "GDN + attention", "full attention"],
+  "series": [
+    {"name": "tokens per second at a 128K prompt", "y": [196, 194, 146, 92]}
+  ],
+  "value_fmt": "%g"
+}

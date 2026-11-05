@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "Equal on short answers, 1.8x apart on long ones (pass@1, 120 AIME/HMMT problems)",
+  "x_label": "problem group, split by how long the typical answer is",
+  "y_label": "pass@1 (%)",
+  "categories": ["answers under 4,000 tokens\n(24 problems)", "longer answers\n(96 problems)"],
+  "series": [
+    {"name": "SWA, learned sink (window 576)", "y": [59.1, 2.5]},
+    {"name": "Bifocal (window 448 + state)", "y": [59.6, 4.4]}
+  ],
+  "value_fmt": "%.1f"
+}

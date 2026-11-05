@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "Four students, all 576 cached tokens per layer: math average (pass@1, %)",
+  "x_label": "how the same 576-token budget is spent",
+  "y_label": "math average pass@1 (%)",
+  "categories": ["SWA\nlearned sink\nwindow 576", "SWA\n+4 sink tokens\nwindow 572", "Bifocal\nwindow 448\n+state/KV head", "Bifocal\nwindow 64\n+state/query head"],
+  "series": [
+    {"name": "AIME + HMMT average", "y": [13.8, 13.9, 15.5, 4.2]}
+  ],
+  "value_fmt": "%.1f"
+}

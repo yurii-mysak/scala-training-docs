@@ -1,0 +1,13 @@
+{
+  "type": "line",
+  "title": "A full-scan read grows with the log; a hash-index read does not",
+  "x_label": "records in the log (db.log)",
+  "y_label": "bytes read per db_get of key 42",
+  "log_x": true,
+  "log_y": true,
+  "series": [
+    {"name": "db_get by full scan", "x": [8, 32, 128, 512], "y": [445, 1785, 7181, 29331]},
+    {"name": "db_get by hash index + seek", "x": [8, 32, 128, 512], "y": [61, 61, 61, 61], "style": "dashed"}
+  ],
+  "annotate": [{"x": 512, "y": 29331, "text": "481x more bytes read"}]
+}

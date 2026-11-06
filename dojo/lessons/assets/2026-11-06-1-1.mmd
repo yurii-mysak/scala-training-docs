@@ -1,0 +1,8 @@
+flowchart TD
+    CFO["CFO · finance policy"] --> M1["calculatePay()"]
+    COO["COO · operations policy"] --> M2["reportHours()"]
+    CTO["CTO · schema and storage"] --> M3["save()"]
+    M1 --> E["class Employee"]
+    M2 --> E
+    M3 --> E
+    E --> B["one file, three actors, three ways to break"]

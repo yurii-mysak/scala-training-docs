@@ -1,0 +1,18 @@
+{
+  "type": "bar",
+  "title": "The aggregate hardly moves: 1,654.48M -> 1,700.28M validating users (lab Step 3)",
+  "y_label": "DNSSEC-validating users (millions)",
+  "categories": [
+    "pre-roll",
+    "post-roll"
+  ],
+  "series": [
+    {
+      "y": [
+        1654.48,
+        1700.28
+      ]
+    }
+  ],
+  "value_fmt": "%.2f"
+}

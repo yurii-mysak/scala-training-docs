@@ -1,0 +1,23 @@
+{
+  "type": "bar",
+  "title": "Of 13,538 networks, 1,254 moved by 10% or more - in both directions (lab Step 5)",
+  "x_label": "change in a network's validation rate across the roll",
+  "y_label": "networks",
+  "categories": [
+    "rose > 50%",
+    "rose >= 10%",
+    "fell >= 10%",
+    "fell > 50%"
+  ],
+  "series": [
+    {
+      "y": [
+        35,
+        594,
+        660,
+        58
+      ]
+    }
+  ],
+  "value_fmt": "%d"
+}

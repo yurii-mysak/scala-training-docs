@@ -1,0 +1,10 @@
+flowchart TD
+  A["Before 11 Oct 2026: validation requires trust in the outgoing KSK"]
+  B["14:00 UTC, 11 Oct 2026: the root KSK roll starts"]
+  C["Next 48 hours: resolvers still serve the cached root DNSKEY RRset"]
+  D["Before 14:00 UTC, 13 Oct 2026: that cache expires and is refetched"]
+  E["Anchor set holds the incoming KSK: validation succeeds"]
+  F["Anchor set does not: validation fails, RCODE 2 to every client"]
+  A --> B --> C --> D
+  D -->|"RFC 5011 update completed in time"| E
+  D -->|"missed the roll"| F

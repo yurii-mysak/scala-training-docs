@@ -1,0 +1,54 @@
+{
+  "type": "hbar",
+  "title": "One economy gained 45.4M validating users; one lost 7.8M (lab Step 1)",
+  "x_label": "change in DNSSEC-validating users across the roll (millions)",
+  "categories": [
+    "BR",
+    "RU",
+    "CN",
+    "US",
+    "BG",
+    "BD",
+    "JP",
+    "UG",
+    "PK",
+    "EG",
+    "LT",
+    "LK",
+    "TH",
+    "IR",
+    "SK",
+    "KZ",
+    "MA",
+    "DZ",
+    "VN",
+    "IN"
+  ],
+  "series": [
+    {
+      "y": [
+        -7.78,
+        -3.08,
+        -1.76,
+        -0.91,
+        -0.76,
+        -0.61,
+        -0.61,
+        -0.33,
+        -0.31,
+        -0.3,
+        0.21,
+        0.26,
+        0.28,
+        0.56,
+        0.66,
+        0.95,
+        2.36,
+        3.27,
+        9.16,
+        45.42
+      ]
+    }
+  ],
+  "value_fmt": "%+.2f"
+}

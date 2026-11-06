@@ -1,0 +1,11 @@
+{
+  "type": "hbar",
+  "title": "Only the OCP-shaped changes edit code that already passed its tests",
+  "x_label": "lines of code (from Step 6 of the lab)",
+  "categories": ["new ADT function (fee)", "new ADT case (Voucher)", "new kind, trait Checkout", "new kind, match Checkout"],
+  "series": [
+    {"name": "lines of already-tested code edited", "y": [0, 3, 0, 1], "color": "#C2571A"},
+    {"name": "lines of brand-new code added", "y": [4, 1, 4, 0], "color": "#2F4B8A"}
+  ],
+  "value_fmt": "%g"
+}

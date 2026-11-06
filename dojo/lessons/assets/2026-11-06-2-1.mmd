@@ -1,0 +1,10 @@
+flowchart TD
+  TA["Trust anchor in the resolver: the root KSK public key, configured out of band"]
+  RD["Root DNSKEY RRset: root KSK plus root ZSK, with an RRSIG made by the root KSK"]
+  DS["DS record for com, held in the root zone, with an RRSIG made by the root ZSK"]
+  CD["com DNSKEY RRset, whose hash the DS record must match"]
+  AN["A RRset for www.example.com, with an RRSIG made by example.com's ZSK"]
+  TA -->|"must match a key in"| RD
+  RD -->|"the root ZSK signs"| DS
+  DS -->|"hash commits to"| CD
+  CD -->|"same two steps, one level down"| AN

@@ -1,0 +1,22 @@
+classDiagram
+    class Checkout {
+      +pay(policy, total) Double
+    }
+    class DiscountPolicy {
+      <<trait>>
+      +amountOff(total) Double
+    }
+    class PercentageDiscount
+    class FixedDiscount
+    class LoyaltyTierDiscount
+    class MinSpendDiscount {
+      +amountOff(total) Double
+      throws under 10.00
+    }
+    Checkout ..> DiscountPolicy : depends only on the trait
+    DiscountPolicy <|-- PercentageDiscount
+    DiscountPolicy <|-- FixedDiscount
+    DiscountPolicy <|-- LoyaltyTierDiscount
+    DiscountPolicy <|-- MinSpendDiscount
+    style LoyaltyTierDiscount fill:#dff3e4,stroke:#2E7D4F
+    style MinSpendDiscount fill:#fde2e2,stroke:#c0392b

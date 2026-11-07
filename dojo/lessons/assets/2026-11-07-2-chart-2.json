@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "Same 22 tokens of work: static batching takes 12 steps, continuous batching 8",
+  "x_label": "forward pass (step)",
+  "y_label": "slots doing useful work (of 3)",
+  "categories": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+  "series": [
+    {"name": "static batching", "y": [3, 3, 2, 1, 1, 1, 1, 3, 2, 2, 2, 1]},
+    {"name": "continuous batching", "y": [3, 3, 3, 3, 3, 3, 3, 1, 0, 0, 0, 0]}
+  ]
+}

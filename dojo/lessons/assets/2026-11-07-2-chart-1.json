@@ -1,0 +1,11 @@
+{
+  "type": "line",
+  "title": "Padding tokens in a static batch: (n-1)x(B-1), from Part B of the lab",
+  "x_label": "batch size B",
+  "y_label": "padding tokens in the batch",
+  "series": [
+    {"name": "prompt length n = 100", "x": [2, 4, 8, 16, 32], "y": [99, 297, 693, 1485, 3069]},
+    {"name": "prompt length n = 50", "x": [2, 4, 8, 16, 32], "y": [49, 147, 343, 735, 1519]}
+  ],
+  "annotate": [{"x": 8, "y": 693, "text": "B=8, n=100: 693 padding tokens", "dx": -30, "dy": 40}]
+}

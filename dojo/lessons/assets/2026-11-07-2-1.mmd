@@ -1,0 +1,9 @@
+flowchart TD
+  Q["waiting queue of prompts"] --> AD["admit a prompt into a free slot"]
+  AD --> P["prefill: one pass over the whole prompt, store K and V"]
+  P --> CH["prompt larger than the budget m? split it into chunks"]
+  CH --> D["decode step: one new token for every running prompt"]
+  D --> E{"stop token emitted?"}
+  E -->|"no"| D
+  E -->|"yes"| EV["evict: free the slot, drop its KV cache"]
+  EV --> AD

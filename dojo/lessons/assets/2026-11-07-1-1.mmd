@@ -1,0 +1,8 @@
+flowchart TD
+  A["ACK arrives for new data"] --> B{"cwnd below ssthresh?"}
+  B -- yes --> C["Slow start: cwnd += 1 segment per ACKed segment, so cwnd doubles each RTT"]
+  B -- no --> D["Congestion avoidance: CUBIC grows cwnd as a cubic in time since the last loss"]
+  C --> E["Sender may keep min of rwnd and cwnd bytes unacknowledged"]
+  D --> E
+  F["Loss detected: three duplicate ACKs, or a retransmission timeout"] --> G["Remember W_max, set ssthresh = beta * cwnd, cut cwnd"]
+  G --> D

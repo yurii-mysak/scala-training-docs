@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "Slow start on a 120 ms path: a 10-segment initial window saves whole round trips",
+  "x_label": "response size",
+  "y_label": "time in slow start (ms)",
+  "categories": ["10 KB", "100 KB", "1 MB", "10 MB"],
+  "series": [
+    {"name": "initial window 4 segments", "y": [240, 600, 960, 1320]},
+    {"name": "initial window 10 segments", "y": [120, 360, 840, 1200]}
+  ],
+  "value_fmt": "%g"
+}

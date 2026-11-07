@@ -1,0 +1,6 @@
+flowchart TD
+  S["static batch, tensor 2 x 7: prompt 0 has 7 tokens, prompt 1 has 3 tokens plus 4 PAD"]
+  S --> W["4 of 14 positions are padding, and attention still runs over them"]
+  W --> R["ragged batch, tensor 1 x 10: the two prompts concatenated on the token axis"]
+  R --> M["block-diagonal mask: prompt 0 sees only t0..t6, prompt 1 sees only t7..t9"]
+  M --> Z["zero padding, and prompts of any length share one forward pass"]

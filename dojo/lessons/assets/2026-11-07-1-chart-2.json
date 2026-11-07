@@ -1,0 +1,16 @@
+{
+  "type": "line",
+  "title": "After one loss: CUBIC's concave-then-convex recovery vs Reno vs BBR's flat pacing",
+  "x_label": "seconds since the loss (RTT 100 ms)",
+  "y_label": "window / in-flight data (segments)",
+  "series": [
+    {"name": "CUBIC (RFC 9438)", "x": [0,1,2,3,4,5,6,7,8,9,10,11,12],
+     "y": [280.0,326.1,358.6,379.8,392.2,398.1,399.9,400.0,400.9,404.9,414.4,431.9,459.7]},
+    {"name": "Reno (RFC 5681)", "x": [0,1,2,3,4,5,6,7,8,9,10,11,12],
+     "y": [200.0,210.0,220.0,230.0,240.0,250.0,260.0,270.0,280.0,290.0,300.0,310.0,320.0]},
+    {"name": "BBR in flight", "x": [0,1,2,3,4,5,6,7,8,9,10,11,12],
+     "y": [342,342,342,427,342,342,427,342,342,427,342,342,427], "style": "dashed"}
+  ],
+  "hline": {"y": 342, "label": "BDP = 342 segments"},
+  "annotate": [{"x": 6.7, "y": 399.9, "text": "K = 6.69 s: W_max regained"}]
+}

@@ -1,0 +1,10 @@
+flowchart TD
+  A["parameters: w (one per feature), b (one number)"] --> B["forward: yhat = X w + b, n predictions"]
+  B --> C["residual r = yhat - y, one number per row"]
+  C --> D["grad_w = (2/n) * X-transpose * r, one partial derivative per feature"]
+  C --> E["grad_b = (2/n) * sum of r, twice the mean residual"]
+  D --> F["update: w = w - lr * grad_w, b = b - lr * grad_b"]
+  E --> F
+  F --> G{"loss still falling?"}
+  G -- "yes" --> B
+  G -- "no" --> H["stop: w and b sit at the minimum"]

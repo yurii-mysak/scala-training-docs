@@ -1,0 +1,14 @@
+flowchart TD
+  IN["age and tickets, as strings off the wire"] --> PA["Try(age.toInt)"]
+  IN --> PT["Try(tickets.toInt)"]
+  PA --> SA["Some(42) — success track"]
+  PA --> FA["None / Left(NumberFormatException: y)"]
+  PT --> ST["Some(2) — success track"]
+  PT --> FT["None / Left(NumberFormatException: x)"]
+  SA --> M2["map2 joins the two success tracks"]
+  ST --> M2
+  M2 --> OK["Some(656.0) / Right(656.0)"]
+  FA --> FAIL["failure track"]
+  FT --> FAIL
+  FAIL --> OPT["Option: None — the reason is gone"]
+  FAIL --> EIT["Either: Left(NumberFormatException: x) — the reason travels"]

@@ -1,0 +1,73 @@
+{
+  "type": "line",
+  "title": "Scaling, not the learning rate, is what fixes this fit: 0.0086 vs 4.69 MSE after 500 steps",
+  "x_label": "gradient-descent step (log)",
+  "y_label": "mean squared error (log)",
+  "series": [
+    {
+      "name": "x2 x 100 raw, lr 8.347e-5 (largest stable)",
+      "x": [
+        1,
+        2,
+        5,
+        10,
+        20,
+        50,
+        100,
+        200,
+        500
+      ],
+      "y": [
+        14.16393,
+        12.54755,
+        9.3166,
+        6.92384,
+        5.78227,
+        5.5638,
+        5.45894,
+        5.25566,
+        4.69035
+      ]
+    },
+    {
+      "name": "x2 x 100 standardised, lr 0.1",
+      "x": [
+        1,
+        2,
+        5,
+        10,
+        20,
+        50,
+        100,
+        200,
+        500
+      ],
+      "y": [
+        10.2325,
+        6.48107,
+        1.65127,
+        0.1759,
+        0.01037,
+        0.00863,
+        0.00863,
+        0.00863,
+        0.00863
+      ]
+    }
+  ],
+  "hline": {
+    "y": 0.00863,
+    "label": "closed-form minimum 0.00863"
+  },
+  "log_x": true,
+  "log_y": true,
+  "annotate": [
+    {
+      "x": 200,
+      "y": 5.25566,
+      "text": "stuck: w1 still 0.07 of 2.0",
+      "dx": -60,
+      "dy": 30
+    }
+  ]
+}

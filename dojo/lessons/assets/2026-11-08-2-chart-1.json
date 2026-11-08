@@ -1,0 +1,37 @@
+{
+  "type": "bar",
+  "title": "One bad element at position 3 of 100: flatMap-traverse parses 3, two passes parse 100",
+  "x_label": "what was counted",
+  "y_label": "count",
+  "categories": [
+    "strings parsed",
+    "intermediate Option cells",
+    "list nodes read"
+  ],
+  "series": [
+    {
+      "name": "map(parse) then sequence",
+      "y": [
+        100,
+        100,
+        103
+      ]
+    },
+    {
+      "name": "traverse (map2, strict)",
+      "y": [
+        100,
+        0,
+        100
+      ]
+    },
+    {
+      "name": "traverse (flatMap, short-circuits)",
+      "y": [
+        3,
+        0,
+        3
+      ]
+    }
+  ]
+}

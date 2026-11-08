@@ -1,25 +1,25 @@
 {
   "schema": 1,
-  "day": 23,
+  "day": 24,
   "credits": {
-    "ai-ml": 9,
-    "fp-scala": -3,
-    "ddia": -3,
-    "architecture": -8,
-    "networking": -8,
-    "rust": 5,
-    "claude-academy": 8
+    "ai-ml": 1,
+    "fp-scala": -15,
+    "ddia": 3,
+    "architecture": -4,
+    "networking": -4,
+    "rust": 7,
+    "claude-academy": 12
   },
   "next_rung": {
-    "ai-ml": 6,
-    "fp-scala": 4,
+    "ai-ml": 7,
+    "fp-scala": 5,
     "ddia": 4,
     "architecture": 3,
     "networking": 3,
     "rust": 1,
     "claude-academy": 2
   },
-  "lessons_sent": 46,
+  "lessons_sent": 48,
   "lessons_passed": 11,
   "open": [
     "2026-10-11-2",
@@ -56,7 +56,9 @@
     "2026-11-06-1",
     "2026-11-06-2",
     "2026-11-07-1",
-    "2026-11-07-2"
+    "2026-11-07-2",
+    "2026-11-08-1",
+    "2026-11-08-2"
   ],
   "last_run_at": "2026-11-07T07:25:53Z",
   "last_fresh_domains": [
@@ -72,5 +74,6 @@
   "trigger_id": "trig_011DeXPBJ6EdXFc3orcBxeSd",
   "reminder_trigger_id": "trig_015yUreb23kdT2rv2bG7vLhT",
   "dashboard_url": "https://claude.ai/artifact/Eedt4UPNqrameHt3dahkHp",
-  "repo_url": "https://github.com/yurii-mysak/scala-training-docs"
+  "repo_url": "https://github.com/yurii-mysak/scala-training-docs",
+  "credits.fp-scala": 40
 }

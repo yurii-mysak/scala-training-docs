@@ -1,0 +1,7 @@
+flowchart TD
+  S["training set: n rows"] --> B1["batch: gradient from all n rows, 1 update per epoch"]
+  S --> M1["mini-batch: shuffle, cut into batches of 32, 1 update per batch"]
+  S --> S1["stochastic: 1 row per update, n updates per epoch"]
+  B1 --> R["an epoch = one full pass over the data, whatever the batch size"]
+  M1 --> R
+  S1 --> R

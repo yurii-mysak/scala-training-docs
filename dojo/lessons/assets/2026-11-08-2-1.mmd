@@ -1,0 +1,8 @@
+flowchart TD
+  F["f: A => B (math.abs)"] --> L["lift(f) = _.map(f)"]
+  L --> G["g: Option[A] => Option[B]"]
+  A1["Some(-3.0)"] --> G
+  A2["None"] --> G
+  G --> B1["Some(3.0)"]
+  G --> B2["None"]
+  N["no new code: map already knows the None case"] --> L

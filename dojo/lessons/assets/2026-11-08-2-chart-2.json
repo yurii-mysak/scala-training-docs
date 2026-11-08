@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "All-valid lists: map-then-sequence reads every list node twice, traverse reads it once",
+  "x_label": "list length",
+  "y_label": "list nodes read",
+  "categories": ["n = 100", "n = 300", "n = 1000"],
+  "series": [
+    {"name": "map(parse) then sequence", "y": [200, 600, 2000]},
+    {"name": "traverse", "y": [100, 300, 1000]}
+  ]
+}

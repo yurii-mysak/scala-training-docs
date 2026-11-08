@@ -92,3 +92,4 @@
 {"ts": "2026-11-08T06:54:05Z", "event": "sent", "lesson": "2026-11-08-1", "by": "job", "note": "core · ai-ml-07"}
 {"ts": "2026-11-08T07:03:47Z", "event": "sent", "lesson": "2026-11-08-2", "by": "job", "note": "core · fp-scala-05"}
 {"ts": "2026-11-08T07:22:44Z", "event": "sent", "lesson": null, "by": "job", "note": "day 24: slot 2 substituted a curriculum rung (fp-scala-05) for the fresh slot — all architecture feeds unreachable (WebFetch blocked, PROVENANCE_REQUIRED)"}
+{"ts": "2026-11-08T07:23:35Z", "event": "sent", "lesson": null, "by": "job", "note": "day 24: 2026-11-08-1, 2026-11-08-2"}

@@ -330,5 +330,17 @@
   "2026-11-08-2-chart-2.png": {
     "url": "/_blob/61b589f92d4e5d9facf38fcaa36224e2",
     "sha256": "000c65f847aa3bb0c7816931ffd3365e650736cba00b1f22af46102f3a0c371a"
+  },
+  "2026-11-09-1-chart-1.png": {
+    "url": "/_blob/bbe538bbb534b92917e38017aacf5823",
+    "sha256": "d0236a0b703f4be953225c1e1122213a21b7271adbaaa573709a4efd03d281a8"
+  },
+  "2026-11-09-2-chart-1.png": {
+    "url": "/_blob/5cb4c7cb7772bbf8ad2a00029ba08e13",
+    "sha256": "9db551f66cf0455c9aefa0c330e5ba5d8cfbf850cc29404da7a38eecdb654c46"
+  },
+  "2026-11-09-2-chart-2.png": {
+    "url": "/_blob/ff329bcdb30582025e8dcb1ece0ed2e0",
+    "sha256": "50c07aa5ff29dd0bcc15af140f831918573a681d3ad4a3af96a53d6261857da0"
   }
 }

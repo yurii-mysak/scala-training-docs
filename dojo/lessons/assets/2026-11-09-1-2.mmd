@@ -1,0 +1,9 @@
+flowchart TD
+  A["DENSE, well-documented<br/>REST handler · Akka actors · SQL joins"] --> B["THINNING<br/>library released after training · niche vendor quirks"]
+  B --> C["SPARSE, novel<br/>your POS–tunnel protocol · your team's conventions"]
+  A --> R1["fabrication risk: LOW"]
+  B --> R2["fabrication risk: RISING"]
+  C --> R3["fabrication risk: HIGH"]
+  R1 --> S1["and within any zone, risk climbs with claim specificity:<br/>concept → process → name → number → version → URL"]
+  R2 --> S1
+  R3 --> S1

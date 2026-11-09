@@ -1,0 +1,8 @@
+flowchart TD
+  A["everything written so far: prompt + answer-in-progress"] --> B["score every candidate next token"]
+  B --> C["a probability distribution over continuations"]
+  C --> D["pick one token, append it"]
+  D --> E{"answer finished?"}
+  E -- "no" --> A
+  E -- "yes" --> F["the answer you read"]
+  C --> G["note: no step in this loop asks<br/>'do I actually know this?'"]

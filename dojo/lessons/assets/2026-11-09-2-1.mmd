@@ -1,0 +1,9 @@
+flowchart TD
+    Q["get key 250"] --> ROOT["root page 1: separators 100, 300"]
+    ROOT -->|"100 to 299"| B2["branch page 7: separators 180, 250"]
+    ROOT -.->|"below 100"| B1["branch page 5"]
+    ROOT -.->|"300 and above"| B3["branch page 9"]
+    B2 -->|"250 and above"| L["leaf page 42: 250, 266, 281, 294"]
+    B2 -.->|"below 180"| L1["leaf page 40"]
+    B2 -.->|"180 to 249"| L2["leaf page 41"]
+    L --> V["value for 250, inside that one 4 KB page"]

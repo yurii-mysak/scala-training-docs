@@ -1,0 +1,8 @@
+flowchart TD
+    I["insert 275, but leaf page 42 is full: 250, 266, 281, 294"] --> S["split at the midpoint"]
+    S --> L1["page 42 keeps 250, 266"]
+    S --> L2["new page 77 takes 281, 294"]
+    S --> P["parent page 7 gains the separator 281"]
+    L1 --> W["275 is below 281, so it lands in page 42: 250, 266, 275"]
+    L2 --> D["three pages written: 42, 77 and the parent"]
+    P --> D

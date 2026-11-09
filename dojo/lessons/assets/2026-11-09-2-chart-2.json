@@ -1,0 +1,21 @@
+{
+  "type": "bar",
+  "title": "At 100,000 keys, insert order moves a B-tree's write cost 21x",
+  "x_label": "",
+  "y_label": "bytes written per key",
+  "categories": [
+    "B-tree, random keys",
+    "B-tree, sequential keys",
+    "LSM-tree, any order"
+  ],
+  "series": [
+    {
+      "name": "bytes written per key",
+      "y": [
+        3175,
+        149,
+        295
+      ]
+    }
+  ]
+}

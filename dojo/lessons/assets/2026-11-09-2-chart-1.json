@@ -1,0 +1,48 @@
+{
+  "type": "line",
+  "title": "A B-tree writes a 4 KB page per key; the LSM path writes 64-369 B",
+  "x_label": "keys inserted (N)",
+  "y_label": "bytes written per key",
+  "log_x": true,
+  "log_y": true,
+  "series": [
+    {
+      "name": "B-tree, every page write counted",
+      "x": [
+        1000,
+        10000,
+        100000,
+        1000000
+      ],
+      "y": [
+        4366,
+        4418,
+        4355,
+        4361
+      ]
+    },
+    {
+      "name": "LSM: WAL + flush + compaction",
+      "x": [
+        1000,
+        10000,
+        100000,
+        1000000
+      ],
+      "y": [
+        64,
+        175,
+        295,
+        369
+      ],
+      "style": "dashed"
+    }
+  ],
+  "annotate": [
+    {
+      "x": 1000000,
+      "y": 369,
+      "text": "11.8x less written per key"
+    }
+  ]
+}

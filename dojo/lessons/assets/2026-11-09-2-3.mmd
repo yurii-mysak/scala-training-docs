@@ -1,0 +1,10 @@
+flowchart TD
+    W["update key 266 in place"] --> WAL["1 append the change to the write-ahead redo log"]
+    WAL --> LT["2 take a latch on leaf page 42"]
+    LT --> MOD["3 modify the 4 KB page in the buffer pool"]
+    MOD --> SP{"page full?"}
+    SP -->|"no"| U["4 release the latch, write page 42 back in place"]
+    SP -->|"yes"| SPL["4 split: write pages 42, 77 and the parent"]
+    U --> CK["checkpoint: pages durable, that prefix of the log discarded"]
+    SPL --> CK
+    CK --> CR["crash before the checkpoint: replay the redo log"]

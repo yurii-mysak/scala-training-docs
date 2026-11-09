@@ -1,25 +1,25 @@
 {
   "schema": 1,
-  "day": 24,
+  "day": 25,
   "credits": {
-    "ai-ml": 1,
-    "fp-scala": -15,
-    "ddia": 3,
-    "architecture": -4,
-    "networking": -4,
-    "rust": 7,
-    "claude-academy": 12
+    "ai-ml": 11,
+    "fp-scala": -9,
+    "ddia": -6,
+    "architecture": 0,
+    "networking": 0,
+    "rust": 9,
+    "claude-academy": -2
   },
   "next_rung": {
     "ai-ml": 7,
     "fp-scala": 5,
-    "ddia": 4,
+    "ddia": 5,
     "architecture": 3,
     "networking": 3,
     "rust": 1,
-    "claude-academy": 2
+    "claude-academy": 3
   },
-  "lessons_sent": 48,
+  "lessons_sent": 50,
   "lessons_passed": 11,
   "open": [
     "2026-10-11-2",
@@ -58,7 +58,9 @@
     "2026-11-07-1",
     "2026-11-07-2",
     "2026-11-08-1",
-    "2026-11-08-2"
+    "2026-11-08-2",
+    "2026-11-09-1",
+    "2026-11-09-2"
   ],
   "last_run_at": "2026-11-08T07:23:35Z",
   "last_fresh_domains": [

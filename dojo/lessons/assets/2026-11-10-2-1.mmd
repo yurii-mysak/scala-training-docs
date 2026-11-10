@@ -1,0 +1,17 @@
+flowchart TD
+  U["User query, or a D1 binding"] --> E1
+  subgraph DP["Data plane: edge only"]
+    E1["Edge API Worker"] --> E2["D1 Eyeball Worker"]
+    E2 --> E3["D1 Durable Object, SQLite"]
+    KV["Workers KV, edge cached"] -.-> E1
+  end
+  CRUD["Dashboard, Wrangler, REST API"] --> C1
+  subgraph CP["Control plane: central Postgres allowed"]
+    C1["Edge API, near Postgres"] --> C2["Hyperdrive"]
+    C2 --> C3["Postgres in Core"]
+  end
+  E3 -.->|"usage events"| B1
+  subgraph BP["Background plane: eventually consistent"]
+    B1["Queue, consumers in Core"] --> B2["database_stats + deltas"]
+    B2 --> B3["account_database_stats"]
+  end

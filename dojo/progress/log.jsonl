@@ -96,3 +96,5 @@
 {"ts": "2026-11-09T06:55:05Z", "event": "sent", "lesson": "2026-11-09-1", "by": "job", "note": "core · claude-academy-03"}
 {"ts": "2026-11-09T07:03:14Z", "event": "sent", "lesson": "2026-11-09-2", "by": "job", "note": "core · ddia-05"}
 {"ts": "2026-11-09T07:34:11Z", "event": "sent", "lesson": null, "by": "job", "note": "day 25: 2026-11-09-1, 2026-11-09-2 (slot 2 = ddia-05 core rung; WebFetch blocked, no fresh research possible)"}
+{"ts": "2026-11-10T06:54:46Z", "event": "sent", "lesson": "2026-11-10-1", "by": "job", "note": "core · ai-ml-08"}
+{"ts": "2026-11-10T07:02:11Z", "event": "sent", "lesson": "2026-11-10-2", "by": "job", "note": "fresh · architecture"}

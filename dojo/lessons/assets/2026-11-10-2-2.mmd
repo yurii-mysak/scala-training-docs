@@ -1,0 +1,9 @@
+flowchart TD
+  W["User Worker with a D1 binding"] --> EY["D1 Eyeball Worker"]
+  API["REST API caller"] --> EA["Edge API Worker"]
+  EA --> KV["Workers KV: UUID to DO-ID"]
+  KV -->|"rare miss"| HD["Hyperdrive, cached, read replicas"]
+  HD --> PG["Postgres in Core"]
+  EA --> EY
+  EY --> DO["D1 Durable Object with SQLite"]
+  DO --> Q["Queue to Core: storage usage"]

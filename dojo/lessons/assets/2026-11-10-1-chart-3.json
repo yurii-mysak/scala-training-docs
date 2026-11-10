@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "Per-class F1 of Cloudflare's WAF classifier, before and after data augmentation",
+  "x_label": "class in the categorical output",
+  "y_label": "F1 score",
+  "categories": ["benign", "SQLi", "XSS", "macro average"],
+  "value_fmt": "%.2f",
+  "series": [
+    {"name": "without augmentation", "y": [0.27, 0.85, 0.70, 0.61]},
+    {"name": "with augmentation", "y": [0.99, 1.00, 0.99, 0.99]}
+  ]
+}

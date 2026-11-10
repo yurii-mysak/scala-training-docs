@@ -1,0 +1,12 @@
+{
+  "type": "hbar",
+  "title": "One central hop in 1% of queries moves p99, not p50",
+  "x_label": "latency (ms), lower is better",
+  "y_label": "",
+  "categories": ["C binding, no lookup", "B KV at edge, 1% miss", "A central read every query"],
+  "series": [
+    {"name": "p50", "y": [7.01, 9.04, 267.13]},
+    {"name": "p99", "y": [7.98, 259.39, 277.05]}
+  ],
+  "value_fmt": "%.1f"
+}

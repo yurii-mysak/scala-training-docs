@@ -1,0 +1,7 @@
+flowchart TD
+  F["one formula: binom(10, k) p^k (1-p)^(10-k)"] --> P["fix p = 0.7, vary k over 0..10"]
+  F --> L["fix k = 7 heads, vary p"]
+  P --> PS["probability: the 11 values sum to 1.0000"]
+  L --> LS["likelihood: those values sum to 0.4504, not 1"]
+  PS --> U["P(3 heads given p=0.7) = L(p=0.3 given 7 heads) = 0.0090"]
+  LS --> U

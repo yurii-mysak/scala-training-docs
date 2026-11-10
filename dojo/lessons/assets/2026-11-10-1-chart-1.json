@@ -1,0 +1,16 @@
+{
+  "type": "line",
+  "title": "Same 95%/1% detector: a flag only means fraud once the base rate is high",
+  "x_label": "base rate P(fraud), log scale",
+  "y_label": "P(fraud | flagged)",
+  "log_x": true,
+  "series": [
+    {"name": "P(fraud | flagged)",
+     "x": [0.0002, 0.0005, 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2],
+     "y": [0.0186, 0.0454, 0.0868, 0.1599, 0.3231, 0.4897, 0.6597, 0.8333, 0.9135, 0.9596]}
+  ],
+  "hline": {"y": 0.5, "label": "coin flip"},
+  "annotate": [
+    {"x": 0.002, "y": 0.1599, "text": "0.2% base rate: 16%", "dx": 18, "dy": 34}
+  ]
+}

@@ -1,0 +1,12 @@
+flowchart TD
+  A["1,000,000 transactions"] --> B["fraud: 0.2% = 2,000"]
+  A --> C["legit: 99.8% = 998,000"]
+  B --> D["flagged: 95% of 2,000 = 1,900"]
+  B --> E["quiet: 5% of 2,000 = 100"]
+  C --> F["flagged: 1% of 998,000 = 9,980"]
+  C --> G["quiet: 99% of 998,000 = 988,020"]
+  D --> H["every alert you see: 1,900 + 9,980 = 11,880"]
+  F --> H
+  H --> I["P(fraud | flagged) = 1,900 / 11,880 = 16%"]
+  style D fill:#f6c89f
+  style F fill:#f6c89f

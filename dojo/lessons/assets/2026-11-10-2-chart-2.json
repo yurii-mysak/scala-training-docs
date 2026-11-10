@@ -1,0 +1,12 @@
+{
+  "type": "line",
+  "title": "Append-and-fold keeps writes per second flat as an account grows",
+  "x_label": "databases in the account",
+  "y_label": "writes per second to the account total row",
+  "series": [
+    {"name": "update one hot account row per database", "x": [1, 10, 100, 1000], "y": [1, 10, 100, 1000]},
+    {"name": "append deltas, fold once per second", "x": [1, 10, 100, 1000], "y": [1, 1, 1, 1]}
+  ],
+  "log_x": true,
+  "log_y": true
+}

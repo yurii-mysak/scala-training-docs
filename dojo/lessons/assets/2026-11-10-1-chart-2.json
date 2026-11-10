@@ -1,0 +1,14 @@
+{
+  "type": "line",
+  "title": "Log-likelihood of 7 heads in 10 flips peaks at p = 0.7",
+  "x_label": "candidate p (probability of heads)",
+  "y_label": "log L(p) = 7 log p + 3 log(1 - p)",
+  "series": [
+    {"name": "log L(p)",
+     "x": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+     "y": [-16.4342, -11.9355, -9.4978, -7.9465, -6.9315, -6.3247, -6.1086, -6.3903, -7.6453]}
+  ],
+  "annotate": [
+    {"x": 0.7, "y": -6.1086, "text": "maximum: -6.1086 at p = 0.7 = 7/10", "dx": -150, "dy": -42}
+  ]
+}

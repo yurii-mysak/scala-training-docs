@@ -1,0 +1,16 @@
+sequenceDiagram
+  participant E as Edge API Worker
+  participant A as Durable Object A
+  participant B as Durable Object B
+  participant P as Postgres in Core
+  E->>A: init with options
+  A-->>E: ready
+  E->>P: insert metadata row
+  P-->>E: write failed
+  E->>B: retry with fresh IDs, init
+  B-->>E: ready
+  E->>P: insert metadata row
+  P-->>E: committed, the database now exists
+  A->>E: heartbeat within 30 seconds
+  E-->>A: your database does not exist
+  A->>A: mark deleted, clean up

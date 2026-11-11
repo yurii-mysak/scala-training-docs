@@ -1,0 +1,16 @@
+flowchart TD
+    subgraph RS["Rust — let s2 = s1"]
+        direction LR
+        R1["s2 owns the buffer, s1 is dead to the compiler"]
+        R2["exactly one free, emitted at s2's closing brace"]
+        R3["cost: no runtime bookkeeping, one compiler error when you get it wrong"]
+        R1 --> R2 --> R3
+    end
+    subgraph JV["JVM — String b = a"]
+        direction LR
+        J1["a and b are two live references to one object"]
+        J2["nothing is freed here, the GC traces reachability later"]
+        J3["cost: a collector, a sized heap, pause times, no compile-time error"]
+        J1 --> J2 --> J3
+    end
+    RS ==> JV

@@ -1,0 +1,13 @@
+{
+  "type": "bar",
+  "title": "Bytes copied: a move is flat at 24 B, a clone grows with the string",
+  "x_label": "string length (bytes)",
+  "y_label": "bytes copied per operation (log scale)",
+  "categories": ["8", "64", "1024", "65536"],
+  "series": [
+    {"name": "move (String record only)", "y": [24, 24, 24, 24]},
+    {"name": "clone (record + buffer)", "y": [32, 88, 1048, 65560]}
+  ],
+  "value_fmt": "%g",
+  "log_y": true
+}

@@ -1,0 +1,10 @@
+flowchart TD
+  T["one model output"] --> C["truly correct, share a"]
+  T --> W["truly wrong, share 1 - a"]
+  C --> P1["judge says PASS with probability sens = 0.92"]
+  W --> P2["judge says PASS with probability fpr = 0.10"]
+  P1 --> Q["observed pass rate q = sens * a + fpr * (1 - a)"]
+  P2 --> Q
+  Q --> I["invert: a = (q - fpr) / (sens - fpr)"]
+  I --> R["error-corrected estimate: 0.8951 in the lab, truth 0.8943"]
+  I --> U["sens and fpr are themselves estimated from human labels,<br/>so their error lands directly in a"]

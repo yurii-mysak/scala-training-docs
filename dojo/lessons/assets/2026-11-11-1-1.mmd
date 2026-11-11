@@ -1,0 +1,20 @@
+flowchart TD
+    subgraph A["Before — let s1 = String::from(hello)"]
+        direction TB
+        P1["s1.ptr"]
+        L1["s1.len = 5"]
+        C1["s1.capacity = 5"]
+        H1["heap buffer, bytes h e l l o"]
+        P1 --> H1
+    end
+    subgraph B["After — let s2 = s1 copies the record, not the buffer"]
+        direction TB
+        P2["s2.ptr"]
+        L2["s2.len = 5"]
+        C2["s2.capacity = 5"]
+        X1["s1 — moved out, rejected by the compiler"]
+        H2["the same heap buffer, still one allocation"]
+        P2 --> H2
+        X1 -. "will not free the buffer" .-> H2
+    end
+    A ==> B

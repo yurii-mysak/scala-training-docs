@@ -1,0 +1,14 @@
+flowchart TD
+  A["100,000 model outputs, each carrying a self-reported confidence"] --> B["bucket by confidence into strata"]
+  B --> S1["stratum 0.50-0.70<br/>1,000 items"]
+  B --> S2["stratum 0.70-0.85<br/>2,000 items"]
+  B --> S3["stratum 0.85-0.95<br/>7,000 items"]
+  B --> S4["stratum 0.95-1.00<br/>90,000 items"]
+  S1 --> D["draw n_k items from each stratum, 400 in total"]
+  S2 --> D
+  S3 --> D
+  S4 --> D
+  D --> E["humans verify only those 400"]
+  E --> F["per-stratum accuracy acc_k = verified correct / n_k"]
+  F --> G["reweight by known stratum sizes: est = sum of weight_k * acc_k"]
+  G --> H["population accuracy 0.8943, 95% interval +/- 0.0279"]

@@ -1,0 +1,21 @@
+{
+  "type": "bar",
+  "title": "Same 400 checks: sd 0.0142 proportional vs 0.0235 equal-per-stratum",
+  "x_label": "how the 400-label budget is spent (lab Step 2, 20,000 trials)",
+  "y_label": "sd of the accuracy estimate",
+  "categories": [
+    "simple random sample\n400 draws, no strata",
+    "stratified, equal alloc\nn_k = 100, 100, 100, 100",
+    "stratified, proportional\nn_k = 4, 8, 28, 360"
+  ],
+  "series": [
+    {
+      "y": [
+        0.0152,
+        0.0235,
+        0.0142
+      ]
+    }
+  ],
+  "value_fmt": "%.4f"
+}

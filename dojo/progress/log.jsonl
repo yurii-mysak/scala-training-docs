@@ -99,3 +99,5 @@
 {"ts": "2026-11-10T06:54:46Z", "event": "sent", "lesson": "2026-11-10-1", "by": "job", "note": "core · ai-ml-08"}
 {"ts": "2026-11-10T07:02:11Z", "event": "sent", "lesson": "2026-11-10-2", "by": "job", "note": "fresh · architecture"}
 {"ts": "2026-11-10T07:21:22Z", "event": "sent", "lesson": null, "by": "job", "note": "day 26: 2026-11-10-1, 2026-11-10-2"}
+{"ts": "2026-11-11T06:54:02Z", "event": "sent", "lesson": "2026-11-11-1", "by": "job", "note": "core · rust-02"}
+{"ts": "2026-11-11T07:04:07Z", "event": "sent", "lesson": "2026-11-11-2", "by": "job", "note": "fresh · ai-ml"}

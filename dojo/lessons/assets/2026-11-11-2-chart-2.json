@@ -1,0 +1,9 @@
+{
+  "type": "line",
+  "title": "The judge correction is only as good as the sensitivity you assume",
+  "x_label": "sensitivity assumed for the judge (true value 0.92, fpr fixed at 0.10)",
+  "y_label": "corrected accuracy estimate",
+  "series": [{"name": "corrected estimate (q - fpr) / (sens - fpr), q = 0.8340", "x": [0.82, 0.86, 0.90, 0.92, 0.94, 0.98, 1.0], "y": [1.0194, 0.9657, 0.9174, 0.8951, 0.8738, 0.8340, 0.8155]}],
+  "hline": {"y": 0.8943, "label": "true population accuracy 0.8943"},
+  "annotate": [{"x": 0.82, "y": 1.0194, "text": "estimate above 1.0: impossible", "dx": 20, "dy": -20}]
+}

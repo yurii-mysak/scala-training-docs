@@ -1,0 +1,7 @@
+{
+  "url": "https://raw.githubusercontent.com/cs231n/cs231n.github.io/master/assets/svmvssoftmax.png",
+  "page": "https://cs231n.github.io/linear-classify/",
+  "credit": "Stanford CS231n, Andrej Karpathy",
+  "license": "MIT",
+  "caption": "The same score vector read two ways: hinge loss versus cross-entropy loss"
+}

@@ -1,0 +1,7 @@
+flowchart TD
+  A["Attacker holding a compromised CA private key"] -->|"signs a leaf for any name"| L["Leaf: CN=repo1.maven.org"]
+  L --> I["Compromised intermediate CA certificate"]
+  I --> Q{"PKIX: is the top of this chain in my trust store?"}
+  Q -->|"yes, it is one of the 120 trustedCertEntry"| OK["Path validated, TLS proceeds, dependency downloaded"]
+  Q -->|"no"| F["PKIX path building failed"]
+  OK --> P["Attacker serves modified artifacts over a connection the JVM calls secure"]

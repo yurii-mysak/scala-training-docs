@@ -1,0 +1,7 @@
+flowchart TD
+  H["last hidden state h, e.g. 4096 numbers"] --> M["unembedding: f = W·h, one score per token"]
+  M --> V["score vector f over the whole vocabulary, e.g. 100k entries"]
+  V --> SM["softmax: p = exp(f - max f) / sum of exp(f - max f)"]
+  SM --> D["distribution over the next token, sums to 1"]
+  D --> TR["training: loss = -log p of the token that actually came next"]
+  D --> SA["serving: sample or take the argmax"]

@@ -1,0 +1,12 @@
+{
+  "type": "line",
+  "title": "The sigmoid squashes any score into a probability; 0.5 sits exactly at z = 0",
+  "x_label": "linear score z = w·x + b",
+  "y_label": "σ(z) = P(y = 1)",
+  "series": [
+    {"name": "σ(z)", "x": [-4.0, -3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0, 4.0],
+     "y": [0.0180, 0.0474, 0.1192, 0.2689, 0.3775, 0.5000, 0.6225, 0.7311, 0.8808, 0.9526, 0.9820]}
+  ],
+  "hline": {"y": 0.5, "label": "default threshold 0.5"},
+  "annotate": [{"x": -1.0, "y": 0.2689, "text": "z = -1  ->  p = 0.2689"}, {"x": 2.0, "y": 0.8808, "text": "z = 2  ->  p = 0.8808"}]
+}

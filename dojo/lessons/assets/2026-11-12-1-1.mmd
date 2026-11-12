@@ -1,0 +1,10 @@
+flowchart TD
+  X["features x, one row"] --> Z["linear score z = w·x + b, any real number"]
+  Z --> S["sigmoid: p = 1 / (1 + e^(-z)), a number in (0, 1)"]
+  S --> L["training: log loss = -(y·log p + (1-y)·log(1-p))"]
+  S --> T{"serving: is p >= threshold t?"}
+  L --> G["gradient (p - y)·x, one number per feature"]
+  G --> U["update w and b, then repeat"]
+  U --> Z
+  T -- "yes" --> P1["predict class 1"]
+  T -- "no" --> P0["predict class 0"]

@@ -1,0 +1,5 @@
+flowchart TD
+  C["Check: run the emudhra-emsign-check tool on every JDK, locally and in CI"] --> D["Distrust: run bin/distrust-emudhra.sh, with --dry-run first"]
+  D --> V["Verify: rerun the check; the test hosts must now fail with PKIX path building failed"]
+  V --> U["Update: move to a fixed vendor build of your JDK line"]
+  U --> R["Repeat for CI runners, Docker base images and every standalone JDK"]

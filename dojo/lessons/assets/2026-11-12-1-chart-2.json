@@ -1,0 +1,15 @@
+{
+  "type": "line",
+  "title": "Log loss keeps punishing a confident wrong answer; squared error gives up",
+  "x_label": "predicted probability p = σ(z)",
+  "y_label": "penalty for one row (log scale)",
+  "log_y": true,
+  "series": [
+    {"name": "-log p  (true label y = 1)", "x": [0.01, 0.1, 0.3, 0.5, 0.7, 0.9, 0.99],
+     "y": [4.605, 2.303, 1.204, 0.693, 0.357, 0.105, 0.010]},
+    {"name": "-log(1-p)  (true label y = 0)", "x": [0.01, 0.1, 0.3, 0.5, 0.7, 0.9, 0.99],
+     "y": [0.010, 0.105, 0.357, 0.693, 1.204, 2.303, 4.605]},
+    {"name": "(1-p)^2  squared error, y = 1", "x": [0.01, 0.1, 0.3, 0.5, 0.7, 0.9, 0.99],
+     "y": [0.9801, 0.8100, 0.4900, 0.2500, 0.0900, 0.0100, 0.0001], "style": "dashed"}
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "type": "bar",
+  "title": "What shrinking a checkpoint to a fixture costs: size down, layer kinds kept",
+  "x_label": "quantity reported in the post",
+  "y_label": "value (log scale)",
+  "categories": [
+    "UMT5\nweights, MB",
+    "Llama 4 Scout\nparams, millions",
+    "Scout vision\nlayers",
+    "Scout language\nlayers"
+  ],
+  "series": [
+    {
+      "name": "source checkpoint",
+      "y": [
+        1227,
+        108600,
+        34,
+        48
+      ]
+    },
+    {
+      "name": "shrunk fixture",
+      "y": [
+        66,
+        44.7,
+        2,
+        4
+      ]
+    }
+  ],
+  "value_fmt": "%g",
+  "log_y": true
+}

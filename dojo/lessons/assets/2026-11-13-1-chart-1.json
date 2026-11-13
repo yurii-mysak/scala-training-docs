@@ -1,0 +1,10 @@
+{
+  "type": "hbar",
+  "title": "Role interfaces cut every count: 6 methods to 2, 3 rebuilds to 1",
+  "x_label": "count (lower is better)",
+  "categories": ["Checkout sees", "Refunds sees", "Maintenance sees", "Checkout double implements", "Clients rebuilt by one method change"],
+  "series": [
+    {"name": "fat PaymentTerminal", "y": [6, 6, 6, 6, 3]},
+    {"name": "role interfaces", "y": [2, 2, 2, 2, 1]}
+  ]
+}

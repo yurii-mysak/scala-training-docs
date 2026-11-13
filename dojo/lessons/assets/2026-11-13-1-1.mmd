@@ -1,0 +1,8 @@
+flowchart TD
+    V["vendor.PaymentTerminal: all six methods"] -->|"wrapped by"| AD["adapters.TerminalAdapter"]
+    AD -->|"implements"| A["checkout.Authorizer: authorize, capture"]
+    AD -->|"implements"| R["refunds.Refunder: refund, printReceipt"]
+    AD -->|"implements"| S["maintenance.Servicer: updateFirmware, runDiagnostics"]
+    A -->|"used by"| C["Checkout"]
+    R -->|"used by"| D["Refund desk"]
+    S -->|"used by"| M["Maintenance job"]

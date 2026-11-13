@@ -1,0 +1,14 @@
+{
+  "type": "bar",
+  "title": "Overfit fixture: 26.6x the signal when the causal mask is dropped",
+  "x_label": "query position in the fixture's 7-token usage path",
+  "y_label": "|change in label log-probability| (log scale)",
+  "categories": ["pos 0", "pos 1", "pos 2", "pos 3", "pos 4", "pos 5"],
+  "series": [
+    {"name": "overfit fixture", "y": [5.9996, 3.7122, 1.0932, 1.8635, 2.0279, 1.0932]},
+    {"name": "random-weight fixture", "y": [0.2252, 0.0613, 0.0504, 0.0132, 0.0554, 0.0833]}
+  ],
+  "hline": {"y": 0.01, "label": "contract tolerance 0.01"},
+  "value_fmt": "%.3f",
+  "log_y": true
+}

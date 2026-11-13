@@ -1,0 +1,11 @@
+flowchart TD
+  A["real checkpoint on the Hub"] --> B["read its config only<br/>(layer kinds, order, widths)"]
+  B --> C["shrink: fewer dims, fewer layers per kind,<br/>every layer kind still present"]
+  C --> D["fixture published to the Hub,<br/>pinned to a frozen revision"]
+  D --> E["usage path: a runnable example<br/>(generate, or one training step)"]
+  E --> F["baselines recorded and reviewed by a human"]
+  F --> G["fleet dataset pins MIC revision<br/>+ package versions used"]
+  G --> H["CI on a PR: re-run usage path on CPU"]
+  H --> I{"outputs match baselines<br/>within tolerance?"}
+  I -->|yes| J["contract holds"]
+  I -->|no| K["report the diff on the PR"]

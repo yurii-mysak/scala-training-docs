@@ -1,0 +1,9 @@
+flowchart TD
+    subgraph pkg["package checkout: the high-level policy"]
+      CO["Checkout"] -->|"depends on"| AU["Authorizer (trait, owned here)"]
+    end
+    AD["adapters.TerminalAdapter"] -->|"implements"| AU
+    AD -->|"wraps"| SDK["vendor SDK"]
+    ROOT["app: composition root"] -->|"constructs"| AD
+    ROOT -->|"injects"| CO
+    CO -. "calls at run time" .-> AD

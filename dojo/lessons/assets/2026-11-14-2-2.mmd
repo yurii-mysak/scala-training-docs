@@ -1,0 +1,8 @@
+flowchart TD
+  A["5 datasets x 4 TFMs<br/>= 20 primary comparisons"] --> B["10 seeded train/test splits each"]
+  B --> C["per-split paired difference<br/>TFM minus best tuned GBDT"]
+  C --> D["Nadeau-Bengio corrected<br/>resampled t-test"]
+  D --> E["Holm step-down over 20"]
+  E --> F["6 significant"]
+  E --> G["14 not significant"]
+  F --> H["0 of the 6 favour the GBDT"]

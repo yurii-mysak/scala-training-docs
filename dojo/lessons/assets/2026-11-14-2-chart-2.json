@@ -1,0 +1,11 @@
+{
+  "type": "line",
+  "title": "Which model earns more depends on the campaign budget",
+  "x_label": "customers contacted (top k by score)",
+  "y_label": "campaign profit, euro",
+  "series": [
+    {"name": "model A (AUC 0.8503)", "x": [2, 4, 6, 8, 10, 12, 14, 16, 18, 20], "y": [84.00, 100.95, 117.45, 210.90, 258.00, 319.05, 403.50, 439.80, 433.80, 465.60]},
+    {"name": "model B (AUC 0.7565)", "x": [2, 4, 6, 8, 10, 12, 14, 16, 18, 20], "y": [44.40, 95.55, 195.75, 292.35, 298.95, 360.00, 354.00, 348.00, 342.00, 336.00]}
+  ],
+  "annotate": [{"x": 12, "y": 360.00, "text": "k = 12: worse ranker, more money", "dx": -150, "dy": 30}]
+}

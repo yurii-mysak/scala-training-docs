@@ -1,0 +1,11 @@
+flowchart TD
+    subgraph W0["Bytes 0-3"]
+        direction LR
+        SP["Source Port, 16 bits"] --- DP["Destination Port, 16 bits"]
+    end
+    subgraph W1["Bytes 4-7"]
+        direction LR
+        LN["Length, 16 bits: header plus data"] --- CK["Checksum, 16 bits"]
+    end
+    W0 --- W1
+    W1 --- PL["Payload: delivered whole, or not at all"]

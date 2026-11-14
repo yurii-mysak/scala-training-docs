@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant A as App over TCP
+    participant S as TCP server
+    participant U as App over UDP
+    participant R as DNS resolver
+    A->>S: SYN
+    S->>A: SYN + ACK
+    A->>S: ACK
+    A->>S: request bytes
+    S->>A: ACK
+    S->>A: response bytes
+    A->>S: FIN
+    Note over A,S: kernel orders, retransmits and paces
+    U->>R: query, one datagram
+    R-->>U: answer, one datagram
+    U->>R: second query, one datagram
+    Note over U,R: answer lost, no ACK, no retransmission
+    U->>U: read timeout fires after 300 ms

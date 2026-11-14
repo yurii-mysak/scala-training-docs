@@ -1,0 +1,7 @@
+flowchart TD
+    Q1["Does a late answer still have value?"] -- no --> UDP1["UDP: voice, video, live game state"]
+    Q1 -- yes --> Q2["Are you building a transport yourself?"]
+    Q2 -- yes --> UDP2["UDP: QUIC, WireGuard, custom tunnels"]
+    Q2 -- no --> Q3["Does request and reply fit in one datagram?"]
+    Q3 -- yes --> UDP3["UDP plus timeout, retry, idempotency: DNS style"]
+    Q3 -- no --> TCP["TCP or QUIC: let the kernel or library do it"]

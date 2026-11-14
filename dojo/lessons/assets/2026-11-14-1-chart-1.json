@@ -1,0 +1,33 @@
+{
+  "type": "bar",
+  "title": "One lost datagram costs the whole timeout: 320 ms instead of 0.01 ms",
+  "x_label": "request sequence number (even ones lose their first reply)",
+  "y_label": "time to a usable answer (ms, log scale)",
+  "categories": [
+    "seq 1",
+    "seq 2",
+    "seq 3",
+    "seq 4",
+    "seq 5",
+    "seq 6"
+  ],
+  "series": [
+    {
+      "name": "total time for the request, including the retry",
+      "y": [
+        0.092,
+        330.86,
+        0.007,
+        319.96,
+        0.011,
+        319.839
+      ]
+    }
+  ],
+  "log_y": true,
+  "value_fmt": "%.3f",
+  "hline": {
+    "y": 300,
+    "label": "300 ms timeout"
+  }
+}

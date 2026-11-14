@@ -1,0 +1,9 @@
+flowchart TD
+  T["labelled training rows"] --> G1["Optuna tuning loop<br/>40 trials, TPE on validation AUC"]
+  G1 --> G2["best hyperparameters<br/>refit on the full training split"]
+  G2 --> G3["fitted trees: the shipped artefact"]
+  G3 --> P1["predictions for test rows"]
+  T --> F1["the same rows used as CONTEXT<br/>no fitting, no tuning"]
+  F1 --> F2["one forward pass of a<br/>pre-trained transformer"]
+  F2 --> P2["predictions for test rows"]
+  F2 -.-> C["cached context / KV cache<br/>encode the context once, reuse per batch"]

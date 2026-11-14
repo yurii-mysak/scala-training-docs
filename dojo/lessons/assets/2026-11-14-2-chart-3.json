@@ -1,0 +1,12 @@
+{
+  "type": "line",
+  "title": "A 0.08 probability shift costs 32% of attainable profit at a fixed threshold",
+  "x_label": "contact threshold on the predicted probability",
+  "y_label": "campaign profit, euro",
+  "series": [
+    {"name": "as scored", "x": [0.10, 0.15, 0.20, 0.25, 0.30, 0.35], "y": [336.00, 357.00, 289.35, 195.75, 44.40, 44.40]},
+    {"name": "shifted by -0.08", "x": [0.10, 0.15, 0.20, 0.25, 0.30, 0.35], "y": [289.35, 242.25, 95.55, 44.40, 0.00, 0.00], "style": "dashed"},
+    {"name": "shift undone", "x": [0.10, 0.15, 0.20, 0.25, 0.30, 0.35], "y": [336.00, 357.00, 289.35, 195.75, 44.40, 44.40], "style": "points"}
+  ],
+  "annotate": [{"x": 0.15, "y": 242.25, "text": "same threshold, 114.75 euro lost", "dx": 20, "dy": -40}]
+}

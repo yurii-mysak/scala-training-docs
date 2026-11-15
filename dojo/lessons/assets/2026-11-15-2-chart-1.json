@@ -1,0 +1,11 @@
+{
+  "type": "hbar",
+  "title": "Measurement is the weakest aspect — it caps the platform at level 1",
+  "x_label": "maturity level (1 Provisional → 4 Optimizing)",
+  "y_label": "aspect assessed",
+  "categories": ["Investment", "Adoption", "Interfaces", "Operations", "Measurement"],
+  "series": [
+    {"name": "current level", "y": [2, 2, 3, 3, 1]},
+    {"name": "target (level 3, Scalable)", "y": [3, 3, 3, 3, 3]}
+  ]
+}

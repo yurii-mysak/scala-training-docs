@@ -1,0 +1,8 @@
+flowchart TD
+    C["product_sk file, 16 rows: 69, 69, 69, 74, 31, 31, 31, 29, 30, 30, 31, 31, 68, 69, 69, 69"]
+    C --> B29["bitmap for 29: 0000000100000000"]
+    C --> B31["bitmap for 31: 0000111000110000"]
+    C --> B69["bitmap for 69: 1110000000000111"]
+    B29 --> R29["run lengths: 7, 1, 8"]
+    B31 --> R31["run lengths: 4, 3, 3, 2, 4"]
+    B69 --> R69["run lengths: 0, 3, 10, 3"]

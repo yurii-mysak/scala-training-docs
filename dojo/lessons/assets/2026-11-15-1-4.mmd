@@ -1,0 +1,8 @@
+flowchart TD
+    W["INSERT into fact_sales"] --> M["in-memory row store, sorted, uncompressed"]
+    M -->|"enough writes accumulated"| MG["merge with the sorted column files"]
+    MG --> NEW["write new column files in bulk, re-compressed"]
+    Q2["analyst query"] --> M
+    Q2 --> OLD["existing column files on disk"]
+    M --> ANS["one answer: recent writes plus disk data, combined by the engine"]
+    OLD --> ANS

@@ -1,0 +1,8 @@
+flowchart TD
+    F["fact_sales: one row per purchase, often 100+ columns"]
+    F -->|"date_key"| DD["dim_date: year, month, weekday, is_holiday"]
+    F -->|"product_sk"| DP["dim_product: sku, description, brand_sk, category_sk"]
+    F -->|"store_sk"| DS["dim_store: chain, city, state"]
+    F -->|"customer_sk"| DC["dim_customer: age_band, income_band"]
+    DP -->|"snowflake step: brand_sk"| DB["dim_brand: brand, owner"]
+    DP -->|"snowflake step: category_sk"| DK["dim_category: category, department"]

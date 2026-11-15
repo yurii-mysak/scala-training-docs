@@ -1,0 +1,15 @@
+{
+  "type": "line",
+  "title": "Only sorted run-length encoding stops growing with the row count",
+  "x_label": "rows in the product_sk column",
+  "y_label": "bytes of column data",
+  "log_x": true,
+  "log_y": true,
+  "series": [
+    {"name": "raw 4-byte ints", "x": [16, 160, 1600, 16000], "y": [64, 640, 6400, 64000]},
+    {"name": "bitmaps, 6 per row-group", "x": [16, 160, 1600, 16000], "y": [12, 120, 1200, 12000]},
+    {"name": "run-length encoded, unsorted", "x": [16, 160, 1600, 16000], "y": [21, 147, 1407, 14007], "style": "dashed"},
+    {"name": "run-length encoded, sorted", "x": [16, 160, 1600, 16000], "y": [17, 20, 28, 33], "style": "line"}
+  ],
+  "annotate": [{"x": 16000, "y": 33, "text": "17 runs, whatever the row count"}]
+}

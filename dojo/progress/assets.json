@@ -430,5 +430,17 @@
   "2026-11-15-2-chart-1.png": {
     "url": "/_blob/814c9be6f00597b7fc0e203eda80feca",
     "sha256": "1b061599a8031708c67a136de8a3e602a7bbe75cc96c330fb61f706b98827538"
+  },
+  "2026-11-16-1-chart-1.png": {
+    "url": "/_blob/4f920b894fce190edcf3b9c6da829814",
+    "sha256": "b8e514878b394b407256575ea7ab8814226afc5e482c8aa420124c3fd46015fd"
+  },
+  "2026-11-16-2-chart-1.png": {
+    "url": "/_blob/91850bb77b8c46a13f4ab0f4b0014386",
+    "sha256": "8c873de744e542683ea85a29d54d51dc6ca0a79dc09eb4c1c3da1a5f73558f86"
+  },
+  "2026-11-16-2-chart-2.png": {
+    "url": "/_blob/109cf7dc9b0e13d33dbef8782b5d93cc",
+    "sha256": "57318a0b3fdf400574fcfb4ac42ad5f7d18aa0dba65283f6f4548c1463a24607"
   }
 }

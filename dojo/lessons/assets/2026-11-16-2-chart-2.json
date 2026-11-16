@@ -1,0 +1,13 @@
+{
+  "type": "bar",
+  "title": "Leaky targets are one-hot: 300 of 300 land outside 0.01-0.99",
+  "x_label": "targets the teacher produced",
+  "y_label": "rows out of 300",
+  "categories": ["leaky in-context", "stratified out-of-fold", "hard labels (no teacher)"],
+  "series": [
+    {"name": "above 0.99", "y": [147, 0, 147]},
+    {"name": "below 0.01", "y": [153, 3, 153]},
+    {"name": "in between", "y": [0, 297, 0]}
+  ],
+  "value_fmt": "%d"
+}

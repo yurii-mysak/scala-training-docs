@@ -1,0 +1,35 @@
+{
+  "type": "hbar",
+  "title": "Prefix of a 100-element source: LazyList forces n, strict List forces 100",
+  "x_label": "element thunks actually forced",
+  "y_label": "requested prefix length n (take n)",
+  "categories": [
+    "take 1",
+    "take 2",
+    "take 3",
+    "take 5",
+    "take 10"
+  ],
+  "series": [
+    {
+      "name": "strict List",
+      "y": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ]
+    },
+    {
+      "name": "LazyList (book's, built in the lab)",
+      "y": [
+        1,
+        2,
+        3,
+        5,
+        10
+      ]
+    }
+  ]
+}

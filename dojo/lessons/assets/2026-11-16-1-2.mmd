@@ -1,0 +1,15 @@
+sequenceDiagram
+  participant T as toList
+  participant F as filter even
+  participant M as map plus ten
+  participant S as source cells
+  T->>F: need the next element
+  F->>M: need the next element
+  M->>S: force cell 1
+  S-->>M: 1
+  M-->>F: 11
+  F->>M: 11 is odd, need the next
+  M->>S: force cell 2
+  S-->>M: 2
+  M-->>F: 12
+  F-->>T: 12, the first result cell

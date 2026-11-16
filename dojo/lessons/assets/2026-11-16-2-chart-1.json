@@ -1,0 +1,11 @@
+{
+  "type": "hbar",
+  "title": "Only out-of-fold targets beat the hard-label baseline",
+  "x_label": "student AUC minus the hard-label baseline of 0.8872, in AUC points",
+  "y_label": "teacher targets the student was trained on",
+  "categories": ["leaky in-context\n(AUC 0.8868)", "stratified out-of-fold\n(AUC 0.9156)"],
+  "series": [
+    {"name": "AUC lift over hard labels", "y": [-0.0004, 0.0288]}
+  ],
+  "value_fmt": "%+.4f"
+}

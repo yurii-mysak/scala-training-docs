@@ -1,0 +1,16 @@
+flowchart TD
+  subgraph LAZY["LazyList: one element through the whole chain"]
+    direction TB
+    L1["pull: source cell 1"] --> L2["map 1 + 10 = 11"]
+    L2 --> L3["filter 11 is odd, drop it"]
+    L3 --> L4["pull: source cell 2"]
+    L4 --> L5["map 2 + 10 = 12"]
+    L5 --> L6["filter 12 is even, keep"]
+    L6 --> L7["emit 12, then pull cell 3"]
+  end
+  subgraph STRICT["List: one full pass per stage"]
+    direction TB
+    S1["List 1, 2, 3, 4"] --> S2["map builds List 11, 12, 13, 14"]
+    S2 --> S3["filter walks that whole list"]
+    S3 --> S4["List 12, 14"]
+  end

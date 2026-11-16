@@ -1,0 +1,9 @@
+flowchart TD
+  D["labelled training table"] --> F["stratified k-fold split"]
+  F --> T["TFM teacher, context = the other k-1 folds"]
+  T --> S["soft targets, calibrated probabilities"]
+  S --> G["gradient-boosted student (XGBoost / CatBoost)"]
+  G --> C["CPU serving, 1.9 ms per row"]
+  D -.->|"the trap"| L["teacher scores its own context"]
+  L -.-> X["near one-hot targets, no inter-class structure"]
+  X -.-> G

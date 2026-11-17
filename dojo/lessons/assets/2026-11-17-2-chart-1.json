@@ -1,0 +1,13 @@
+{
+  "type": "bar",
+  "title": "A ML-DSA-44 answer is twice the Flag Day buffer; an ECDSA one is a seventh of it",
+  "x_label": "DNSSEC signing algorithm of the queried name",
+  "y_label": "DNS response size, bytes",
+  "categories": ["ECDSA P-256 (alg 13)", "ML-DSA-44 (alg 18)"],
+  "series": [
+    {"name": "modelled by the lab", "y": [168, 2523]},
+    {"name": "measured by APNIC", "y": [191, 2551]}
+  ],
+  "hline": {"y": 1232, "label": "Flag Day 2020 buffer 1,232 B"},
+  "value_fmt": "%.0f"
+}

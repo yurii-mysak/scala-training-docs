@@ -1,0 +1,26 @@
+{
+  "type": "hbar",
+  "title": "Boosting wins; one tree barely beats a straight line",
+  "x_label": "validation MAE in price units (lower is better; the noise floor is about 16)",
+  "y_label": "model fitted on the same 240 training rows",
+  "categories": [
+    "train mean",
+    "linear regression",
+    "single tree, depth 6",
+    "random forest, 25",
+    "gradient boosting"
+  ],
+  "series": [
+    {
+      "name": "validation MAE",
+      "y": [
+        108.713,
+        26.088,
+        36.414,
+        30.07,
+        20.893
+      ]
+    }
+  ],
+  "value_fmt": "%.2f"
+}

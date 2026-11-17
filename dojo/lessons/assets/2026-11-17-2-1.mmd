@@ -1,0 +1,9 @@
+flowchart TD
+  A["Stub resolver asks for an A record"] --> B
+  B["Recursive resolver, DO=1 in the EDNS0 OPT record"] --> C
+  C["Authoritative server for the zone"] --> D
+  D["Answer plus RRSIG: 191 B with ECDSA, 2,551 B with ML-DSA-44"] --> E{"Fits the advertised EDNS buffer?"}
+  E -- yes --> F["One UDP datagram, 2 packets end to end"]
+  E -- no --> G["Reply truncated, TC bit set, answer section emptied"]
+  G --> H["Same query re-sent over TCP port 53"]
+  H --> I["Handshake, query, reply, teardown: 10 packets end to end"]

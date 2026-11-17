@@ -1,0 +1,8 @@
+flowchart TD
+  Q["Resolver must query an authoritative server"] --> R{"Will anything downstream check the signature?"}
+  R -- "this resolver validates, or the stub set DO and CD" --> S["Send with DO=1"]
+  R -- "nobody downstream validates" --> T["Send with DO=0, the 'No DO for you' proposal"]
+  S --> U["Response carries the RRSIG: 2,523 B modelled, TCP fallback"]
+  T --> V["Response is 60 B modelled: one UDP datagram"]
+  U --> W["Authoritative server pays a TCP connection per query"]
+  V --> X["Cache must not serve this answer to a later DO=1 query"]

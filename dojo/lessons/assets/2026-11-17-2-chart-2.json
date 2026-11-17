@@ -1,0 +1,13 @@
+{
+  "type": "bar",
+  "title": "ML-DSA-44 keys and signatures are 37x to 80x their ECDSA P-256 counterparts",
+  "x_label": "key material (log scale: the values span three orders of magnitude)",
+  "y_label": "size, bytes",
+  "categories": ["public key", "private key", "signature"],
+  "series": [
+    {"name": "ECDSA P-256", "y": [32, 32, 65]},
+    {"name": "ML-DSA-44", "y": [1312, 2560, 2420]}
+  ],
+  "log_y": true,
+  "value_fmt": "%.0f"
+}

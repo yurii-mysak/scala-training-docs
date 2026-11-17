@@ -1,0 +1,8 @@
+flowchart TD
+  F0["F0 = mean of the training prices"] --> R1["residual r = y - F0"]
+  R1 --> T1["tree 1 fitted to r"]
+  T1 --> F1["F1 = F0 + 0.1 * tree1"]
+  F1 --> R2["residual r = y - F1"]
+  R2 --> T2["tree 2 fitted to r"]
+  T2 --> F2["F2 = F1 + 0.1 * tree2"]
+  F2 --> DOTS["repeat until the validation score stops improving"]

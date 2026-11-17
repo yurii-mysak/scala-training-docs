@@ -1,0 +1,24 @@
+flowchart TD
+  subgraph S1["1 - one tree: recursive splits on single features"]
+    direction TD
+    A["240 training rows"] -->|"size <= 102.11"| B["85 rows"]
+    A -->|"size > 102.11"| C["155 rows"]
+    B --> D["deeper splits, then a leaf = mean of its rows"]
+    C --> E["deeper splits, then a leaf = mean of its rows"]
+  end
+  subgraph S2["2 - random forest: trained in parallel, averaged"]
+    direction TD
+    G["bootstrap sample 1 - 4 of 6 features per split"] --> H["deep tree 1"]
+    I["bootstrap sample 25 - 4 of 6 features per split"] --> J["deep tree 25"]
+    H --> K["prediction = mean of the 25 outputs"]
+    J --> K
+  end
+  subgraph S3["3 - gradient boosting: sequential, on the leftovers"]
+    direction TD
+    L["F0 = mean price"] --> M["residuals y - F0"]
+    M --> N["tree 1, depth 2"]
+    N --> O["F1 = F0 + 0.1 * tree1, then new residuals"]
+    O --> P["tree 2 ... tree 171, all summed"]
+  end
+  S1 ~~~ S2
+  S2 ~~~ S3

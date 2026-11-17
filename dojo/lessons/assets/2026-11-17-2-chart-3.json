@@ -1,0 +1,22 @@
+{
+  "type": "hbar",
+  "title": "60.2% of queries set DO; 24.8% still invite IP fragmentation",
+  "x_label": "share of the 36,324,963,331 queries measured in the week to 3 November 2026, %",
+  "y_label": "property of the query",
+  "categories": [
+    "buffer size that would accept\nfragmented responses (24.8%)",
+    "DO bit set, so DNSSEC data\nis requested (60.2%)",
+    "buffer size likely to avoid\nIP fragmentation (75.2%)"
+  ],
+  "series": [
+    {
+      "name": "share of queries",
+      "y": [
+        24.8,
+        60.2,
+        75.2
+      ]
+    }
+  ],
+  "value_fmt": "%.1f%%"
+}

@@ -1,0 +1,12 @@
+{
+  "type": "line",
+  "title": "Parametric provenance rises with model size: 1.2% at 0.5B, 13.3% at 14B",
+  "x_label": "parameters, billions",
+  "y_label": "parametric provenance rate, % of citable claims",
+  "series": [
+    {"name": "Qwen2.5-Instruct", "x": [0.5, 1.5, 3, 7, 14], "y": [1.2, 6.5, 8.3, 8.2, 13.3]},
+    {"name": "Llama-3.1-8B-Instruct", "x": [8], "y": [15.7], "style": "points"}
+  ],
+  "log_x": true,
+  "value_fmt": "%.1f"
+}

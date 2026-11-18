@@ -1,0 +1,28 @@
+{
+  "type": "bar",
+  "title": "Share answerable without tools plateaus at 38.5%",
+  "x_label": "candidate training cutoff",
+  "y_label": "share of claims answerable without tools, %",
+  "categories": [
+    "2018-06",
+    "2021-06",
+    "2022-06",
+    "2022-12",
+    "2024-06",
+    "2026-11"
+  ],
+  "series": [
+    {
+      "name": "in-weights share (STEP 3 of the lab)",
+      "y": [
+        7.7,
+        23.1,
+        23.1,
+        38.5,
+        38.5,
+        38.5
+      ]
+    }
+  ],
+  "value_fmt": "%.1f"
+}

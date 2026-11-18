@@ -1,0 +1,8 @@
+flowchart TD
+  Q["a claim you are about to rely on"] --> A{"established after the cutoff?"}
+  A -- "yes" --> S["STALE - web search, or fetch the release note"]
+  A -- "no" --> B{"private to your company?"}
+  B -- "yes" --> U["UNKNOWABLE - internal MCP server, or paste the document"]
+  B -- "no" --> C{"written about a lot?"}
+  C -- "no" --> T["THIN - fetch the one page that states it"]
+  C -- "yes" --> K["IN-WEIGHTS - accept, then spot-check the specifics"]

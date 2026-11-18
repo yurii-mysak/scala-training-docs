@@ -1,0 +1,12 @@
+{
+  "type": "line",
+  "title": "At an 8.2% base rate no detector up to AUROC 0.95 clears break-even",
+  "x_label": "assumed detector AUROC",
+  "y_label": "precision of the flags, %",
+  "series": [
+    {"name": "Qwen2.5-7B, base rate 8.2%", "x": [0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95], "y": [10.6, 12.1, 13.9, 16.2, 19.0, 22.8, 28.6, 39.0]},
+    {"name": "Llama-3.1-8B, base rate 15.7%", "x": [0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95], "y": [19.9, 22.4, 25.3, 28.7, 32.8, 38.2, 45.5, 57.2]}
+  ],
+  "hline": {"y": 50, "label": "break-even under symmetric costs"},
+  "value_fmt": "%.1f"
+}

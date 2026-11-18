@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "Only 5 of 13 claims are answerable without a tool",
+  "x_label": "bucket at the modelled cutoff 2026-02-28",
+  "y_label": "claims in the audit sheet",
+  "categories": ["in-weights", "thin", "stale", "unknowable"],
+  "series": [
+    {"name": "claims (STEP 2 of the lab)", "y": [5, 2, 3, 3]}
+  ],
+  "value_fmt": "%.0f"
+}

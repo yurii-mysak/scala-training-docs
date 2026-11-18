@@ -1,0 +1,8 @@
+flowchart TD
+  A["A claim in the answer, plus the passage it cites"] --> B{"Does the passage entail the claim?"}
+  B -- "no" --> F["Flagged: unsupported citation"]
+  B -- "yes" --> G["Passes the support check"]
+  G --> H["Genuinely contextual: the claim was read from the passage"]
+  G --> I["Post-rationalised: recalled first, cited afterwards"]
+  I --> J["Support alone cannot tell these two apart"]
+  H --> J

@@ -1,0 +1,15 @@
+flowchart TD
+  subgraph IN["read during training - now in the weights"]
+    D["DENSE coverage: Scala 3 licensing, Akka supervision, cats-effect basics"]
+    T["THIN coverage: Alpakka committer defaults, BSL free-tier threshold"]
+  end
+  WALL["THE TRAINING CUTOFF - reading stops here"]
+  subgraph OUT["never read, at any coverage"]
+    S["AFTER the cutoff: this autumn's releases, last week's advisory"]
+    P["PRIVATE: PilotTransaction journal format, your deploy manifests"]
+  end
+  IN --> WALL --> OUT
+  D --> CTX["the context window - what the model can actually use for this answer"]
+  T -. "weak, guessable" .-> CTX
+  S --> W1["web search or a fetch of the page"] --> CTX
+  P --> W2["an internal MCP server, or the document pasted in"] --> CTX

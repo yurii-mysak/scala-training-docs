@@ -1,0 +1,9 @@
+flowchart TD
+  Q["Question with a known answer, e.g. the Apollo 11 landing year"] --> R["Retriever returns the top-5 passages"]
+  R --> S["Probe edits the passages: true value 1969 replaced by 1971"]
+  S --> M["Model generates an answer with citation markers"]
+  M --> D{"Which value does the answer assert?"}
+  D -- "1971, the substituted value" --> C["Contextual: the claim came from the passage"]
+  D -- "1969, the remembered value" --> P["Parametric: the claim came from the weights"]
+  C --> X["Both answers cite the same passage"]
+  P --> X

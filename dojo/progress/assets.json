@@ -478,5 +478,29 @@
   "2026-11-18-2-chart-2.png": {
     "url": "/_blob/33973bcd5b6fde5c6a7f0602e6372756",
     "sha256": "e39039e386098879099737b3be1900455a745f5f88b722e2f519209cbf42f909"
+  },
+  "2026-11-19-1-chart-1.png": {
+    "url": "/_blob/59875e73dee35b879e10a4b6be68ab28",
+    "sha256": "8c4f850ead3b8bad1b4be85ed3c117e3b92b742a40ebf10fbad1bc7779a3511e"
+  },
+  "2026-11-19-1-chart-2.png": {
+    "url": "/_blob/c167ead757f3321c25327a0531b397ff",
+    "sha256": "a00db29b94677f791e02ad3ec9fb925779ba4d7706e511256f212e46df078711"
+  },
+  "2026-11-19-1-chart-3.png": {
+    "url": "/_blob/7455590a007ea49fe13526ff8df55927",
+    "sha256": "a1428ad69ea9ba4de16c916031d0e8207dfed37be1d78ddcfb8877817e0ae7f1"
+  },
+  "2026-11-19-1-chart-4.png": {
+    "url": "/_blob/2f7efde8b99b270686891d95fc46de87",
+    "sha256": "659904f10deb07eee90ae859f05a56fda96166747687bbe5dfd6670797e16872"
+  },
+  "2026-11-19-2-chart-1.png": {
+    "url": "/_blob/e19f2c81cd12cb10445de777d0096418",
+    "sha256": "bb484010532b0256df6c0ea17c8c7a7401a7fa687bdf132583d74518b2693411"
+  },
+  "2026-11-19-2-chart-2.png": {
+    "url": "/_blob/d2efba1d2649e430096a091314d716d3",
+    "sha256": "2f3fa20b49c112d642f90a1931b6af0cf33a85eb2ca22651b3ce822c5c7cd863"
   }
 }

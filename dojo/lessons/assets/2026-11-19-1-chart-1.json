@@ -1,0 +1,11 @@
+{
+  "type": "heatmap",
+  "title": "Confusion matrix, threshold 0.5: 92 right, but 3 missed malignants",
+  "x_label": "what the model said (p >= 0.5 counts as 1)",
+  "y_label": "the truth",
+  "matrix": [[51, 3], [5, 41]],
+  "row_labels": ["actual 1 (malignant)", "actual 0 (benign)"],
+  "col_labels": ["predicted 1", "predicted 0"],
+  "value_fmt": "{:g}",
+  "cmap": "Blues"
+}

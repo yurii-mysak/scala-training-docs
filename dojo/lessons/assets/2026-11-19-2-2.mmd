@@ -1,0 +1,13 @@
+sequenceDiagram
+  participant Alice
+  participant Athens
+  participant Byzantium
+  participant Cyrene
+  participant Bob
+  Alice->>Athens: write After Dawn
+  Athens->>Byzantium: replicate After Dawn
+  Athens--xCyrene: replicate lost
+  Byzantium-->>Athens: ack
+  Athens-->>Alice: ok, majority of two
+  Bob->>Cyrene: read
+  Cyrene-->>Bob: Before Dawn, stale

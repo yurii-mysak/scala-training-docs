@@ -1,0 +1,53 @@
+{
+  "type": "bar",
+  "title": "Same code, same timeout: the seed decides whether the write commits",
+  "x_label": "random seed",
+  "y_label": "tick at which the write resolved",
+  "categories": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12"
+  ],
+  "series": [
+    {
+      "name": "resolution tick",
+      "y": [
+        10,
+        5,
+        10,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    }
+  ],
+  "hline": {
+    "y": 10,
+    "label": "request timeout = 10 ticks"
+  },
+  "value_fmt": "%g",
+  "annotate": [
+    {
+      "x": 1,
+      "y": 10,
+      "text": "seeds 1 and 3 hit the timeout",
+      "dx": 90,
+      "dy": -70
+    }
+  ]
+}

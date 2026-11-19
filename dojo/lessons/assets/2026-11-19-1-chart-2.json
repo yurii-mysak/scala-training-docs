@@ -1,0 +1,23 @@
+{
+  "type": "line",
+  "title": "ROC curve, AUC = 0.9767: the model ranks 2426 of 2484 pairs correctly",
+  "x_label": "false positive rate FP/(FP+TN)",
+  "y_label": "true positive rate TP/(TP+FN) = recall",
+  "series": [
+    {
+      "name": "the model, thresholds 0.9 down to 0.1",
+      "x": [0.0, 0.0, 0.0, 0.0435, 0.0652, 0.1087, 0.1304, 0.1739, 0.2826, 0.3478, 1.0],
+      "y": [0.0, 0.5926, 0.7407, 0.8519, 0.9074, 0.9444, 0.9444, 0.9444, 0.9815, 1.0, 1.0]
+    },
+    {
+      "name": "coin flip, AUC 0.5",
+      "x": [0.0, 1.0],
+      "y": [0.0, 1.0],
+      "style": "dashed"
+    }
+  ],
+  "annotate": [
+    {"x": 0.1087, "y": 0.9444, "text": "threshold 0.5", "dx": 30, "dy": -40},
+    {"x": 0.3478, "y": 1.0, "text": "threshold 0.1: recall 1.0", "dx": 20, "dy": -25}
+  ]
+}

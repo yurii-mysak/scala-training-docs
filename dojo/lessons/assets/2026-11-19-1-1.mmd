@@ -1,0 +1,14 @@
+flowchart TD
+  P["model reports p, e.g. 0.79"] --> T{"p >= threshold t?"}
+  T -- yes --> Y["predicted 1"]
+  T -- no --> N["predicted 0"]
+  Y --> TP["TP: truth is 1"]
+  Y --> FP["FP: truth is 0, a false alarm"]
+  N --> FN["FN: truth is 1, a miss"]
+  N --> TN["TN: truth is 0"]
+  TP --> PR["precision = TP / (TP + FP)"]
+  FP --> PR
+  TP --> RC["recall = TP / (TP + FN)"]
+  FN --> RC
+  PR --> F["F1 = 2PR / (P + R)"]
+  RC --> F

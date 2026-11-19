@@ -1,0 +1,9 @@
+flowchart TD
+  L["simulation loop: tick = tick + 1"] --> C["Clock.tick"]
+  C --> N["SimulatedNetwork.tick"]
+  N --> D["deliver messages whose delivery tick is now"]
+  D --> P["each process: Tickable.tick"]
+  P --> F["SimulatedFile: visible bytes and durable bytes"]
+  F --> R["seeded Random: inject a fault, or heal"]
+  R --> H["history log: invoke, ok, fail"]
+  H --> L

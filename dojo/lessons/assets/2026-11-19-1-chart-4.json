@@ -1,0 +1,9 @@
+{
+  "type": "bar",
+  "title": "Cost 10*FN + FP is lowest at threshold 0.10, not at 0.50",
+  "x_label": "threshold on p(y=1)",
+  "y_label": "10 * false negatives + false positives (lower is better)",
+  "categories": ["0.10", "0.20", "0.30", "0.40", "0.50", "0.60", "0.70", "0.80", "0.90"],
+  "series": [{"name": "cost in false-alarm units", "y": [16, 23, 38, 36, 35, 53, 82, 140, 220]}],
+  "value_fmt": "%g"
+}

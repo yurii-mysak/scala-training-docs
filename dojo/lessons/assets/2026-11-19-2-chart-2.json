@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "A wall-clock timeout moves with machine speed; a tick timeout does not",
+  "x_label": "how fast the simulated loop runs",
+  "y_label": "tick at which the timeout fires",
+  "categories": ["40 ms per tick", "120 ms per tick"],
+  "series": [
+    {"name": "1000 ms wall-clock timeout", "y": [25, 9]},
+    {"name": "10-tick timeout", "y": [10, 10]}
+  ],
+  "value_fmt": "%g"
+}

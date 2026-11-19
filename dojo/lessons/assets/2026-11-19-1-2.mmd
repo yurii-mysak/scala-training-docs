@@ -1,0 +1,11 @@
+flowchart TD
+  Q{"Which mistake costs more?"} --> A["a miss costs more: lower the threshold"]
+  Q --> B["a false alarm costs more: raise it"]
+  Q --> C["about the same: sit near the F1 peak"]
+  A --> M1["report recall at a fixed precision floor"]
+  B --> M2["report precision at a fixed recall floor"]
+  C --> M3["report F1"]
+  M1 --> R["also report AUC, or average precision when positives are rare: ranking quality, no threshold"]
+  M2 --> R
+  M3 --> R
+  R --> L["and report log loss if a downstream system uses the probability itself"]

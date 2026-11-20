@@ -1,0 +1,38 @@
+{
+  "type": "heatmap",
+  "title": "Only one of these four schema changes breaks a rolling upgrade",
+  "x_label": "direction of compatibility (from STEP 9 of the lab)",
+  "y_label": "change made to the protobuf schema",
+  "matrix": [
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      0,
+      0
+    ]
+  ],
+  "row_labels": [
+    "add a field on new tag 4",
+    "remove a field, retire tag 2",
+    "rename a field, keep tag 2",
+    "recycle tag 2 for a string"
+  ],
+  "col_labels": [
+    "forward (old reads new)",
+    "backward (new reads old)"
+  ],
+  "value_names": {
+    "0": "breaks",
+    "1": "works"
+  }
+}

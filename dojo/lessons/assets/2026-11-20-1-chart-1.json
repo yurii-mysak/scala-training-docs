@@ -1,0 +1,9 @@
+{
+  "type": "bar",
+  "title": "One record, four encodings: 81 bytes of JSON become 32 bytes of Avro",
+  "x_label": "encoding of the record userName=Martin, favoriteNumber=1337, interests=[daydreaming, hacking]",
+  "y_label": "bytes on the wire (lower is better)",
+  "categories": ["JSON", "MessagePack", "Protocol Buffers", "Avro"],
+  "series": [{"name": "total bytes", "y": [81, 66, 33, 32]}],
+  "annotate": [{"x": 1, "y": 70, "text": "field names still spelled out"}]
+}

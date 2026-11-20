@@ -1,0 +1,10 @@
+flowchart TD
+  A["dispatch: config and model metadata known here"] --> B["setup: environment, model download and loading, tokenisation"]
+  B --> C["optimisation loop: about 6PD FLOPs"]
+  C --> D["evaluation cycles: num_eval_data samples, contended I/O"]
+  D --> C
+  C --> E["checkpoint saves: num_saves x num_params_saved to object storage"]
+  E --> C
+  C --> F["final model upload to object storage"]
+  F --> G["measured wall clock: GPUs granted to job finished"]
+  H["T = 6PD / (N x FLOPS x MFU) covers only this one box"] -.-> C

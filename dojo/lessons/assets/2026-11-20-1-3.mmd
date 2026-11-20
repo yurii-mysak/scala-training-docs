@@ -1,0 +1,5 @@
+flowchart TD
+  J0["JSON, 81 bytes"] --> J1["field names, quotes, colons: 40 B"] --> J2["values, braces, commas, brackets: 41 B"]
+  M0["MessagePack, 66 bytes"] --> M1["fixmap byte plus the 3 field names: 35 B"] --> M2["type headers and values: 31 B"]
+  P0["Protocol Buffers, 33 bytes"] --> P1["0a 06 Martin, tag 1 length 6: 8 B"] --> P2["10 b9 0a, tag 2 varint 1337: 3 B"] --> P3["1a 0b daydreaming: 13 B"] --> P4["1a 07 hacking: 9 B"]
+  A0["Avro, 32 bytes"] --> A1["0c Martin, length 6, no tag: 7 B"] --> A2["02 f2 14, union branch then 1337: 3 B"] --> A3["04 then both strings: 21 B"] --> A4["00, end of array: 1 B"]

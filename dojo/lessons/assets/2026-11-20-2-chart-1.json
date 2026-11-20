@@ -1,0 +1,32 @@
+{
+  "type": "hbar",
+  "title": "Mean error on 272 H200 runs (jobs average 23.43 h)",
+  "x_label": "mean absolute error (hours) \u2014 lower is better",
+  "y_label": "",
+  "categories": [
+    "CatBoost (chosen)",
+    "XGBoost",
+    "Ridge",
+    "Linear Regression",
+    "Calculon analytical",
+    "FLOP baseline MFU 60%",
+    "FLOP baseline MFU 45%",
+    "FLOP baseline MFU 30%"
+  ],
+  "series": [
+    {
+      "name": "MAE (h)",
+      "y": [
+        1.71,
+        1.95,
+        7.23,
+        7.52,
+        20.36,
+        14.62,
+        13.01,
+        12.41
+      ]
+    }
+  ],
+  "value_fmt": "%.2f"
+}

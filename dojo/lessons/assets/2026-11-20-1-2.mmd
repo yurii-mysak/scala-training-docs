@@ -1,0 +1,9 @@
+flowchart TD
+  WS["writer's schema, version 7"] --> ENC["encode: values only, in schema order"]
+  ENC --> BYTES["32 bytes, carrying a version number, not a schema"]
+  BYTES --> REG["schema registry: version 7 maps to the full schema text"]
+  RS["reader's schema, version 9"] --> RES["resolution: match the two schemas by field name"]
+  REG --> RES
+  RES --> R1["in writer, not in reader: the value is skipped"]
+  RES --> R2["in reader, not in writer: the reader's default is used"]
+  RES --> R3["in both: the value is converted to the reader's type"]

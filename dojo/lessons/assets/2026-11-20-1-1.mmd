@@ -1,0 +1,8 @@
+flowchart TD
+  W["service v2 writes a record"] --> E["encode: in-memory object becomes bytes"]
+  E --> B["bytes in a file, a database row or a message queue"]
+  B --> D1["decoded by service v2, the schema it was written with"]
+  B --> D2["decoded by service v1, still mid-rollout"]
+  D2 --> F["forward compatibility: v1 must ignore what it does not recognise"]
+  OLD["bytes written months ago by service v1"] --> D3["decoded by service v2"]
+  D3 --> K["backward compatibility: v2 must supply what is missing"]

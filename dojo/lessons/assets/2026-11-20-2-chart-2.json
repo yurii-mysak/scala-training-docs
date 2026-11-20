@@ -1,0 +1,27 @@
+{
+  "type": "line",
+  "title": "Predicted vs real wall clock: the FLOP line flattens, the overhead model follows",
+  "x_label": "real wall-clock time (hours)",
+  "y_label": "predicted wall-clock time (hours)",
+  "series": [
+    {
+      "name": "perfect prediction",
+      "x": [1.5, 68.54],
+      "y": [1.5, 68.54],
+      "style": "dashed",
+      "color": "#5F657B"
+    },
+    {
+      "name": "FLOP-only, MFU 0.45",
+      "x": [1.50, 2.91, 5.08, 4.53, 5.48, 11.78, 11.85, 14.21, 21.96, 19.57, 35.42, 40.52, 68.54, 8.72],
+      "y": [1.12, 1.69, 4.49, 1.69, 3.28, 3.28, 2.62, 8.99, 5.99, 14.04, 12.64, 9.83, 16.85, 3.93],
+      "style": "points"
+    },
+    {
+      "name": "OLS + overhead features",
+      "x": [1.50, 2.91, 5.08, 4.53, 5.48, 11.78, 11.85, 14.21, 21.96, 19.57, 35.42, 40.52, 68.54, 8.72],
+      "y": [-1.25, 0.90, 4.75, 3.59, 4.70, 18.24, 13.09, 16.84, 26.05, 24.72, 27.91, 38.28, 66.74, 8.62],
+      "style": "points"
+    }
+  ]
+}

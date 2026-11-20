@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "The learned model stays accurate until the data runs out above 60 h",
+  "x_label": "real job duration",
+  "y_label": "absolute error (hours)",
+  "categories": ["1.56-5 h\n60 runs", "5-10 h\n63 runs", "10-30 h\n69 runs", "30-60 h\n67 runs", "60-175 h\n13 runs"],
+  "series": [
+    {"name": "median absolute error", "y": [0.30, 0.18, 0.73, 1.06, 5.19]},
+    {"name": "90th percentile error", "y": [1.55, 1.27, 4.17, 5.50, 18.51]}
+  ],
+  "value_fmt": "%.2f"
+}

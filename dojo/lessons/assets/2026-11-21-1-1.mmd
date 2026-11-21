@@ -1,0 +1,7 @@
+flowchart TD
+  SEED["seed state: (0, 1) for fibs"] --> F{"apply f to the current state"}
+  F -->|"Some of a and next state"| EMIT["emit a as the head cell"]
+  EMIT --> LOOP["loop back with the next state"]
+  LOOP --> F
+  F -->|"None"| STOP["empty: the list ends here"]
+  LOOP --> TRACE["fibs states: (0,1), (1,1), (1,2), (2,3), (3,5)"]

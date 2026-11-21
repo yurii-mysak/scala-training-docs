@@ -1,0 +1,7 @@
+flowchart TD
+  S["raw String from the Authorization header"] --> P["SignedJwt.fromString: parsed, NOT verified"]
+  P --> Q{"verifyWith(verification)"}
+  Q -->|"alg allowed, MAC or signature ok, exp and nbf ok"| V["VerifiedJwt"]
+  Q -->|"any check fails"| E["JwtException raised in F"]
+  V --> C["verifiedJwt.as[UserJwt]: typed claims"]
+  X["any other route to a VerifiedJwt"] -.->|"blocked: no public constructor, no copy, no cast"| V

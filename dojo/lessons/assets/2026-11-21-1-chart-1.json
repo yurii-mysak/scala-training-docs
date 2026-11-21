@@ -1,0 +1,11 @@
+{
+  "type": "line",
+  "title": "take(n) on an infinite fibs forces n+1 cells; a strict horizon of 40 pays 40 every time",
+  "x_label": "n, the prefix asked for (fibs.take(n).toList)",
+  "y_label": "fibonacci cells actually computed",
+  "series": [
+    {"name": "lazy: unfold generator steps", "x": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "y": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11], "style": "line"},
+    {"name": "strict: List horizon of 40", "x": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "y": [40, 40, 40, 40, 40, 40, 40, 40, 40, 40], "style": "dashed"}
+  ],
+  "log_y": false
+}

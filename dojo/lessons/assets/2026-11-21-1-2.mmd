@@ -1,0 +1,12 @@
+flowchart TD
+  subgraph FR["foldRight consumes: structure to value"]
+    direction TB
+    A1["cells 1, 2, 3 and the seed z"] --> A2["f(1, f(2, f(3, z)))"]
+    A2 --> A3["one value"]
+  end
+  subgraph UN["unfold produces: value to structure"]
+    direction TB
+    B1["one seed state"] --> B2["f: state to element plus next state"]
+    B2 --> B3["cells a0, a1, a2, ..."]
+  end
+  A3 -.->|"dual"| B1

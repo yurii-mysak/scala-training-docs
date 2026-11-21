@@ -1,0 +1,49 @@
+{
+  "type": "heatmap",
+  "title": "Naive verifier accepts 3 of 6 tokens, strict accepts 1",
+  "x_label": "verifier",
+  "y_label": "crafted token",
+  "matrix": [
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      0
+    ],
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      0
+    ],
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      0
+    ]
+  ],
+  "row_labels": [
+    "T1 honest HS256",
+    "T2 alg=none, sig stripped",
+    "T3 role=admin, old sig",
+    "T4 expired exp",
+    "T5 other secret",
+    "T6 sig truncated"
+  ],
+  "col_labels": [
+    "naive (trusts alg)",
+    "strict (RFC 8725)"
+  ],
+  "value_names": {
+    "0": "rejected",
+    "1": "accepted"
+  },
+  "log_y": false
+}

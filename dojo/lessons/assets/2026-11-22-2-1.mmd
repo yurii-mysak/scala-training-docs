@@ -1,0 +1,15 @@
+flowchart TD
+  T["(a) transcripts: a searchable event log"]
+  N["(b) memory notes: files Claude writes"]
+  R["(c) representations: a wiki of linked pages"]
+  I["(d) injected context: loaded every session"]
+  S["a live session"]
+  T -->|"dreaming: correct against the log"| N
+  N -->|"dreaming: merge, write wiki pages"| R
+  N -->|"dreaming: promote a rule"| I
+  R -->|"dreaming: promote the small stuff"| I
+  I -->|"read: free, already in the window"| S
+  R -->|"read: follow links"| S
+  N -->|"read: open files in the memory dir"| S
+  T -->|"read: search the log"| S
+  S -->|"write in the moment: tag events, drop notes"| N

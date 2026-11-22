@@ -1,0 +1,13 @@
+{
+  "type": "bar",
+  "title": "Four write policies over the same transcript (my simulation, not Anthropic's benchmark)",
+  "x_label": "write policy",
+  "y_label": "count",
+  "categories": ["no memory", "record everything", "record only failures", "dreaming"],
+  "series": [
+    {"name": "notes written", "y": [0, 10, 2, 5]},
+    {"name": "notes loaded into injected context", "y": [0, 7, 2, 5]},
+    {"name": "stale notes still trusted", "y": [0, 1, 0, 0]},
+    {"name": "tasks solved (of 6)", "y": [1, 4, 3, 6]}
+  ]
+}

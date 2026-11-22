@@ -1,0 +1,10 @@
+flowchart TD
+  T["input text"] --> IN["Input"]
+  IN --> CS["Circular Shift"]
+  CS --> AL["Alphabetizer"]
+  AL --> OU["Output"]
+  CH["change: store lines differently in memory"]
+  CH -.->|"must be edited"| IN
+  CH -.->|"must be edited"| CS
+  CH -.->|"must be edited"| AL
+  CH -.->|"must be edited"| OU

@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "CL-Bench 1.0 database task, mean reward: stateless vs. with a memory store",
+  "x_label": "model",
+  "y_label": "mean reward",
+  "categories": ["Sonnet 4.6", "Sonnet 5", "Opus 4.7", "Opus 5", "Sonnet 5.5", "Opus 5.5"],
+  "series": [
+    {"name": "no memory (stateless)", "y": [0.330, 0.306, 0.383, 0.564, 0.644, 0.655]},
+    {"name": "with a memory store", "y": [0.364, 0.610, 0.700, 0.828, 0.833, 0.838]}
+  ],
+  "value_fmt": "%.3f"
+}

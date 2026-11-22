@@ -1,0 +1,7 @@
+flowchart TD
+  T["input text"] --> IN["Input"]
+  IN -->|"fills"| LS["Line Storage: owns how lines are stored"]
+  CS["Circular Shifter"] -->|"asks for word l,w"| LS
+  AL["Alphabetizer"] -->|"uses"| CS
+  OU["Output"] -->|"uses"| AL
+  CH["change: store lines differently in memory"] -.->|"must be edited"| LS

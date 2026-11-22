@@ -1,0 +1,9 @@
+flowchart TD
+  C["caller: addAll of 3 elements"] --> A1["CountingSet.addAll: adds += 3"]
+  A1 --> S["super.addAll in AbstractCollection"]
+  S --> L["loop over the 3 elements"]
+  L --> A2["back into CountingSet.add: adds += 1, three times"]
+  A2 --> R["adds = 6 for 3 elements"]
+  C2["caller: addAll of 3 elements"] --> B1["CountingBag.addAll: no counting here"]
+  B1 --> B2["its own add, three times: adds += 1"]
+  B2 --> R2["adds = 3"]

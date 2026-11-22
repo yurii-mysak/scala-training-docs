@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "Inheritance counts 6 insertions for 3 elements; delegation counts 3",
+  "x_label": "how the counting set is built",
+  "y_label": "count",
+  "categories": ["truth: elements handed in", "CountingSet (inheritance)", "CountingBag (delegation)"],
+  "series": [
+    {"name": "insertions counted", "y": [3, 6, 3]},
+    {"name": "elements in the set", "y": [3, 3, 3]}
+  ]
+}

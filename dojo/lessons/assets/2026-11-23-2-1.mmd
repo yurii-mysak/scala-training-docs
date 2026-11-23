@@ -1,0 +1,12 @@
+flowchart TD
+  P["motion-edit prompt + static SVG"] --> M["the model under test"]
+  M --> G["animation code, GSAP for the controlled comparison"]
+  G --> R["MoVer rendering engine, run in a browser"]
+  R --> F["a sequence of SVG frames"]
+  F --> V["the task's own verification program, CPU only"]
+  V --> C["named checks: rotate, translate_x, order, duration"]
+  C --> D{"did it render AND every check pass?"}
+  D -->|"yes"| S["success"]
+  D -->|"no"| X["report naming the failed checks"]
+  F -.->|"the path this replaces"| J["a VLM judge: one opaque verdict"]
+  J -.-> D

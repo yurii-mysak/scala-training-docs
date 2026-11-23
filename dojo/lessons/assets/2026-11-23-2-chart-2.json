@@ -1,0 +1,39 @@
+{
+  "type": "hbar",
+  "title": "Success rate at 1 attempt vs 8: a 29-point lead shrinks to 1.9",
+  "x_label": "success rate (%)",
+  "y_label": "model setting",
+  "categories": [
+    "Qwen 3.8 Flash-Next",
+    "GLM 5.3 (max)",
+    "Qwen 3.8 (xhigh)",
+    "GPT-5.6 Sol (max)",
+    "GPT-6 Astra (max)",
+    "Fable 5.1 (max)"
+  ],
+  "series": [
+    {
+      "name": "k=1",
+      "y": [
+        34.0,
+        36.0,
+        39.0,
+        52.0,
+        67.0,
+        68.0
+      ]
+    },
+    {
+      "name": "k=8",
+      "y": [
+        96.4,
+        97.2,
+        98.1,
+        99.7,
+        100.0,
+        100.0
+      ]
+    }
+  ],
+  "value_fmt": "%.1f"
+}

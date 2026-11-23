@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant C as Client
+    participant S as Server
+    Note over C,S: TCP already established
+    alt full handshake, no ticket yet
+        C->>S: ClientHello - key_share, SNI, ALPN, supported_versions
+        S->>C: ServerHello - key_share
+        Note over C,S: handshake keys derived here, everything below is encrypted
+        S->>C: EncryptedExtensions - the ALPN choice
+        S->>C: CertificateRequest - only when mTLS is on
+        S->>C: Certificate and CertificateVerify
+        S->>C: Finished
+        C->>S: Certificate and CertificateVerify - only when mTLS is on
+        C->>S: Finished plus first application data - 1 RTT after ClientHello
+        S->>C: application data
+    else PSK resumption carrying 0-RTT early data
+        C-->>S: ClientHello - pre_shared_key plus early_data, request rides along
+        S-->>C: ServerHello, EncryptedExtensions accepting early_data, Finished
+        C-->>S: Finished
+        S-->>C: application data - 0 RTT, but the early data is replayable
+    end

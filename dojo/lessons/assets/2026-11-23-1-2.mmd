@@ -1,0 +1,11 @@
+flowchart TD
+  ROOT["Root CA - self-signed - already in the OS or JVM trust store"]
+  INT["Intermediate CA - signed by the root - the server MUST send it"]
+  LEAF["Leaf - CN svc.dojo.test - SAN DNS svc.dojo.test - sent by the server"]
+  CHK["Client walks upward - at each hop checks signature, dates, CA flag; at the leaf also the SAN"]
+  MISS["Intermediate not sent - openssl verify error 20, unable to get local issuer certificate"]
+  ROOT -->|signs| INT
+  INT -->|signs| LEAF
+  LEAF --> CHK
+  CHK --> ROOT
+  CHK -.-> MISS

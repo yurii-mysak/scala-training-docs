@@ -1,0 +1,12 @@
+{
+  "type": "line",
+  "title": "In TLS 1.3 only 0-RTT buys back a round trip",
+  "x_label": "network round-trip time (ms)",
+  "y_label": "time to first response byte (ms)",
+  "series": [
+    {"name": "TLS 1.2 full, 3.5 x RTT", "x": [10, 20, 60, 150], "y": [35, 70, 210, 525]},
+    {"name": "TLS 1.3 full or resumed, 2.5 x RTT", "x": [10, 20, 60, 150], "y": [25, 50, 150, 375]},
+    {"name": "TLS 1.3 + 0-RTT early data, 1.5 x RTT", "x": [10, 20, 60, 150], "y": [15, 30, 90, 225], "style": "dashed"}
+  ],
+  "annotate": [{"x": 150, "y": 225, "text": "150 ms RTT: 225 vs 375 ms"}]
+}

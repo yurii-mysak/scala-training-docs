@@ -1,0 +1,15 @@
+flowchart TD
+  H["construction set: 1,585 human-labelled animations, 410 approved and 1,175 rejected"]
+  W["agent 1: the verification-program writer, built on GPT-6 Astra"]
+  T["agent 2: the test-case synthesizer, up to 20 test cases per task"]
+  PR["a candidate verification program for one task"]
+  CMP{"do its decisions match the human labels?"}
+  FIX["revise; log checks with no negative example as coverage gaps"]
+  FR["freeze the program, then run held-out evaluation"]
+  H --> W
+  W --> PR
+  T --> PR
+  PR --> CMP
+  CMP -->|"no"| FIX
+  FIX --> W
+  CMP -->|"yes"| FR

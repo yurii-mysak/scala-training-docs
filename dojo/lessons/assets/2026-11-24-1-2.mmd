@@ -1,0 +1,4 @@
+flowchart TD
+  A["input x: 784 pixel activations"] --> B["layer 1: a1 = sigmoid(W1 x + b1), W1 is 16 by 784, gives 16 activations"]
+  B --> C["layer 2: a2 = sigmoid(W2 a1 + b2), W2 is 16 by 16, gives 16 activations"]
+  C --> D["layer 3: out = sigmoid(W3 a2 + b3), W3 is 10 by 16, gives 10 digit scores"]

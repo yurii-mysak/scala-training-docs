@@ -1,0 +1,7 @@
+flowchart TD
+  X["crash: the process is gone"] --> R["the runtime restarts the program from line 1"]
+  J[("the journal survived, with 4 records")] --> A
+  R --> A["read_stock, get_quote, ask_model, create_po"]
+  A -->|"each returns its recorded value; nothing leaves the process"| B["the pure code between the steps re-runs and rebuilds state"]
+  B --> E["wait_for_supplier_reply: no record"]
+  E -->|"the first step without a record runs for real"| F["execution continues forward"]

@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "Durable is not the same as correct: the same crash, three outcomes",
+  "x_label": "scenario (both runs together)",
+  "y_label": "count",
+  "categories": ["A: crash between steps", "B1: crash inside, same key", "B2: crash inside, fresh key"],
+  "series": [
+    {"name": "attempts that reached the supplier", "y": [1, 2, 2]},
+    {"name": "purchase orders created", "y": [1, 1, 2]},
+    {"name": "units ordered / 28", "y": [1, 1, 2]}
+  ]
+}

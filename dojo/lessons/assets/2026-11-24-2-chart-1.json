@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "Scenario A: nine step invocations, five real external calls",
+  "x_label": "step",
+  "y_label": "real external calls",
+  "categories": ["read_stock", "get_quote", "ask_model", "create_po", "wait_for_reply"],
+  "series": [
+    {"name": "run 1 (before the crash)", "y": [1, 1, 1, 1, 0]},
+    {"name": "run 2 (replay)", "y": [0, 0, 0, 0, 1]}
+  ]
+}

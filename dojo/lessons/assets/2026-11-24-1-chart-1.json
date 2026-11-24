@@ -1,0 +1,65 @@
+{
+  "type": "scatter",
+  "title": "Two hidden neurons cut the plane twice; the strip between the cuts is XOR = 1",
+  "x_label": "x1",
+  "y_label": "x2",
+  "series": [
+    {
+      "name": "h1 boundary: x1 + x2 = 0.5 (OR)",
+      "x": [
+        -0.25,
+        1.25
+      ],
+      "y": [
+        0.75,
+        -0.75
+      ],
+      "style": "line"
+    },
+    {
+      "name": "h2 boundary: x1 + x2 = 1.5 (AND)",
+      "x": [
+        0.25,
+        1.25
+      ],
+      "y": [
+        1.25,
+        0.25
+      ],
+      "style": "dashed"
+    },
+    {
+      "name": "XOR = 1  (net out 0.9974)",
+      "x": [
+        0.0,
+        1.0
+      ],
+      "y": [
+        1.0,
+        0.0
+      ],
+      "style": "points"
+    },
+    {
+      "name": "XOR = 0  (net out 0.0025)",
+      "x": [
+        0.0,
+        1.0
+      ],
+      "y": [
+        0.0,
+        1.0
+      ],
+      "style": "points"
+    }
+  ],
+  "annotate": [
+    {
+      "x": 0.5,
+      "y": 0.5,
+      "text": "only here is h1 = 1 and h2 = 0",
+      "dx": 25,
+      "dy": 18
+    }
+  ]
+}

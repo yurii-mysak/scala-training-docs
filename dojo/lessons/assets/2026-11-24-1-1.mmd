@@ -1,0 +1,8 @@
+flowchart TD
+  X1["input x1"] --> H1["hidden h1 = act(1*x1 + 1*x2 - 0.5), an OR-shaped cut"]
+  X2["input x2"] --> H1
+  X1 --> H2["hidden h2 = act(1*x1 + 1*x2 - 1.5), an AND-shaped cut"]
+  X2 --> H2
+  H1 -->|"weight +1"| O["output = act(h1 - h2 - 0.5)"]
+  H2 -->|"weight -1"| O
+  O --> R["0.9974 for (0,1) and (1,0); 0.0025 for (0,0) and (1,1)"]

@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "13,002 parameters in the 784-16-16-10 network: 96.6% sit in the first layer",
+  "x_label": "layer (inputs -> outputs)",
+  "y_label": "parameters (weights + biases)",
+  "categories": ["784 -> 16", "16 -> 16", "16 -> 10"],
+  "series": [
+    {"name": "weights", "x": [0, 1, 2], "y": [12544, 256, 160]},
+    {"name": "biases", "x": [0, 1, 2], "y": [16, 16, 10]}
+  ],
+  "log_y": true
+}

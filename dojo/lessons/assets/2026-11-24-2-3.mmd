@@ -1,0 +1,14 @@
+flowchart TD
+  E["entity workflow for SKU-4471: one per part, lives for years"]
+  P1["process workflow: replenishment #1, starts, waits, finishes"]
+  P2["process workflow: replenishment #2, starts later"]
+  T["timer: 7 days"]
+  M["message: supplier reply"]
+  J[("the journal: timer and message are both entries")]
+  E --> P1
+  E --> P2
+  P1 --> T
+  P1 --> M
+  T --> J
+  M --> J
+  J -->|"whichever lands first wakes the workflow; no process is held"| P1

@@ -1,0 +1,11 @@
+flowchart TD
+  S["workflow code, deterministic, local state only"]
+  C["step(name) { … }"]
+  L[("the journal: append-only, durable")]
+  W["the outside world: LLM, ERP, supplier"]
+  S --> C
+  C -->|"1. is there a record for this name?"| L
+  L -->|"no record"| W
+  W -->|"2. result"| C
+  C -->|"3. append name, input, output BEFORE moving on"| L
+  C -->|"4. return the value"| S

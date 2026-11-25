@@ -1,0 +1,59 @@
+{
+  "type": "line",
+  "title": "Illustration of the shape: the ends are recalled, the middle is not",
+  "x_label": "position of the item in the context (1 = first, 10 = last)",
+  "y_label": "illustrative recall (%)",
+  "series": [
+    {
+      "name": "illustrative recall by position (not measured data)",
+      "x": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "y": [
+        95,
+        82,
+        68,
+        58,
+        52,
+        50,
+        55,
+        66,
+        80,
+        92
+      ],
+      "style": "line"
+    }
+  ],
+  "annotate": [
+    {
+      "x": 1,
+      "y": 95,
+      "text": "primacy",
+      "dx": 18,
+      "dy": 12
+    },
+    {
+      "x": 10,
+      "y": 92,
+      "text": "recency",
+      "dx": -60,
+      "dy": 14
+    },
+    {
+      "x": 6,
+      "y": 50,
+      "text": "lost in the middle (50%)",
+      "dx": -30,
+      "dy": 48
+    }
+  ]
+}

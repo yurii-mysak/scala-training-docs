@@ -1,0 +1,14 @@
+flowchart TD
+  STORE["CLAUDE.md on disk - outside the window, outlives the session"]
+  NEW["your next message"]
+  subgraph WIN["THE CONTEXT WINDOW - fixed size - this is all that exists"]
+    direction TB
+    HEAD["FRONT: system prompt, CLAUDE.md, the first thing you said - HIGH attention (primacy)"]
+    MID["MIDDLE: turn 18, tool results, the constraint you typed once - LOW attention"]
+    TAIL["BACK: the last few turns and the current request - HIGH attention (recency)"]
+    HEAD --> MID --> TAIL
+  end
+  STORE -->|"re-read and placed at the front of every new session"| HEAD
+  NEW --> TAIL
+  HEAD -.->|"over capacity: the oldest chat turns go first"| CUT["SILENT TRUNCATION - dropped, no error, no warning"]
+  CUT -.-> GONE["gone: the model answers as if it was never said"]

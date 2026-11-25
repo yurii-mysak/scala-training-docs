@@ -1,0 +1,7 @@
+flowchart TD
+  T3["turn 3 in chat: 'never touch files under vendor/' - 120 tokens, oldest"]
+  CM["CLAUDE.md: 'never touch files under vendor/' - 120 tokens, pinned"]
+  COMP["compaction at turn 7: 1320 tokens over capacity, oldest first"]
+  PIN["re-sent at the front on every turn, so never the oldest"]
+  T3 --> COMP --> OUT["rule evicted: run A answers with vendor/ fair game"]
+  CM --> PIN --> IN["rule still present at turn 8: run B refuses to touch vendor/"]

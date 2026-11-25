@@ -1,0 +1,20 @@
+{
+  "type": "line",
+  "title": "The cliff: at turn 7 the window stops growing and the oldest turn is dropped",
+  "x_label": "turn of the session (run A, rule stated in chat on turn 1)",
+  "y_label": "tokens",
+  "series": [
+    {"name": "written so far (if nothing were evicted)",
+     "x": [1, 2, 3, 4, 5, 6, 7, 8],
+     "y": [1920, 4320, 5220, 8320, 11120, 18720, 21320, 21620],
+     "style": "dashed"},
+    {"name": "actually in the window after compaction",
+     "x": [1, 2, 3, 4, 5, 6, 7, 8],
+     "y": [1920, 4320, 5220, 8320, 11120, 18720, 18800, 19100],
+     "style": "line"}
+  ],
+  "hline": {"y": 20000, "label": "window capacity 20000"},
+  "annotate": [
+    {"x": 7, "y": 18800, "text": "rule evicted here (2520 tokens dropped)", "dx": -150, "dy": -55}
+  ]
+}

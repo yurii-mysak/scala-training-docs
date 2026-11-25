@@ -1,0 +1,8 @@
+flowchart TD
+  H["haystack: a long book excerpt, 1K to 128K tokens"] --> X["one needle sentence placed at a known depth"]
+  X --> N["needle, illustration: 'Elena's flat overlooks the Semperoper'"]
+  Q2["question: 'Which character has been to Dresden?'"] --> J["no word is shared between question and needle"]
+  N --> L["the model must infer the latent association"]
+  J --> L
+  L --> SC["score at that length, averaged over needle placements"]
+  SC --> T["effective length: the largest length still at or above 0.85 x base"]

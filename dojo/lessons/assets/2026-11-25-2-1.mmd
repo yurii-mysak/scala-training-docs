@@ -1,0 +1,14 @@
+flowchart TD
+  P["prompt: 40K tokens"] --> S["start: system prompt and instructions"]
+  P --> M["middle: the 30K tokens you pasted"]
+  P --> E["end: your actual question"]
+  E --> Q["query vector q at position n"]
+  S --> K1["key vector k near position 0"]
+  M --> K2["key vector k near position n/2"]
+  Q --> D["RoPE rotates q and k by an angle proportional to position"]
+  K1 --> D
+  K2 --> D
+  D --> R["the surviving dot product shrinks as the position gap grows"]
+  R --> W["middle keys carry the weakest positional signal"]
+  W --> F["a fact in the middle loses the attention competition"]
+  G["QGPM reshapes the RoPE positions using query relevance from the model's own heads"] --> D

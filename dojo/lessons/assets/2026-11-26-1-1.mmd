@@ -1,0 +1,12 @@
+flowchart TD
+    A0["MODE 1 - database"] --> A1["v2 process encodes and writes"]
+    A1 -->|"bytes outlive the code"| A2["v1 process decodes it later"]
+    A2 -->|"reader needs FORWARD compat"| A3["v1 rewrites the record"]
+    A3 -->|"unknown fields must survive"| A4["row read again by v2"]
+    B0["MODE 2 - service call"] --> B1["old client encodes a request"]
+    B1 -->|"request: server needs BACKWARD compat"| B2["new server, upgraded first"]
+    B2 -->|"response: client needs FORWARD compat"| B3["old client decodes the reply"]
+    C0["MODE 3 - message broker"] --> C1["producer encodes a message"]
+    C1 -->|"broker keeps opaque bytes"| C2["queue or topic"]
+    C2 -->|"consumers of mixed versions decode"| C3["consumer, may republish"]
+    C3 -->|"preserve unknown fields"| C2

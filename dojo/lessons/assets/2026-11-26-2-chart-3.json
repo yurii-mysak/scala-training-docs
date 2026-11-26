@@ -1,0 +1,38 @@
+{
+  "type": "hbar",
+  "title": "Table 1 replicated: cost per name, and how hard a repeating client retries",
+  "x_label": "queries",
+  "categories": [
+    "positive answer",
+    "NXDOMAIN",
+    "NOERROR/NODATA",
+    "SERVFAIL",
+    "REFUSED",
+    "no response"
+  ],
+  "series": [
+    {
+      "name": "average queries per test",
+      "y": [
+        3.43,
+        4.4,
+        3.93,
+        51.73,
+        11.47,
+        83.46
+      ]
+    },
+    {
+      "name": "average repeats per repeating test",
+      "y": [
+        3.8,
+        6.03,
+        4.57,
+        51.29,
+        16.32,
+        83.38
+      ]
+    }
+  ],
+  "value_fmt": "%.2f"
+}

@@ -1,0 +1,31 @@
+{
+  "type": "bar",
+  "title": "Saying no costs 4.40 queries; saying SERVFAIL or nothing costs 52 and 83",
+  "x_label": "response the authoritative server gave",
+  "y_label": "DNS queries per single name resolution",
+  "categories": [
+    "positive\nanswer",
+    "NXDOMAIN",
+    "NOERROR/\nNODATA",
+    "SERVFAIL",
+    "REFUSED",
+    "no\nresponse"
+  ],
+  "series": [
+    {
+      "name": "queries per test",
+      "y": [
+        3.43,
+        4.4,
+        3.93,
+        51.73,
+        11.47,
+        83.46
+      ]
+    }
+  ],
+  "value_fmt": "%.2f",
+  "hline": {
+    "y": 1.87
+  }
+}

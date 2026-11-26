@@ -1,0 +1,8 @@
+{
+  "type": "hbar",
+  "title": "Under SERVFAIL or silence, almost no resolution finishes in one query",
+  "x_label": "share of tests answered by a single query (%)",
+  "categories": ["no response", "SERVFAIL", "REFUSED", "NOERROR/NODATA", "positive answer", "NXDOMAIN"],
+  "series": [{"name": "single-query tests", "y": [2.2, 2.7, 41.3, 55.4, 57.8, 58.2]}],
+  "value_fmt": "%.1f%%"
+}

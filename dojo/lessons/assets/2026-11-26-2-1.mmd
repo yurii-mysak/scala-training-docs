@@ -1,0 +1,18 @@
+flowchart TD
+  APP["Application asks for one name"] --> STUB["Stub resolver on the host"]
+  STUB --> Q1["Query 1, arm 1s timer"]
+  Q1 -->|"timer fires, still no answer"| Q2["Query 2, arm 2s timer"]
+  Q2 -->|"timer fires, still no answer"| Q3["Query 3, arm 4s timer"]
+  Q3 -->|"up to 5 queries, 10s cap"| Q4["Switch resolver, ask every one configured"]
+  Q1 --> REC["Recursive resolver"]
+  Q2 --> REC
+  Q3 --> REC
+  Q4 --> REC
+  REC --> CACHE{"Answer already cached?"}
+  CACHE -->|"yes, within TTL"| HIT["Nothing leaves the resolver"]
+  CACHE -->|"no"| WALK["Walk the delegation: root, then TLD, then authoritative"]
+  WALK --> AUTH["Authoritative servers 1..N"]
+  AUTH -->|"NXDOMAIN: definitive, has a TTL, cacheable"| DONE["Terminal. 4.40 queries per name"]
+  AUTH -->|"SERVFAIL or silence: says nothing, no TTL"| RETRY["Not terminal: re-query, then try the next server"]
+  RETRY --> WALK
+  RETRY --> BAD["51.73 queries per name, 83.46 when silent"]

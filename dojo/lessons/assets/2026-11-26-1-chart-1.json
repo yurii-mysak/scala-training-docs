@@ -1,0 +1,8 @@
+{
+  "type": "bar",
+  "title": "A naive v1 round trip drops 2 of 4 fields; serde flatten keeps all 4",
+  "x_label": "stored record after each step of the lab",
+  "y_label": "top-level fields in the stored JSON",
+  "categories": ["1 - v2 wrote", "2 - v1 Customer rewrote", "3 - v1 CustomerKeep rewrote"],
+  "series": [{"name": "fields present", "y": [4, 2, 4]}]
+}

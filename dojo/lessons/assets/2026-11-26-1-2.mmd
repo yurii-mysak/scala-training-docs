@@ -1,0 +1,6 @@
+flowchart TD
+    V2["v2 code adds a loyaltyTier field"] -->|"writes"| REC1["row: id, name, loyaltyTier"]
+    REC1 -->|"read by a v1 node mid-upgrade"| OBJ["Customer object: id and name only"]
+    OBJ -->|"v1 renames and writes the object back"| REC2["row: id, name"]
+    REC2 --> GONE["loyaltyTier gone, no error anywhere"]
+    GONE --> V2B["v2 reads the row and sees no tier"]

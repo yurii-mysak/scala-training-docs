@@ -1,0 +1,11 @@
+flowchart TD
+  H["human: drafts and owns the rows"] --> D["contract.psv - the data table"]
+  D --> P["parser - a dozen lines, no library"]
+  P --> R["runner - the test adapter"]
+  R --> S["system under test"]
+  S --> O["actual value or error"]
+  O --> C["compare against the row's expected"]
+  C --> V["one line per row - PASS or FAIL"]
+  A["coding agent"] -.->|may rewrite| S
+  A -.->|may rewrite| R
+  A -.->|must not touch| D

@@ -1,0 +1,11 @@
+{
+  "type": "bar",
+  "title": "Add passes -6.00 on unchanged; multiply switches it to -18 at w, -12 at x",
+  "x_label": "node of the graph, output on the left, leaves on the right",
+  "y_label": "dL/dnode after one backward pass",
+  "categories": ["L sq", "resid sub", "pred add", "wx mul", "b leaf", "x leaf", "w leaf"],
+  "series": [
+    {"name": "gradient", "x": [0, 1, 2, 3, 4, 5, 6], "y": [1.0, -6.0, -6.0, -6.0, -6.0, -12.0, -18.0]}
+  ],
+  "value_fmt": "%.2f"
+}

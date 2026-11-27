@@ -1,0 +1,8 @@
+flowchart TD
+  X2["x: value 3.00, grad -8.00"] --> M2["multiply, the switcher: value -12.00, grad 2.00"]
+  Y2["y: value -4.00, grad 6.00"] --> M2
+  Z2["z: value 2.00, grad 2.00"] --> MX["max, the router: value 2.00, grad 2.00"]
+  W2["w: value -1.00, grad 0.00"] --> MX
+  M2 --> A2["add, the distributor: value -10.00, grad 2.00"]
+  MX --> A2
+  A2 --> O2["times 2: value -20.00, grad seed 1.00"]

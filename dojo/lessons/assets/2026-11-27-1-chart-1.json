@@ -1,0 +1,49 @@
+{
+  "type": "line",
+  "title": "Gradient checking is a V: best at h = 1e-5, round-off ruins it below",
+  "x_label": "finite-difference step  h = 10^-k  (k on this axis)",
+  "y_label": "relative error of dLt/dw",
+  "log_y": true,
+  "series": [
+    {
+      "name": "tanh neuron loss, central difference vs analytic",
+      "x": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "y": [
+        0.0006866,
+        6.89e-06,
+        6.89e-08,
+        6.876e-10,
+        5.526e-12,
+        7.111e-11,
+        1.078e-10,
+        3.47e-09,
+        1.048e-07,
+        2.241e-07,
+        7.379e-06,
+        0.0001238
+      ]
+    }
+  ],
+  "annotate": [
+    {
+      "x": 5,
+      "y": 5.526e-12,
+      "text": "h = 1e-5: 5.5e-12",
+      "dx": -45,
+      "dy": 105
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+flowchart TD
+  AD["test runner - the adapter"] -->|reads| DC["contract rows in domain language"]
+  AD -->|drives| IMPL["implementation the agent rewrites"]
+  AD -->|seeds and inspects state via| SC["side channel - a test-only port"]
+  SC -->|exposed by| IMPL

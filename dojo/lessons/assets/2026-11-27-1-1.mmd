@@ -1,0 +1,9 @@
+flowchart TD
+  W["leaf w: value 2.0, grad -18.0"] --> MUL
+  X["leaf x: value 3.0, grad -12.0"] --> MUL
+  MUL["multiply wx: value 6.0, grad -6.0"] --> ADD
+  B["leaf b: value 1.0, grad -6.0"] --> ADD
+  ADD["add pred: value 7.0, grad -6.0"] --> SUB
+  Y["leaf y: value 10.0, grad 6.0"] --> SUB
+  SUB["subtract resid: value -3.0, grad -6.0"] --> SQ
+  SQ["square L: value 9.0, grad seed 1.0"]

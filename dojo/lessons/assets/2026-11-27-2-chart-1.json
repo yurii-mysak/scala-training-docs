@@ -1,0 +1,12 @@
+{
+  "type": "bar",
+  "title": "Only the untouched data table catches the agent's 2 behaviour changes",
+  "x_label": "where the expected values live",
+  "y_label": "contract rows (of 5)",
+  "categories": ["tests as code\n(agent regenerated it)", "tests as data\n(table untouched)"],
+  "series": [
+    {"name": "behaviour changes caught", "y": [0, 2]},
+    {"name": "changes silently accepted", "y": [2, 0]},
+    {"name": "rows reported PASS", "y": [5, 3]}
+  ]
+}

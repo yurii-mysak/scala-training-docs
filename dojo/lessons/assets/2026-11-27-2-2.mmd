@@ -1,0 +1,6 @@
+flowchart TD
+  G["GIVEN model - seed the starting state"] --> W["WHEN user - a command in the customer's words"]
+  W --> TP["THEN page - the screen, printed as diffable text"]
+  W --> TM["THEN model - the state the command should leave behind"]
+  SC["side channel - seeds and reads state, never ships"] -.-> G
+  SC -.-> TM

@@ -1,0 +1,10 @@
+{
+  "type": "heatmap",
+  "title": "Per row: the two rows the agent's test-code update silenced",
+  "x_label": "suite",
+  "y_label": "contract row",
+  "matrix": [[1, 1], [1, 1], [1, 1], [1, 0], [1, 0]],
+  "row_labels": ["default_name", "explicit_name", "farewell_named", "blank_name", "unknown_resource"],
+  "col_labels": ["tests as code", "tests as data"],
+  "value_names": {"0": "FAIL reported", "1": "PASS"}
+}

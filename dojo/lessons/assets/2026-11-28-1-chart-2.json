@@ -1,0 +1,35 @@
+{
+  "type": "bar",
+  "title": "Plain modulo over-weights the low third; retrying restores 25% per quarter",
+  "x_label": "quarter of [0, 1500000000), 20000 draws from SimpleRNG(42)",
+  "y_label": "share of draws landing in that quarter (%)",
+  "categories": [
+    "0 to 375M",
+    "375M to 750M",
+    "750M to 1125M",
+    "1125M to 1500M"
+  ],
+  "series": [
+    {
+      "name": "naive: map(nonNegativeInt)(_ % n)",
+      "y": [
+        34.9,
+        30.3,
+        17.4,
+        17.5
+      ]
+    },
+    {
+      "name": "book: flatMap + retry (nonNegativeLessThan)",
+      "y": [
+        25.2,
+        25.1,
+        24.9,
+        24.9
+      ]
+    }
+  ],
+  "hline": {
+    "y": 25.0
+  }
+}

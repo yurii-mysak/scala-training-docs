@@ -1,0 +1,6 @@
+flowchart TD
+  S["current state rng_k"] --> A["nonNegativeInt gives (i, rng_k+1)"]
+  A --> T{"i + (n-1) - (i % n) >= 0 ?"}
+  T -->|"yes: no Int overflow, i is in a full block"| U["unit(i % n): value out, rng_k+1 out"]
+  T -->|"no: i is in the short tail"| B["call nonNegativeLessThan(n) again from rng_k+1"]
+  B --> A

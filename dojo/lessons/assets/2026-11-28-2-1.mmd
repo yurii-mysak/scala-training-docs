@@ -1,0 +1,9 @@
+flowchart TD
+  C["companion requests: contents and lengths you do not control"] --> BW["padded batch width, chosen from the longest request in the group"]
+  BW --> SH["the tensor shapes the kernels see for your request"]
+  SH --> RO["the tiling, and therefore the reduction order, inside matmul and softmax"]
+  RO --> FP["float addition is not associative, so the partial sums land differently"]
+  FP --> LG["your logits move by roughly one unit in the last place"]
+  LG --> AM{"is the gap between the top two logits bigger than that move?"}
+  AM -->|"yes"| SAME["same token, same output"]
+  AM -->|"no"| DIFF["a different token, and every token after it diverges"]

@@ -1,0 +1,55 @@
+{
+  "type": "bar",
+  "title": "Same seed, same five numbers: the pure RNG repeats, Random(42) does not",
+  "x_label": "draw number within the batch of five",
+  "y_label": "value drawn, 0..99",
+  "categories": [
+    "draw 1",
+    "draw 2",
+    "draw 3",
+    "draw 4",
+    "draw 5"
+  ],
+  "series": [
+    {
+      "name": "pure Rand, SimpleRNG(42), pass 1",
+      "y": [
+        53,
+        96,
+        1,
+        19,
+        18
+      ]
+    },
+    {
+      "name": "pure Rand, SimpleRNG(42), pass 2",
+      "y": [
+        53,
+        96,
+        1,
+        19,
+        18
+      ]
+    },
+    {
+      "name": "scala.util.Random(42), pass 1",
+      "y": [
+        30,
+        63,
+        48,
+        84,
+        70
+      ]
+    },
+    {
+      "name": "scala.util.Random(42), pass 2",
+      "y": [
+        25,
+        5,
+        18,
+        19,
+        93
+      ]
+    }
+  ]
+}

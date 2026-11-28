@@ -1,0 +1,10 @@
+flowchart TD
+  G["a group of B requests, length class width W, W a multiple of L = 64"]
+  G --> R["BlockLock-Rows: one tensor of shape B by W"]
+  G --> P["BlockLock-Pack: one packed block of 1 by P, where P = B times W"]
+  R --> R1["each request sits in its own fixed-width row, left-padded, with an attention mask over the real tokens"]
+  R1 --> R2["the target keeps the same row index and the same logical positions whoever its companions are"]
+  R2 --> R3["one prefill for all rows, then the ordinary batched decode"]
+  P --> P1["companions first, then an isolated dummy segment, then the target last"]
+  P1 --> P2["the target occupies a fixed interval ending at position P, under a segment-causal mask with per-segment local positions"]
+  P2 --> P3["after prefill the target's KV state is extracted and it decodes on its own"]

@@ -151,3 +151,5 @@
 {"ts": "2026-11-27T06:53:55Z", "event": "sent", "lesson": "2026-11-27-1", "by": "job", "note": "core · ai-ml-13"}
 {"ts": "2026-11-27T07:01:27Z", "event": "sent", "lesson": "2026-11-27-2", "by": "job", "note": "fresh · architecture"}
 {"ts": "2026-11-27T07:18:58Z", "event": "sent", "lesson": null, "by": "job", "note": "day 43: 2026-11-27-1, 2026-11-27-2"}
+{"ts": "2026-11-28T06:54:08Z", "event": "sent", "lesson": "2026-11-28-1", "by": "job", "note": "core · fp-scala-08"}
+{"ts": "2026-11-28T06:56:16Z", "event": "sent", "lesson": "2026-11-28-2", "by": "job", "note": "fresh · ai-ml"}

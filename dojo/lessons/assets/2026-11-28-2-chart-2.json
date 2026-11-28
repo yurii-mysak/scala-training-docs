@@ -1,0 +1,71 @@
+{
+  "type": "line",
+  "title": "Four reduction orders, four logits, and one wrong argmax",
+  "x_label": "reduction order:  1 sequential  2 tiles of 4  3 tiles of 8  4 reversed",
+  "y_label": "logit value (Float)",
+  "series": [
+    {
+      "name": "token A, exact value 18.800",
+      "x": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "y": [
+        18.800001,
+        18.875,
+        18.825001,
+        18.75
+      ]
+    },
+    {
+      "name": "token B, exact value 19.000",
+      "x": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "y": [
+        18.9,
+        18.75,
+        19.0,
+        19.125
+      ]
+    },
+    {
+      "name": "exact value of A",
+      "x": [
+        1,
+        4
+      ],
+      "y": [
+        18.8,
+        18.8
+      ],
+      "style": "dashed"
+    },
+    {
+      "name": "exact value of B",
+      "x": [
+        1,
+        4
+      ],
+      "y": [
+        19.0,
+        19.0
+      ],
+      "style": "dashed"
+    }
+  ],
+  "annotate": [
+    {
+      "x": 2,
+      "y": 18.875,
+      "text": "tiles of 4 pick A, wrongly",
+      "dx": 12,
+      "dy": 24
+    }
+  ]
+}

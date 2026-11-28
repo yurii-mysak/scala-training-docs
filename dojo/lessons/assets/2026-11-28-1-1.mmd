@@ -1,0 +1,7 @@
+flowchart TD
+  R0["rng0 = SimpleRNG(42)"] --> N1["nextInt: newSeed = seed * 0x5DEECE66D + 11, masked to 48 bits"]
+  N1 --> P1["returns (16159453, rng1 = SimpleRNG(1059025964525))"]
+  P1 --> N2["nextInt on rng1"]
+  N2 --> P2["returns (-1281479697, rng2 = SimpleRNG(197491923327988))"]
+  R0 -.->|"call nextInt on rng0 a second time: same pair"| P1
+  P2 --> M2["map2(ra, rb)(f) hides this chain: ra gets rng0, rb gets rng1, result is (f(a, b), rng2)"]

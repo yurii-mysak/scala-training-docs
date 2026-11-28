@@ -1,0 +1,13 @@
+{
+  "type": "line",
+  "title": "Padded batching loses agreement as the batch grows; BlockLock does not",
+  "x_label": "batch size B (TP=2, two A6000s, Gemma-3-4B)",
+  "y_label": "target sequence agreement (%)",
+  "series": [
+    {"name": "padded batching", "x": [1, 2, 4, 8], "y": [100.0, 72.4, 43.6, 21.8]},
+    {"name": "BlockLock-Rows and BlockLock-Pack", "x": [1, 2, 4, 8], "y": [100.0, 100.0, 100.0, 100.0]}
+  ],
+  "annotate": [
+    {"x": 8, "y": 21.8, "text": "21.8% at B=8", "dx": -95, "dy": 25}
+  ]
+}
